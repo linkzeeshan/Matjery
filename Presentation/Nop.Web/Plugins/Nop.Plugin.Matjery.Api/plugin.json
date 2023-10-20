@@ -1,0 +1,11 @@
+﻿{
+  "Group": "Matjery",
+  "FriendlyName": "Api plugin",
+  "SystemName": "Nop.Plugin.Matjery.Api",
+  "Version": "4.3.0",
+  "SupportedVersions": [ "4.30" ],
+  "Author": "maqta gateway",
+  "DisplayOrder": 1,
+  "FileName": "Nop.Plugin.Matjery.Api.dll",
+  "Description": "This plugin is Restfull API for matjery"
+}

@@ -1,0 +1,81 @@
+﻿@model UrbanThemeSettingsModel
+
+@{
+    Layout = AdminViewLocations.AdminLayoutViewPath;
+
+    Html.AppendCssFileParts("~/Plugins/SevenSpikes.Core/Areas/Admin/Content/Styles/adminstyles.css");
+    Html.AddCssFileParts("~/Plugins/SevenSpikes.Theme.Urban/Areas/Admin/Content/Styles/adminStyle.css");
+    Html.AddScriptParts("~/Plugins/SevenSpikes.Theme.Urban/Areas/Admin/Content/Scripts/admin.min.js");
+
+    Html.SetActiveMenuItemSystemName("SevenSpikes.Themes.Admin.SettingsSubmenu.Urban");
+}
+
+<form method="post">
+    <nop-antiforgery-token />
+
+    <script type="text/javascript">
+        $(document)
+            .ready(function() {
+                $("#@Html.IdFor(model => model.LogoImageId_OverrideForStore)").change(logoOverrideChanged);
+                $("#@Html.IdFor(model => model.HomepageCategoriesIds_OverrideForStore)").change(homePageCategoriesOverrideChanged);
+
+                $('.store-scope-configuration .checkbox input').change(function () {
+                    homePageCategoriesOverrideChanged();
+                    logoOverrideChanged();
+                });
+
+                homePageCategoriesOverrideChanged();
+                logoOverrideChanged();
+
+                bindBootstrapTabSelectEvent('urban-settings-edit');
+            });
+
+        function logoOverrideChanged() {
+            if ($('#@Html.IdFor(model => model.LogoImageId_OverrideForStore)').length == 0) {
+                return;
+            }
+
+            if ($('#@Html.IdFor(model => model.LogoImageId_OverrideForStore)').is(':checked') == true) {
+                $(".upload-image-overlay").remove();
+            } else {
+                $('#logo-image').append("<div class=\"upload-image-overlay\"></div>");
+            }
+        }
+
+        function homePageCategoriesOverrideChanged() {
+            if ($('#@Html.IdFor(model => model.HomepageCategoriesIds_OverrideForStore)').length == 0) {
+                return;
+            }
+
+            if ($('#@Html.IdFor(model => model.HomepageCategoriesIds_OverrideForStore)').is(':checked') == true) {
+                $(".pluginSettings.home-categories").show();
+            } else {
+                $('.pluginSettings.home-categories').hide();
+            }
+        }
+    </script>
+
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @T("SevenSpikes.Themes.Urban.Admin.Settings")
+        </h1>
+        <div class="pull-right">
+
+            @await Html.PartialAsync(AdminViewLocations.AdminResetDefaultSettingsViewPath, Plugin.FolderName)
+            <button type="submit" name="save" class="btn bg-blue">
+                <i class="fa fa-floppy-o"></i>
+                @T("Admin.Common.Save")
+            </button>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="form-horizontal">
+            @await Component.InvokeAsync("StoreScopeConfiguration")
+            <nop-tabs id="urban-settings-edit" data-logoImageId="#@Html.IdFor(model => model.LogoImageId_OverrideForStore)" >
+                <nop-tab asp-name="tab-info" asp-title="@T("SevenSpikes.Themes.Urban.Admin.TabTitle.GeneralSettings")" asp-default="true">@await Html.PartialAsync("_Settings.General", Model)</nop-tab>
+                <nop-tab asp-name="tab-seo" asp-title="@T("SevenSpikes.Themes.Urban.Admin.TabTitle.AdditionalSettings")">@await Html.PartialAsync("_Settings.Additional", Model)</nop-tab>
+            </nop-tabs>
+        </div>
+    </div>
+</form>  

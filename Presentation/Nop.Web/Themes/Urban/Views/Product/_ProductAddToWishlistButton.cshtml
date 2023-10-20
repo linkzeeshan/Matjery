@@ -1,0 +1,35 @@
+﻿@model ProductDetailsModel.AddToCartModel
+@using Nop.Core.Domain.Orders
+@using Nop.Core
+@using Nop.Services.Orders
+
+@inject IWorkContext workContext
+@inject IStoreContext storeContext
+@inject IShoppingCartService shoppingCartService
+
+@if (!Model.DisableWishlistButton && Model.UpdatedShoppingCartItemId == 0)
+{
+    var quantity = 1;
+    var addtowishlistlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = Model.ProductId, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity });
+
+    var shoppingCartItems = shoppingCartService.GetShoppingCart(workContext.CurrentCustomer, ShoppingCartType.Wishlist, storeContext.CurrentStore.Id);
+    var currentProductInWishList = shoppingCartItems
+         .Where(sci => sci.ProductId == Model.ProductId)
+         .LimitPerStore(storeContext.CurrentStore.Id)
+         .FirstOrDefault();
+
+    Model.IsAddedToWishlist = currentProductInWishList != null ? true : false;
+
+
+    @*<div class="add-to-wishlist">
+            <input type="button" id="add-to-wishlist-button-@Model.ProductId" class="button-2 add-to-wishlist-button" value="@T("ShoppingCart.AddToWishlist")" data-productid="@Model.ProductId" onclick="AjaxCart.addproducttocart_details('@Url.RouteUrl("AddProductToCart-Details", new { productId = Model.ProductId, shoppingCartTypeId = (int)ShoppingCartType.Wishlist })', '#product-details-form');return false;" />
+        </div>*@
+    @*<div class="add-to-wishlist">
+        <input type="button" class="button-2 add-to-wishlist-button@(Model.IsAddedToWishlist ? " added" : "")" value="@T("ShoppingCart.AddToWishlist")" title="@T("ShoppingCart.AddToWishlist")" data-productid="@Model.Id" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink',this,false);return false;" />
+    </div>*@
+    <div class="add-to-wishlist">
+        <input type="button" id="add-to-wishlist-button-@Model.ProductId" class="button-2 add-to-wishlist-button@(Model.IsAddedToWishlist ? " added" : "")" value="@T("ShoppingCart.AddToWishlist")" data-productid="@Model.ProductId" onclick="AjaxCart.addproducttocart_catalog('@addtowishlistlink',this,false);return false;" />
+    </div>
+
+}
+}

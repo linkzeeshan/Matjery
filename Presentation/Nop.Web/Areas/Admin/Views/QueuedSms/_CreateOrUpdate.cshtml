@@ -1,0 +1,88 @@
+﻿@model Nop.Web.Areas.Admin.Models.Sms.QueuedSmsModel
+@inherits Nop.Web.Framework.Mvc.Razor.NopRazorPage<TModel>
+
+@Html.ValidationSummary(true)
+@Html.HiddenFor(model => model.Id)
+
+<div class="content">
+    <div class="form-horizontal">
+        <div class="panel-group">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="PriorityName" />
+                        </div>
+                        <div class="col-md-9">
+                            @Html.HiddenFor(model => model.PriorityName)
+                            <div class="form-text-row">@Model.PriorityName</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="Message" />
+                        </div>
+                        <div class="col-md-9">
+                            @Html.TextAreaFor(model => model.Message, 10, 12, new { style = "width: 100%;" })
+                            @Html.ValidationMessageFor(model => model.Message)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="PhoneNumber" />
+                        </div>
+                        <div class="col-md-9">
+                            @Html.HiddenFor(model => model.PhoneNumber)
+                            <div class="form-text-row">@Model.PhoneNumber</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="IsRtl" />
+                        </div>
+                        <div class="col-md-9">
+                            @Html.HiddenFor(model => model.IsRtl)
+                            <div class="form-text-row">@Model.IsRtl</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="CreatedOn" />
+                        </div>
+                        <div class="col-md-9">
+                            @Html.HiddenFor(model => model.CreatedOn)
+                            <div class="form-text-row">@Model.CreatedOn</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="SentTries" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="SentTries" />
+                            @Html.ValidationMessageFor(model => model.SentTries)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="SentOn" />
+                        </div>
+                        <div class="col-md-9">
+                            @if (Model.SentOn.HasValue)
+                            {
+                                @Html.HiddenFor(model => model.SentOn)
+                                <div class="form-text-row">@Model.SentOn</div>
+                            }
+                            else
+                            {
+                                <label class="control-label">
+                                    @T("Admin.System.QueuedSmss.Fields.SentOn.NotSent")
+                                </label>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

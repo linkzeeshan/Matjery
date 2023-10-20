@@ -1,0 +1,15 @@
+﻿@using Nop.Web.Framework.UI
+@using Nop.Core.Infrastructure
+@using Nop.Core
+
+@{
+    Layout = "";
+
+    Html.AddCssFileParts("~/Plugins/ExternalAuth.Google/Content/googlestyles.css");
+    var lang = EngineContext.Current.Resolve<IWorkContext>().WorkingLanguage.UniqueSeoCode;
+}
+<div class="google-login-block">
+    <div class="buttons">
+        <a asp-controller="GoogleAuthentication" asp-action="login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" class="google-btn"  style="background-image: url('plugins/ExternalAuth.Google/content/images/google-signing-@(lang).png');"></a>
+    </div>
+</div>

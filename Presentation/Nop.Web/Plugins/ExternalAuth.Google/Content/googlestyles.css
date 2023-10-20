@@ -1,0 +1,16 @@
+﻿.foo {
+}
+/*.google-login-block{display:inline;float:left;margin:5px;}*/
+.google-btn {
+    display: inline-block;
+    /*background-image: url('images/google-signing.png');*/
+    background-repeat: no-repeat;
+    width: 154px;
+    height: 24px;
+    /*margin: 0 20px;*/
+}
+
+.google-login-block .buttons {
+    display: flex;
+    align-items: center;
+}

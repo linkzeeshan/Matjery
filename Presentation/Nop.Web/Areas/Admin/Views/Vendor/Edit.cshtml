@@ -1,0 +1,79 @@
+@using Microsoft.AspNetCore.Http
+@model VendorModel
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@{
+    //page title
+    ViewBag.PageTitle = T("Admin.Vendors.EditVendorDetails").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Vendors");
+   
+    @*if (HttpContextAccessor.HttpContext.Request.Cookies["visitedVendor"] != null)
+    {
+        CookieOptions cookieOptions = new CookieOptions();            
+        cookieOptions.Response.Append("visitedVendor", cookieOptions);
+        cookieOptions.Expires = new DateTimeOffset(DateTime.Now.AddDays(-1));
+    }*@
+
+}
+
+<form asp-controller="Vendor" asp-action="Edit" method="post">
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @T("Admin.Vendors.EditVendorDetails") - @Model.Name
+            <small>
+                <i class="fa fa-arrow-circle-left"></i>
+                <a asp-action="List">@T("Admin.Vendors.BackToList")</a>
+            </small>
+        </h1>
+        <div class="pull-right">
+            @if (!Model.Deleted)
+            {
+                <button type="submit" name="save" class="btn bg-blue">
+                    <i class="fa fa-floppy-o"></i>
+                    @T("Admin.Common.Save")
+                </button>
+                <button type="submit" name="save-continue" class="btn bg-blue">
+                    <i class="fa fa-floppy-o"></i>
+                    @T("Admin.Common.SaveContinue")
+                </button>
+                <span id="vendor-delete" class="btn bg-red">
+                    <i class="fa fa-trash-o"></i>
+                    @T("Admin.Common.Delete")
+                </span>
+            }
+            @if (Model.Deleted)
+            {
+                <a id="adminretrieve" href="@Url.Action("RetrieveVendor", "Vendor",new { id=Model.Id} )" data-form-method="post" class="btn bg-green">
+                    <i class="fa fa-undo"></i>
+                    @T("admin.common.retrive")
+                </a>
+               
+                <nop-action-confirmation asp-button-id="adminretrieve" />
+
+            }
+            @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.VendorDetailsButtons, additionalData = Model })
+        </div>
+    </div>
+    @await Html.PartialAsync("_CreateOrUpdate", Model)
+</form>
+<nop-delete-confirmation asp-model-id="@Model.Id" asp-button-id="vendor-delete" />
+    <script>
+        var currentPageData = [{
+            property: 'currentPage',
+            value: {
+                name: 'vendor-edit',
+                title: '@T("Admin.Vendors.EditVendorDetails").Text'
+            }
+        }];
+        window.parent.postMessage(JSON.stringify(currentPageData), '*');
+        $('#vendor-delete').click(function () {
+            var scrollAction = [{
+                property: 'scrollAction',
+                value: true,
+                cacheFix: (new Date()).getTime() + Math.floor(Math.random() * 1000000)
+            }];
+            window.parent.postMessage(JSON.stringify(scrollAction), '*');
+        });
+    </script>
+

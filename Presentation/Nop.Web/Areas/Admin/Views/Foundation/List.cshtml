@@ -1,0 +1,101 @@
+﻿@using Nop.Web.Areas.Admin.Models.Foundation
+@model FoundationSearchModel
+
+@{
+    //page title
+    ViewBag.Title = T("Admin.Foundations").Text;
+
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Foundations");
+}
+
+<div class="content-header clearfix">
+    <h1 class="pull-left">
+        @T("Admin.Foundations")
+    </h1>
+    @if (Model.IsAdmin)
+    {
+        <div class="pull-right">
+            <a href="@Url.Action("Create")" class="btn bg-blue">
+                <i class="fa fa-plus-square"></i>
+                @T("Admin.Common.AddNew")
+            </a>
+        </div>
+    }   
+
+</div>
+<div class="content">
+    <div class="form-horizontal">
+        <div class="panel-group">
+            <div class="panel panel-default panel-search">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div class="col-md-4">
+                                    <nop-label asp-for="SearchName" />
+                                </div>
+                                <div class="col-md-8">
+                                    <nop-editor asp-for="SearchName" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-8 col-md-offset-4">
+                                    <button type="button" id="search-foundation" class="btn btn-primary btn-search">
+                                        <i class="fa fa-search"></i>
+                                        @T("Admin.Common.Search")
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        @await Html.PartialAsync("Table", new DataTablesModel
+                       {
+                           Name = "foundations-grid",
+                           UrlRead = new DataUrl("List", "Foundation", null),
+                           SearchButtonId = "search-foundation",
+                           Length = Model.PageSize,
+                           LengthMenu = Model.AvailablePageSizes,
+                           Filters = new List<FilterParameter>
+                                   {
+                               new FilterParameter(nameof(Model.SearchName))
+                           },
+                           ColumnCollection = new List<ColumnProperty>
+                           {
+                               new ColumnProperty(nameof(FoundationModel.Name))
+                               {
+                                   Title = T("Admin.Foundations.Fields.Name").Text,
+                               },
+                               new ColumnProperty(nameof(FoundationModel.Email))
+                               {
+                                   Title = T("Admin.Foundations.Fields.Email").Text
+                               },
+                               new ColumnProperty(nameof(FoundationModel.PhoneNumber))
+                               {
+                                   Title = T("Admin.Foundations.Fields.PhoneNumber").Text
+                               },
+                               new ColumnProperty(nameof(FoundationModel.Id))
+                               {
+                                   Title = T("Admin.Common.Edit").Text,
+                                   Width = "100",
+                                   ClassName =  NopColumnClassDefaults.Button,
+                                   Render = new RenderButtonEdit(new DataUrl("Edit"))
+                               }
+                           }
+                       })
+                        <script>
+                            function renderTitle(data, type, row, meta) {
+                              
+                            }
+                        </script>
+                        <nop-alert asp-alert-id="deleteSelectedFailed" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

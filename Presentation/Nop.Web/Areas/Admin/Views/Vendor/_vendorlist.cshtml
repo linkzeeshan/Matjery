@@ -1,0 +1,180 @@
+﻿@model VendorSearchModel
+
+@using Nop.Core.Domain.Common
+
+@{
+    const string hideSearchBlockAttributeName = "VendorsPage.HideSearchBlock";
+    var hideSearchBlock = genericAttributeService.GetAttribute<bool>(workContext.CurrentCustomer, hideSearchBlockAttributeName);
+}
+
+
+
+<div class="content">
+    <div class="form-horizontal">
+        <div class="panel-group">
+            <div class="panel panel-default panel-search">
+                <div class="panel-body">
+                    <div class="row search-row @(!hideSearchBlock ? "opened" : "")" data-hideAttribute="@hideSearchBlockAttributeName">
+                        <div class="search-text">@T("Admin.Common.Search")</div>
+                        <div class="icon-search"><i class="fa fa-search" aria-hidden="true"></i></div>
+                        <div class="icon-collapse"><i class="fa fa-angle-down" aria-hidden="true"></i></div>
+                    </div>
+
+                    <div class="search-body @(hideSearchBlock ? "closed" : "")">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="col-md-4">
+                                        <nop-label asp-for="SearchName" />
+                                    </div>
+                                    <div class="col-md-8">
+                                        <nop-editor asp-for="SearchName" />
+                                    </div>
+                                </div>
+                            </div>
+                            @if (Model.IsAdmin)
+                            {
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="col-md-4">
+                                            <nop-label asp-for="SupportedByFoundationsLabel" />
+                                        </div>
+                                        <div class="col-md-8">
+                                            <nop-select asp-items="Model.SupportedByFoundations" />
+                                            <nop-select asp-for="SupportedByFoundationsLabel" asp-items="Model.SupportedByFoundations" />
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="row">
+                            <div class="col-md-7 col-md-offset-5">
+                                <button type="button" id="search-vendors" class="btn btn-primary btn-search">
+                                    <i class="fa fa-search"></i>
+                                    @T("Admin.Common.Search")
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    @await Html.PartialAsync("Table", new DataTablesModel
+               {
+                   Name = "vendors-grid",
+                   UrlRead = new DataUrl("List", "Vendor", null),
+
+                   SearchButtonId = "search-vendors",
+                   Length = Model.PageSize,
+                   LengthMenu = Model.AvailablePageSizes,
+                   Filters = new List<FilterParameter>
+                        {
+                            new FilterParameter(nameof(Model.SearchName)),
+                            new FilterParameter(nameof(Model.SupportedByFoundationsLabel))
+                        },
+                   ColumnCollection = new List<ColumnProperty>
+                        {
+                            new ColumnProperty(nameof(VendorModel.Name))
+                            {
+                                Title = T("Admin.Vendors.Fields.Name").Text,
+                                Width = "300"
+                            },
+
+                            new ColumnProperty(nameof(VendorModel.Email))
+                            {
+                                Title = T("Admin.Vendors.Fields.Email").Text,
+                                Width = "300",
+                                Visible=Model.IsAdmin?true:false
+                            },
+                             new ColumnProperty(nameof(VendorModel.AprovalStatus))
+                            {
+                                Title = T("Admin.Vendors.Fields.FoundationAprovalStatusId").Text,
+                                Width = "300",
+                                Render = new RenderCustom("renderColumnStatus")
+                            },
+                            new ColumnProperty(nameof(VendorModel.Id))
+                            {
+                                Title = T("Admin.Common.Aprove").Text,
+                                Visible=Model.IsFoundation?true:false,
+                                Width = "300",
+                                Render = new RenderCustom("renderapproval")
+                            },
+                             new ColumnProperty(nameof(VendorModel.Id))
+                            {
+                                Title = T("Admin.Common.Reject").Text,
+                                Width = "300",
+                                Visible=Model.IsFoundation?true:false,
+                                Render = new RenderCustom("renderrejection")
+                            },
+                             
+
+
+                            new ColumnProperty(nameof(VendorModel.CreatedOnUtc))
+                            {
+                                Title = T("Admin.Vendors.Fields.CreatedOnUtc").Text,
+                                Width = "300",
+                                Visible=Model.IsAdmin?true:false
+                            },
+                              new ColumnProperty(nameof(VendorModel.TotalBlackPoints))
+                            {
+                                Title = T("Admin.Promotions.BlackPoints").Text,
+                                Width = "300",
+                                Visible=Model.IsAdmin?true:false
+                            },
+                            new ColumnProperty(nameof(VendorModel.Active))
+                            {
+                                Title = T("Admin.Vendors.Fields.Active").Text,
+                                Width = "50",
+                                ClassName =  NopColumnClassDefaults.CenterAll,
+                                Render = new RenderBoolean(),
+                                Visible=Model.IsAdmin?true:false
+                            },
+                            new ColumnProperty(nameof(VendorModel.Id))
+                            {
+                                Title = T("Admin.Common.Edit").Text,
+                                Width = "50",
+                                ClassName =  NopColumnClassDefaults.Button,
+                                Visible=Model.IsAdmin?true:false,
+                                Render = new RenderButtonEdit(new DataUrl("Edit"))
+                            }
+                        }
+               })
+                    <script>
+                            function renderColumnStatus(data, type, row, meta) {
+                                var color;
+                                switch (row.FoundationAprovalStatusId) {
+                                    case 0:
+                                        color = 'blue';
+                                        break;
+                                    case 2:
+                                        color = 'green';
+                                        break;
+                                    case 1:
+                                        color = 'blue';
+                                        break;
+                                }
+                                return '<span class="grid-report-item ' + color + '">' + data + '</span >';
+                        }
+                        function renderapproval(data, type, row, meta) {
+                            var html = '';
+                            if (row.FoundationAprovalStatusId !== null && row.FoundationAprovalStatusId !== 2) {
+                             html += '<a class="btn bg-blue" href="">@T("Admin.Common.Aprove")</a>';
+                             }
+                           return html;
+                        }
+                        function renderrejection(data, type, row, meta) {
+                              var html = '';
+                              if (row.FoundationAprovalStatusId !== null && row.FoundationAprovalStatusId !== 1) {
+                              html += '<a class="btn bg-red" href="">@T("Admin.Common.Reject")</a>';
+                              }
+                           return html;
+                        }
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

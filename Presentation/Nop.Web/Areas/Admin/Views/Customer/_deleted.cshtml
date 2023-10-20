@@ -1,0 +1,81 @@
+﻿@model CustomerSearchModel
+
+@using Nop.Core.Domain.Common
+
+
+@*<script>
+
+    function renderRetrieveButton(data, type, row, meta) {
+        <a class="btn btn-default" href="Edit/1478"><i class="fa fa-eye"></i>View</a>
+        return '<a class="btn btn-default ' + color + '">' + data + '</span >';
+    }
+       function renderRetrieveButton(data, type, row, meta) {
+        if (confirm('@T("Admin.Common.DeleteConfirmation")')) {
+
+        }
+        return '<span class="grid-report-item ' + color + '">' + data + '</span >';
+    }
+</script>*@
+
+<div class="content">
+    <div class="form-horizontal">
+        <div class="panel-group">
+
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    @await Html.PartialAsync("Table", new DataTablesModel
+                   {
+                       Name = "deleted-grid",
+
+                       UrlRead = new DataUrl("deletedCustomersList", "Customer", null),
+                      
+                       Length = Model.PageSize,
+                       LengthMenu = Model.AvailablePageSizes,
+                       ColumnCollection = new List<ColumnProperty>
+                       {
+                           new ColumnProperty(nameof(CustomerModel.Id))
+                           {
+                            Title = T("Admin.Customers.Customers.Fields.CustomerId").Text,
+                            Width = "50"
+                           },
+                           new ColumnProperty(nameof(CustomerModel.Username))
+                           {
+                               Title = T("Admin.Customers.Customers.Fields.Username").Text,
+                               Width = "300"
+                           },
+                           new ColumnProperty(nameof(CustomerModel.FullName))
+                           {
+                               Title = T("Admin.Customers.Customers.Fields.FullName").Text,
+                               Width = "300"
+                           },
+                           new ColumnProperty(nameof(CustomerModel.CustomerRoleNames))
+                           {
+                               Title = T("Admin.Customers.Customers.Fields.CustomerRoles").Text,
+                               Width = "150"
+                           },
+                           new ColumnProperty(nameof(CustomerModel.Phone))
+                           {
+                               Title = T("Admin.Customers.Customers.Fields.Phone").Text,
+                               Width = "150"
+                           },
+                           new ColumnProperty(nameof(CustomerModel.CreatedOn))
+                           {
+                               Title = T("Admin.Customers.Customers.Fields.CreatedOn").Text,
+                               Width = "150"
+                           },
+                           new ColumnProperty(nameof(CustomerModel.Id))
+                           {
+                                Title = T("Admin.Common.View").Text,
+                                Width = "80",
+                                ClassName = NopColumnClassDefaults.Button,
+                                Render = new RenderButtonView(new DataUrl("Edit"))
+
+                           }
+
+                       }
+                   })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

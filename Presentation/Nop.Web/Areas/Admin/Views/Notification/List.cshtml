@@ -1,0 +1,151 @@
+﻿@model NotificationSearchModel
+@using Nop.Web.Areas.Admin.Models.Notification
+@using System.Globalization;
+@{
+    //page title
+    ViewBag.Title = T("Admin.Promotions.Notification").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Manage Notification");
+    var defaultGridPageSize = EngineContext.Current.Resolve<Nop.Core.Domain.Common.AdminAreaSettings>().DefaultGridPageSize;
+    var gridPageSizes = EngineContext.Current.Resolve<Nop.Core.Domain.Common.AdminAreaSettings>().GridPageSizes;
+}
+
+@Html.AntiForgeryToken()
+@if (Model.IsAdmin)
+{
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @T("Admin.Promotions.Notification")
+        </h1>
+        <div class="pull-right">
+            <a href="javascript:void(0);" class="btn bg-blue" data-toggle="modal" data-target="#sendemail-window">
+                <i class="fa fa-plus-square"></i>
+                @T("Admin.Common.AddNew")
+            </a>
+        </div>
+    </div>
+}
+
+<div id="sendemail-window" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="sendemail-window-title">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="sendemail-window-title">@T("Admin.Promotions.Notification.Type.header")</h4>
+            </div>
+            <div class="form-horizontal">
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="@Model." />
+                        </div>
+                        <div class="col-md-9">
+                            @*@Html.NopDropDownList("TypeId", Model.AvailableTypes)*@
+                            <nop-select data("TypeId", Model.AvailableTypes) />
+                            <nop-select asp-for="TypeId" asp-items="Model.AvailableTypes" />
+                            @Html.HiddenFor(model => model.TypeId)
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-redirect-to-action">
+                        @T("Admin.Promotions.Notification.Proceed")
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="form-horizontal">
+        <div class="panel-group">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    @await Html.PartialAsync("Table", new DataTablesModel
+               {
+                   Name = "notifications-grid",
+                   UrlRead = new DataUrl("List", "Notification", null),
+                   SearchButtonId = "search-notification",
+                   Length = Model.PageSize,
+                   LengthMenu = Model.AvailablePageSizes,
+                   Filters = new List<FilterParameter>
+                               {
+                           new FilterParameter(nameof(Model.SearchName))
+                       },
+                   ColumnCollection = new List<ColumnProperty>
+                       {
+                           new ColumnProperty(nameof(NotificationModel.Id))
+                           {
+                               Title = T("Admin.Promotions.Notification.Fields.Id").Text,
+                           },
+                           new ColumnProperty(nameof(NotificationModel.Title))
+                           {
+                               Title = T("Admin.Promotions.Notification.Fields.Title").Text
+                           },
+                           new ColumnProperty(nameof(NotificationModel.Type))
+                            {
+                                Title = T("Admin.Promotions.Notification.Fields.Type").Text,
+                                Render = new RenderCustom("renderColumnType")
+                            },
+                           new ColumnProperty(nameof(NotificationModel.CreatedOnUtc))
+                            {
+                                Title = T("Admin.Promotions.Notification.Fields.CreatedOnUtc").Text
+                            }
+                           //new ColumnProperty(nameof(PushNotificationTemplateModel.Id))
+                           //{
+                           //    Title = T("Admin.Common.Edit").Text,
+                           //    Width = "100",
+                           //    ClassName =  NopColumnClassDefaults.Button,
+                           //    Render = new RenderButtonEdit(new DataUrl("Edit"))
+                           //}
+                       }
+               })
+                    <script>
+                        function renderColumnType(data, type, row, meta) {
+                            debugger;
+                            var color;
+                            switch (row.typeId) {
+                                case 1:
+                                    color = 'yellow';
+                                    break;
+                                case 2:
+                                    color = 'green';
+                                    break;
+                            }
+                            return '<span class="grid-report-item ' + color + '">' + data + '</span >';
+                        }
+                    </script>
+                    <nop-alert asp-alert-id="deleteSelectedFailed" />
+                </div>
+                <script type="text/javascript">
+                        $(document).ready(function () {
+                            $('#search-campaigns').click(function () {
+                                var grid = $('#campaigns-grid').data('kendoGrid');
+                                grid.dataSource.page(1); //new search. Set page size to 1
+                                //grid.dataSource.read(); we already loaded the grid above using "page" function
+                                return false;
+                            });
+                        });
+
+                        $(".btn-redirect-to-action").on("click",function(){
+                            var typeId = $("#TypeId").val();
+                            if(typeId == 0)
+                                alert("@T("Admin.Promotions.Notification.Proceed.text")");
+                            var url = "@Url.Action("Create")?typeId="+typeId;
+                            window.location.href = url;
+                        });
+
+                        @*function additionalData() {
+                            var data = {
+                                StoreId: $('#@Html.IdFor(model => model.StoreId)').val()
+                            };
+                            addAntiForgeryToken(data);
+                            return data;
+                        }*@
+                </script>
+            </div>
+        </div>
+    </div>
+</div>

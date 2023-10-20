@@ -1,0 +1,54 @@
+# ASP.NET
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+
+trigger:
+- main
+- qa
+- prod
+
+pool:
+  name: DevOps - Build
+  demands: msbuild
+
+variables:
+  solution: '$(SOLUTION_FILE_PATH)'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '**\*.sln'#'$(solution)'''
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    vsVersion: '16.0'
+    msbuildArgs: '/p:DebugSymbols=false /p:DebugType=None /p:DeployOnBuild=true /p:WebPublishMethod=FileSystem /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:OutDir="$(build.artifactStagingDirectory)"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    clean: true
+    msbuildArchitecture: 'x64'
+- task: VSTest@2
+
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+  
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      # Write your PowerShell commands here.
+      
+      Remove-Item  $(Build.SourcesDirectory)\* -Recurse -Force

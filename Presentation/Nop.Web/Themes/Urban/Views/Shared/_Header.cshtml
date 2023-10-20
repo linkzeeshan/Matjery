@@ -1,0 +1,40 @@
+﻿@using Nop.Core
+@using Nop.Services.Configuration
+
+@inject IStoreContext storeContext
+@inject ISettingService settingService
+
+@{
+    var isMenuMobile = settingService.GetSettingByKey("urbanthemesettings.ismenumobile", false, storeContext.CurrentStore.Id, true);
+    var headerClass = isMenuMobile ? "mobile" : "normal";
+}
+
+<div class="header @headerClass">
+    @*@Html.ActionLink("AdminHeaderLinks", "Common")*@
+    <div style="display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;">
+        <div style="display:flex;align-items: flex-end;justify-content: flex-end;position: relative;">
+            @await Component.InvokeAsync("HeaderLinks")
+            <div class="header-menu-opener icon-menu">
+                @T("SevenSpikes.Themes.Urban.Menu.Title")
+            </div>
+        </div>
+
+        @if (isMenuMobile)
+        {
+            @await Component.InvokeAsync("Logo")
+        }
+    </div>
+
+    @*@await Component.InvokeAsync("HeaderLinks")
+
+        @if (isMenuMobile)
+        {
+            @await Component.InvokeAsync("Logo")
+        }
+
+        <div class="header-menu-opener icon-menu">@T("SevenSpikes.Themes.Urban.Menu.Title")</div>*@
+</div>

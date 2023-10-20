@@ -1,0 +1,131 @@
+﻿@using Nop.Web.Areas.Admin.Models.Messages
+@model AddProductToCampaignSearchModel
+
+@{
+    Layout = "_AdminPopupLayout";
+
+    //page title
+    ViewBag.PageTitle = T("Admin.Catalog.Categories.Products.AddNew").Text;
+}
+
+
+@if (ViewBag.RefreshPage == true)
+{
+<script>
+      
+        try {window.opener.document.forms['@(Context.Request.Query["formId"])'].@(Context.Request.Query["btnId"]).click();}
+        catch (e){}
+        window.close();
+       // window.location.href = '@ViewBag.currentPageUrl';
+</script>
+}
+else
+{
+
+<form asp-controller="Campaign" asp-action="ProductAddPopup"
+      asp-route-categoryId="@Context.Request.Query["campaignId"]"
+      asp-route-btnId="@Context.Request.Query["btnId"]"
+      asp-route-formId="@Context.Request.Query["formId"]">
+    <input asp-for="CampaignId" type="hidden" />
+    <input asp-for="DiscountPercentage" type="hidden" />
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @T("Admin.Catalog.Categories.Products.AddNew")
+        </h1>
+        <div class="pull-right">
+            &nbsp;
+        </div>
+    </div>
+    <div class="content">
+        <div class="form-horizontal">
+            <div class="panel-group">
+                <div class="panel panel-default panel-search panel-popup">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-5">
+                                        <nop-label asp-for="SearchProductName" />
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <nop-editor asp-for="SearchProductName" />
+                                    </div>
+                                </div>
+                                <div class="form-group" @(Model.AvailableCategories.SelectionIsNotPossible() ? Html.Raw("style=\"display:none\"") : null)>
+                                    <div class="col-sm-5">
+                                        <nop-label asp-for="SearchCategoryId" />
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <nop-select asp-for="SearchCategoryId" asp-items="Model.AvailableCategories" />
+                                    </div>
+                                </div>
+                                <div class="form-group" @(Model.AvailableVendors.SelectionIsNotPossible() ? Html.Raw("style=\"display:none\"") : null)>
+                                    <div class="col-sm-5">
+                                        <nop-label asp-for="SearchVendorId" />
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <nop-select asp-for="SearchVendorId" asp-items="Model.AvailableVendors" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <button type="button" id="search-products" class="btn btn-primary btn-search">
+                                    <i class="fa fa-search"></i>
+                                    @T("Admin.Common.Search")
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        @await Html.PartialAsync("Table", new DataTablesModel
+                   {
+                       Name = "products-grid",
+                       UrlRead = new DataUrl("ProductAddPopupList", "Campaign", null),
+                       SearchButtonId = "search-products",
+                       Length = Model.PageSize,
+                       LengthMenu = Model.AvailablePageSizes,
+                       Filters = new List<FilterParameter>
+    {
+                        new FilterParameter(nameof(Model.SearchProductName)),
+                        new FilterParameter(nameof(Model.SearchCategoryId)),
+                        new FilterParameter(nameof(Model.SearchVendorId))
+                        },
+                        ColumnCollection = new List<ColumnProperty>
+                            {
+                            new ColumnProperty(nameof(ProductModel.Id))
+                            {
+                            IsMasterCheckBox = true,
+                            Render = new RenderCheckBox(nameof(AddProductToCategoryModel.SelectedProductIds)),
+                            ClassName = NopColumnClassDefaults.CenterAll,
+                            Width = "50"
+                            },
+                            new ColumnProperty(nameof(ProductModel.Name))
+                            {
+                            Title = T("Admin.Catalog.Products.Fields.Name").Text
+                            },
+                            new ColumnProperty(nameof(ProductModel.Price))
+                            {
+                            Title = T("Admin.Catalog.Products.Fields.Price").Text,
+                            Width = "100"
+                            }
+                            }
+                        })
+
+                    </div>
+                    <div class="panel-footer">
+                        <button type="submit" name="save" class="btn bg-blue">
+                            <i class="fa fa-floppy-o"></i>
+                            @T("Admin.Common.Save")
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+}

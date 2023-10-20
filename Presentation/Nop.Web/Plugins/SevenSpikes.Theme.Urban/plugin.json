@@ -1,0 +1,12 @@
+﻿{
+  "Group": "7Spikes",
+  "FriendlyName": "Nop Urban Theme",
+  "SystemName": "SevenSpikes.Theme.Urban",
+  "Version": "4.3",
+  "SupportedVersions": [ "4.30" ],
+  "DependsOnSystemNames": [ "SevenSpikes.Core" ],
+  "Author": "Seven Spikes Ltd",
+  "DisplayOrder": 2,
+  "FileName": "SevenSpikes.Theme.Urban.dll",
+  "Description": "This plugin allows you to configure the Urban theme settings"
+}

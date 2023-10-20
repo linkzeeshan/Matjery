@@ -1,0 +1,86 @@
+﻿@model IList<ProductOverviewModel>
+@using Nop.Web.Models.Customer;
+@using Nop.Core;
+@using Nop.Core.Domain.Catalog;
+@using Nop.Core.Domain.Orders;
+@using Nop.Core.Infrastructure;
+@using Nop.Services.Configuration;
+@using Nop.Web.Models.Catalog;
+
+@{
+    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Vendors").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-vendor-list-page");
+}
+
+@section left
+{
+    @*@Html.Action("CustomerNavigation", "Customer", new { selectedTabId = CustomerNavigationEnum.VendorProducts })*@
+    @await Component.InvokeAsync("CustomerNavigation",new { selectedTabId = CustomerNavigationEnum.VendorProducts })
+}
+
+@using Nop.Web.Models.Catalog;
+<div class="page vendor-list-page">
+    <div class="page-title">
+        <h1>@T("Vendor.Products")</h1>
+    </div>
+    @if (Model.Count > 0)
+    {
+        <div class="product-grid home-page-product-grid">
+
+            <div class="item-grid">
+                @foreach (var item in Model)
+                {
+                    string addtocartlink = "";
+                    var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
+                    var quantity = 1;
+                    if (item.ProductPrice.ForceRedirectionAfterAddingToCart)
+                    {
+                        addtocartlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = item.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity, forceredirection = item.ProductPrice.ForceRedirectionAfterAddingToCart });
+                    }
+                    else
+                    {
+                        addtocartlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = item.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity });
+                    }
+
+                    var addtowishlistlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = item.Id, shoppingCartTypeId = (int)ShoppingCartType.Wishlist, quantity = quantity });
+                    var addtocomparelink = Url.RouteUrl("AddProductToCompare", new { productId = item.Id });
+
+                    var currentStore = EngineContext.Current.Resolve<IStoreContext>().CurrentStore;
+
+                    var catalogSettings = EngineContext.Current.Resolve<CatalogSettings>();
+
+                    var hoverEffectClass = EngineContext.Current.Resolve<ISettingService>().GetSettingByKey("urbanthemesettings.ItemBoxHoverEffect", "hover-1", currentStore.Id, true).ToLowerInvariant();
+                    <div class="item-box" style="margin:10px !important; padding:10px !important; width:25% !important">
+                        <div class="product-item @hoverEffectClass" data-productid="@item.Id">
+                            <div class="picture">
+                                <a href="@Url.RouteUrl("Product", new { SeName = item.SeName })" title="@item.DefaultPictureModel.Title">
+                                    <img alt="@item.DefaultPictureModel.AlternateText" src="@item.DefaultPictureModel.ImageUrl" title="@item.DefaultPictureModel.Title" />
+                                </a>
+                                <div class="buttons">
+                                    <div class="vertical-centering">
+                                        <div class="buttons-inner-wrapper">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="details">
+                                <h2 class="product-title">
+                                    <a href="@Url.RouteUrl("Product", new { SeName = item.SeName })">@item.Name</a>
+                                </h2>
+
+                            </div>
+                        </div>
+                        @*@Html.Partial("_ProductBox", item)*@
+                    </div>
+
+                }
+            </div>
+        </div>
+    }
+
+</div>

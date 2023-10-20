@@ -1,0 +1,37 @@
+﻿@model Tuple<CategoryModel, int>
+
+@inject IViewComponentSelector viewComponentSelector
+
+@{
+    var titleType = Model.Item1.Name.Length > 6 ? "big-title" : "small-title";
+    var evenOrOdd = Model.Item1.Name.Length % 2 == 0 ? "even" : "odd";
+}
+
+<div class="item-box box-number-@Model.Item2">
+    <div class="category-item">
+        <h2 class="title @titleType @evenOrOdd">
+            <a href="@Url.RouteUrl("Category", new { SeName = Model.Item1.SeName })" title="@Model.Item1.PictureModel.Title">
+                <strong>@Model.Item1.Name</strong>
+                <span>@T("SevenSpikes.Themes.Urban.Catalog.ShopNow")</span>
+            </a>
+        </h2>
+        <div class="picture">
+            <a href="@Url.RouteUrl("Category", new { SeName = Model.Item1.SeName })" title="@Model.Item1.PictureModel.Title">
+                @if (viewComponentSelector.SelectComponent("LazyLoadImage") != null)
+                {
+                    @await Component.InvokeAsync("LazyLoadImage", new (string Key, string Value)[]
+                    {
+                        ("src", Model.Item1.PictureModel.ImageUrl),
+                        ("alt", Model.Item1.PictureModel.AlternateText),
+                        ("title", Model.Item1.PictureModel.Title)
+                    })
+
+                }
+                else
+                {
+                    <img alt="@Model.Item1.PictureModel.AlternateText" src="@Model.Item1.PictureModel.ImageUrl" title="@Model.Item1.PictureModel.Title" />
+                }
+            </a>
+        </div>
+    </div>
+</div>

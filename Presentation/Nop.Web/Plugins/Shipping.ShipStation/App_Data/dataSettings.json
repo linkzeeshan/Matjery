@@ -1,0 +1,5 @@
+﻿{
+  "DataConnectionString": "__DataConnectionString__",
+  "DataProvider": "sqlserver",
+  "RawDataSettings": {}
+}

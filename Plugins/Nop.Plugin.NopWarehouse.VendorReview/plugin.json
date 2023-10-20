@@ -1,0 +1,11 @@
+﻿{
+  "Group": "NopWarehouse",
+  "FriendlyName": " Vendor Review",
+  "SystemName": "NopWarehouse.VendorReview",
+  "Version": "4.3",
+  "SupportedVersions": [ "4.30" ],
+  "Author": "maqta team",
+  "DisplayOrder": 1,
+  "FileName": "Nop.Plugin.NopWarehouse.VendorReview.dll",
+  "Description": "This plugin enables vendor reviews"
+}

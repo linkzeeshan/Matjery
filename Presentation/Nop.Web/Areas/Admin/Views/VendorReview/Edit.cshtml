@@ -1,0 +1,47 @@
+﻿@model AdminVendorReviewModel
+
+@{
+
+    ViewBag.Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews.EditVendorReviewDetails").Text;
+}
+<form asp-controller="VendorReview" asp-action="Edit" method="post">
+    
+    @*@Html.AntiForgeryToken()*@
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews.EditVendorReviewDetails")
+            <small>
+                <i class="fa fa-arrow-circle-left"></i>
+                @if (!string.IsNullOrEmpty(Model.ReturnUrl))
+                {
+                    <a href="@Model.ReturnUrl">@T("Nop.Plugin.NopWarehouse.VendorReview.BackToList")</a>
+                }
+                else
+                {
+                    @Html.RouteLink(T("Nop.Plugin.NopWarehouse.VendorReview.BackToList").Text, "Nop.Plugin.NopWarehouse.VendorReview.List")
+                }
+            </small>
+        </h1>
+        <div class="pull-right">
+            <button type="submit" name="save" class="btn bg-blue">
+                <i class="fa fa-floppy-o"></i>
+                @T("Admin.Common.Save")
+            </button>
+            @*            <button type="submit" name="save-continue" class="btn bg-blue">
+            <i class="fa fa-floppy-o"></i>
+            @T("Admin.Common.SaveContinue")
+        </button>*@
+            <span id="review-delete" class="btn bg-red">
+                <i class="fa fa-trash-o"></i>
+                @T("Admin.Common.Delete")
+            </span>
+            @*<button type="submit" name="btnDeleteReview" class="btn bg-red" onclick="return confirm('@T("Admin.Common.AreYouSure")');">
+            <i class="fa fa-trash-o"></i>
+            @T("Admin.Common.Delete")
+        </button>*@
+        </div>
+    </div>
+    @await Html.PartialAsync("_CreateOrUpdate", Model)
+    </form>
+<nop-delete-confirmation asp-model-id="@Model.Id" asp-button-id="review-delete" />
+    

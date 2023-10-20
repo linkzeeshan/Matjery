@@ -1,0 +1,349 @@
+﻿@model VendorInfoModel
+@using Nop.Core.Domain.Vendors
+@{ Layout = "_ColumnsTwo";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.VendorInfo").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-account-page");
+    Html.AppendPageCssClassParts("html-vendorinfo-page"); }
+
+
+<style>
+    .dropzone {
+        border: 2px dashed #ccc;
+        padding: 25px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        color: #aaa;
+        cursor: pointer;
+    }
+
+        .dropzone.active {
+            border-color: #009ddc;
+            color: #3bb300;
+        }
+
+        .dropzone p {
+            margin: 0;
+        }
+
+        .dropzone:hover {
+            border-color: #009ddc;
+            color: #009ddc;
+        }
+
+    .dropzone {
+        border: 2px dashed #ccc;
+        padding: 20px;
+        text-align: center;
+        margin-top: 20px;
+        cursor: pointer;
+    }
+
+    .dragover {
+        background-color: #f7f7f7;
+    }
+    .infoicon {
+        color: white;
+        padding: 9px;
+    }
+</style>
+@section left
+{
+    @await Component.InvokeAsync("CustomerNavigation", new { selectedTabId = CustomerNavigationEnum.LicenseInfo })
+}
+<link href="~/lib/kendo/2020.1.406/styles/web/kendo.common.min.css" rel="stylesheet" />
+@{
+    string alertType = "";
+    string alertMessage = "";
+    string iconClass = "";
+    bool IsReadonly = Model.TradelicenseStatus.Id == (int)VendorLicenseStatus.Active ? true : false;
+    string readonlyValue = IsReadonly ? "readonly" : "";
+
+    if (Model.TradelicenseStatus.Id == (int)VendorLicenseStatus.Active)
+    {
+        alertType = "success";
+        alertMessage = Model.TradelicenseStatus.Message;
+        iconClass = "fi-tick activeicon";
+    }
+    else if (Model.TradelicenseStatus.Id == (int)VendorLicenseStatus.Expired)
+    {
+        alertType = "danger";
+        alertMessage = Model.TradelicenseStatus.Message;
+        iconClass = "fi-info-2 infoicon";
+    }
+    else if (Model.TradelicenseStatus.Id == (int)VendorLicenseStatus.AboutToExpire)
+    {
+        alertType = "warning";
+        alertMessage = Model.TradelicenseStatus.Message;
+        iconClass = "fi-info-2 warningicon";
+    }
+}
+
+
+
+<div id="licensediv" class="page account-page vendorinfo-page">
+    <div class="page-title">
+        <h1>@T("Account.MyAccount") - @T("Account.VendorInfo")</h1>
+    </div>
+    <div class="page-body">
+        <form asp-route="LicenseInfo" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="message-error"></div>
+
+            @if (!string.IsNullOrEmpty(alertType))
+            {
+                <div class="alert alert-@alertType alert-dismissible fade show" role="alert">
+                    <i class="@iconClass"></i>
+                    @alertMessage
+                    <button id="btnRenew" class="button-retrieve">@T("vendor.license.retrieve")</button>
+                </div>
+            }
+
+            <div class="fieldset" id="licensefldset">
+                <div class="form-fields">
+
+
+                    <div class="inputs">
+                        <label asp-for="TradeLicenseNumber" asp-postfix=":"></label>
+                        <nop-editor asp-for="TradeLicenseNumber" />
+                        <span asp-validation-for="TradeLicenseNumber"></span>
+                        <span id="error-tradeLicenseNumber" class="field-validation-error" data-valmsg-replace="true" />
+                        <span id="error-tradeLicenseNumber-success" class="retrieve-success" data-valmsg-replace="true"  />
+                    </div>
+                    <div style="display:flex;padding-left:19px;padding-right:19px">
+                        <div class="inputs">
+                            <label asp-for="IssueDate" asp-postfix=":"></label>
+                            <nop-editor asp-for="IssueDate" asp-disabled="false" />
+                            <span asp-validation-for="IssueDate"></span>
+                        </div>
+                        <div class="inputs">
+                            <label asp-for="ExpiryDate" asp-postfix=":"></label>
+                            <nop-editor asp-for="ExpiryDate" asp-disabled="false" />
+                            <span asp-validation-for="ExpiryDate"></span>
+                        </div>
+                    </div>
+                    <div class="inputs" style="font-size:15px">
+                        <label asp-for="CategoryName">
+                        </label>
+
+                        <select asp-for="@Model.CategoryId" asp-items="Model.Categories"></select>
+                        <script>
+                                $(document).ready(function () {
+                                   $("#@Html.IdFor(model => model.CategoryId)").kendoMultiSelect({
+                                        select: function (e) {
+                                            var current = this.value();
+
+                                            if (this.dataSource.view()[e.item.index()].value === "0") {
+                                                this.value("");
+                                            }
+                                            else if (current.indexOf("0") !== -1) {
+                                                current = $.grep(current, function (value) {
+                                                    return value !== "0";
+                                                });
+
+                                                this.value(current);
+                                            }
+                                        },
+                                        change: function (e) {
+                                            if (this.value().length === 0)
+                                                this.value(["0"]);
+                                        }
+                                    }).data("kendoMultiSelect");
+                                });
+                        </script>
+                        <span asp-validation-for="CategoryId"></span>
+                    </div>
+
+
+                    <div class="inputs">
+
+                        <label asp-for="TradeLicenseFile" asp-postfix=":"></label>
+
+                        <input type="file" style="display:none;" id="tradeLicenseFile" name="tradeLicenseFile" accept=".pdf, .doc, .docx,.png,.jpg,.jpeg" />
+                        <div class="dropzone" id="dropzone">
+                            <p>@T("account.licenseuplaodclick")</p>
+                            <label style="font-size: 12px; color: #009ddc;" id="uploadfilename"></label>
+                        </div>
+                        <label style="font-size: 10px; color: #009ddc">(pdf,doc,docx,png,jpg,jpeg only allowed)   <span id="file-error" style="color:red"></span></label>
+                        <span asp-validation-for="TradeLicenseFile"></span>
+
+                        @if (!string.IsNullOrEmpty(Model.TradeLicenseFile))
+                        {
+                            <div class="vendor-picture">
+                                <img src="@(Model.TradeLicenseFile)" alt="TradeFile" />
+                                <input type="submit" name="remove-picture" class="button-2 remove-picture-button" value="@T("Account.VendorInfo.TradeLicenseFile.Remove")" />
+                            </div>
+                        }
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.TradeLicenseFileurl))
+                    {
+                        <div class="inputs">
+                            <div class="col-md-5">
+                                <a class="button-1 btn" style="padding: 12px 11px!important" href=@Url.Content("~/vendor/DownloadFile/?downloadGuid="+Model.TradeLicenseFileurl)><i class="fa fa-download"></i>
+                                    <span style="margin: 10px; font-size: 13px; ">
+                                         @T("Admin.Orders.OrderNotes.Fields.Download.Link")
+                                    </span>  
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    @Html.HiddenFor(mo=>mo.TradeLicenseFileurl)
+
+
+                </div>
+            </div>
+            <div class="buttons" id="licensefldsetbtn">
+                <input type="submit" value="@T("Common.Save")" name="save-LicenseInfo-button" class="button-1 save-vendorinfo-button" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<script asp-location="Footer">
+
+    $(document).ready(function () {
+
+          $("#@Html.IdFor(model => model.TradeLicenseNumber)").change(function () {
+       
+                var licenseNumber = $(this).val();
+                var tradeField = $("#@Html.IdFor(model => model.TradeLicenseNumber)");
+                var issueDate= $("#@Html.IdFor(model => model.IssueDate)");
+                var expiryDate = $("#@Html.IdFor(model => model.ExpiryDate)");
+
+
+                $.ajax({
+                    cache: false,
+                    type: "GET",
+                    url: "@(Url.Action("GetTradeLicense", "Vendor"))",
+                    data: {
+                        "licenseNumber": licenseNumber
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        issueDate.val(data.GetLicenseDetailsResponse.IssueDate);
+                        expiryDate.val(data.GetLicenseDetailsResponse.ExpiryDate);
+                        $("#error-tradeLicenseNumber").html("");
+                        //$("#error-tradeLicenseNumber-success").html('DED Verified successfully');
+                        @*const successmsg = $('#error-tradeLicenseNumber-success');
+
+                        // Change the text of the span element
+                        successmsg.text("@T("vendors.applyaccount.dedsuccess")");*@
+                        $("#lblSuccessDiv").css("display", "block");
+                        $("#error-tradeLicenseNumber-success").html("@T("vendors.applyaccount.dedsuccess")");
+
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        issueDate.val("");
+                        expiryDate.val("");
+                        $("#error-tradeLicenseNumber-success").html("Error happaned");
+                    }
+                });
+          });
+
+        var readonlyValue = '@readonlyValue';
+        if (readonlyValue === "readonly") {
+            $("#licensefldset input, #licensefldset textarea").prop("readonly", true);
+            $("#licensefldset input[type=checkbox]").prop("disabled", true);
+            $("#licensefldsetbtn input[type=submit]").prop("disabled", true);
+        }
+
+
+        $("#tradeLicenseFile").change(function () {
+            var file = this.files[0];
+            var fileType = file.type;
+            var fileSize = file.size / 1024 / 1024; //size in MB
+
+            //validate file type
+            if (fileType != "image/png" && fileType != "image/jpeg" && fileType != "image/jpg" && fileType != "application/pdf" && fileType != "application/msword" && fileType != "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+                document.getElementById("file-error").innerHTML = "Invalid File Type";
+                $("#tradeLicenseFile").val('');
+                return false;
+            }
+
+            //validate file size
+            if (fileSize > 5) { //10 MB
+                document.getElementById("file-error").innerHTML = "File size should be less than 5 MB.";
+                $("#tradeLicenseFile").val('');
+                return false;
+            }
+            const filename = event.target.value.split('\\').pop(); // Get the filename without the fake path
+            console.log(filename);
+            const mySpan = $('#uploadfilename');
+
+            mySpan.text(filename);
+
+        });
+
+
+        $("#btnRenew").click(function (e) {
+
+            e.preventDefault();
+            GetDEDLicense();
+
+        });
+
+        // Get the div and file input elements
+        const div = document.querySelector('#dropzone');
+        const fileInput = document.querySelector('#tradeLicenseFile');
+
+        // Add a click event listener to the div element
+        div.addEventListener('click', () => {
+            // Trigger the click event of the file input element
+            fileInput.click();
+        });
+
+    });
+    $('#@Html.IdFor(mdoel => Model.EmiratesId)').mask("000000000000000", {
+        placeholder: "___-____-_______-_",
+        clearIfNotMatch: true
+    });
+
+    function GetDEDLicense() {
+
+
+                var licenseNumber = $("#@Html.IdFor(model => model.TradeLicenseNumber)").val();
+                var tradeField = $("#@Html.IdFor(model => model.TradeLicenseNumber)");
+                var issueDate= $("#@Html.IdFor(model => model.IssueDate)");
+                var expiryDate = $("#@Html.IdFor(model => model.ExpiryDate)");
+
+
+                $.ajax({
+                    cache: false,
+                    type: "GET",
+                    dataType: 'json',
+                    url: "@(Url.Action("RenewTradeLicense", "Vendor"))",
+                    data: {
+                        "licenseNumber": licenseNumber,
+                        "ExpiryDate": expiryDate.val()
+                    },
+                    success: function (data, textStatus, jqXHR) {
+
+                        issueDate.val(data.GetLicenseDetailsResponse.IssueDate);
+                        expiryDate.val(data.GetLicenseDetailsResponse.ExpiryDate);
+
+                        $("#lblSuccessDiv").css("display", "block");
+                        $("#error-tradeLicenseNumber-success").html("@T("vendors.applyaccount.dedsuccess")");
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+
+                        issueDate.val("");
+                        expiryDate.val("");
+                        $("#error-tradeLicenseNumber").html(jqXHR.responseText);
+                    }
+                });
+    }
+
+</script>
+
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+            window.onload = function () {
+                alert("@ViewBag.Message");
+        };
+
+
+    </script>
+}

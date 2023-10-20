@@ -1,0 +1,834 @@
+﻿@model RegisterModel
+@using Nop.Core;
+@using Nop.Web;
+@inject IWorkContext workContext
+
+
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Register").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-registration-page");
+    var isUaePassStr = @Context.Request.Query["type"];
+    string uaePassSignUp = Url.Content("~/images/SignUp_" + workContext.WorkingLanguage.UniqueSeoCode + ".png");
+}
+<script src="~/lib/datepicker.js"></script>
+<script>
+
+    $(document).ready(function () {
+        today = new Date();
+        $('[data-toggle="datepicker"]').datepicker({
+            format: 'dd/mm/yyyy',
+            autoHide: true,
+            autoclose: true,
+            endDate: "today",
+            maxDate: today
+        }).on('changeDate', function (ev) {
+            $(this).datepicker('hide');
+        });
+        $('[data-toggle="datepicker"]').keyup(function () {
+            if (this.value.match(/[^0-9]/g)) {
+                this.value = this.value.replace(/[^0-9^-]/g, '');
+            }
+        });
+
+        $("u").on("click", function (e) {
+            e.preventDefault();
+            window.location.href = "../passwordrecovery?email=@{@Model.Email}";
+        });
+
+    });
+
+
+</script>
+<style>
+    .dropzone {
+        border: 2px dashed #ccc;
+        padding: 25px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        color: #aaa;
+        cursor: pointer;
+    }
+
+        .dropzone.active {
+            border-color: #009ddc;
+            color: #3bb300;
+        }
+
+        .dropzone p {
+            margin: 0;
+        }
+
+        .dropzone:hover {
+            border-color: #009ddc;
+            color: #009ddc;
+        }
+
+    .minheight {
+        MIN-HEIGHT: 210PX;
+    }
+
+    .dropzone {
+        border: 2px dashed #ccc;
+        padding: 20px;
+        text-align: center;
+        margin-top: 20px;
+        cursor: pointer;
+    }
+
+    .dragover {
+        background-color: #f7f7f7;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+    .k-icon, .k-tool-icon {
+        font: 16px/1 WebComponentsIcons !important;
+
+    }
+</style>
+
+
+
+<link href="~/lib/kendo/2020.1.406/styles/web/kendo.common.min.css" rel="stylesheet" />
+<div class="page registration-page">
+    <div class="page-title">
+        <h1>@T("Account.Register")</h1>
+    </div>
+    <div class="page-body">
+        <form asp-route="~/Register" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="message-error"></div>
+            @*@Html.ValidationSummary()*@
+
+            <div class="fieldset">
+                @Html.HiddenFor(model => model.IsUaePass)
+                @Html.HiddenFor(model => model.RequestType)
+
+
+                @if (!Model.IsUaePass)
+                {
+                    <div class="uae-pass-link">
+                        <h4 @(@Context.Request.Query["type"].ToString().ToLower() == "uaepassauthenticationcancelled" ? null : Html.Raw("style=\"display:none\""))>@T("uaepass.authenticationcanceled.text")</h4>
+                        <img src="@(uaePassSignUp)" class="add-uae-image"
+                             onclick="setLocation('@Url.RouteUrl("UaePass", new { type ="register" , registrationType = Model.RequestType })')" />
+                    </div>
+                    <div class="uae-pass-text">
+                        <h4>@T("uaepass.button.below.text")</h4>
+                    </div>
+                }
+                <div class="title">
+                    <strong>@T("Account.YourPersonalDetails")</strong>
+                </div>
+                <div class="form-fields">
+                    @if (Model.GenderEnabled)
+                    {
+                        <div class="inputs">
+                            <label for="gender">@T("Account.Fields.Gender"):</label>
+                            <div id="gender" class="gender">
+                                <span class="male">
+                                    <input type="radio" asp-for="Gender" value="M" checked="@(Model.Gender == "M")" id="gender-male" />
+                                    <label class="forcheckbox" for="gender-male">@T("Account.Fields.Gender.Male")</label>
+                                </span>
+                                <span class="female">
+                                    <input type="radio" asp-for="Gender" value="F" checked="@(Model.Gender == "F")" id="gender-female" />
+                                    <label class="forcheckbox" for="gender-female">@T("Account.Fields.Gender.Female")</label>
+                                </span>
+                            </div>
+                        </div>
+                    }
+                    @if (Model.FirstNameEnabled)
+                    {
+                        <div class="inputs">
+                            <label asp-for="FirstName" asp-postfix=":"></label>
+                            <input asp-for="FirstName" />
+                            @if (Model.FirstNameRequired)
+                            {
+                                <nop-required />
+                            }
+                            <span asp-validation-for="FirstName"></span>
+                        </div>
+                    }
+                    @if (Model.LastNameEnabled)
+                    {
+                        <div class="inputs">
+                            <label asp-for="LastName" asp-postfix=":"></label>
+                            <input asp-for="LastName" />
+                            @if (Model.LastNameRequired)
+                            {
+                                <nop-required />
+                            }
+                            <span asp-validation-for="LastName"></span>
+                        </div>
+                    }
+                    @if (Model.DateOfBirthEnabled)
+                    {
+                        <div class="inputs date-of-birth">
+                            <label>@T("Account.Fields.DateOfBirth"):</label>
+
+                            <input class="text-box single-line datepicker" id="DateOfBirth" name="DateOfBirth" type="text" data-toggle="datepicker" value="@Model.DateOfBirth">
+                            @if (Model.DateOfBirthRequired)
+                            {
+                                <nop-required />
+                            }
+                            <span asp-validation-for="DateOfBirth"></span>
+                        </div>
+                    }
+                    <div class="inputs">
+                        <label asp-for="Email" asp-postfix=":"></label>
+                        <input asp-for="Email" />
+                        <nop-required />
+                        <span asp-validation-for="Email"></span>
+                    </div>
+                    @if (Model.EnteringEmailTwice)
+                    {
+                        <div class="inputs">
+                            <label asp-for="ConfirmEmail" asp-postfix=":"></label>
+                            <input asp-for="ConfirmEmail" />
+                            <nop-required />
+                            <span asp-validation-for="ConfirmEmail"></span>
+                        </div>
+                    }
+                    @if (Model.UsernamesEnabled)
+                    {
+                        <div class="inputs">
+                            <label asp-for="Username" asp-postfix=":"></label>
+                            <input asp-for="Username" />
+                            <nop-required />
+                            <span asp-validation-for="Username"></span>
+                            @if (Model.CheckUsernameAvailabilityEnabled)
+                            {
+                                @await Html.PartialAsync("_CheckUsernameAvailability")
+                            }
+                        </div>
+
+                    }
+                    @if (Model.CompanyEnabled || Model.DisplayVatNumber)
+                    {
+
+                        @if (Model.CompanyEnabled)
+                        {
+                            <div class="inputs">
+                                <label asp-for="Company" asp-postfix=":"></label>
+                                <input asp-for="Company" />
+                                @if (Model.CompanyRequired)
+                                {
+                                    <nop-required />
+                                }
+                                <span asp-validation-for="Company"></span>
+                            </div>
+                        }
+                        @if (Model.DisplayVatNumber)
+                        {
+                            <div class="inputs">
+                                <label asp-for="VatNumber" asp-postfix=":"></label>
+                                <input asp-for="VatNumber" />
+                                <span class="vat-note"><em>@T("Account.Fields.VatNumber.Note")</em></span>
+                            </div>
+                        }
+
+                    }
+                    @if (Model.StreetAddressEnabled || Model.StreetAddress2Enabled || Model.ZipPostalCodeEnabled || Model.CityEnabled || Model.CountyEnabled || Model.CountryEnabled)
+                    {
+
+                        @if (Model.StreetAddressEnabled)
+                        {
+                            <div class="inputs">
+                                <label asp-for="StreetAddress" asp-postfix=":"></label>
+                                <input asp-for="StreetAddress" />
+                                @if (Model.StreetAddressRequired)
+                                {
+                                    <nop-required />
+                                }
+                                <span asp-validation-for="StreetAddress"></span>
+                            </div>
+                        }
+                        @if (Model.StreetAddress2Enabled)
+                        {
+                            <div class="inputs">
+                                <label asp-for="StreetAddress2" asp-postfix=":"></label>
+                                <input asp-for="StreetAddress2" />
+                                @if (Model.StreetAddress2Required)
+                                {
+                                    <nop-required />
+                                }
+                                <span asp-validation-for="StreetAddress2"></span>
+                            </div>
+                        }
+                        @if (Model.ZipPostalCodeEnabled)
+                        {
+                            <div class="inputs">
+                                <label asp-for="ZipPostalCode" asp-postfix=":"></label>
+                                <input asp-for="ZipPostalCode" />
+                                @if (Model.ZipPostalCodeRequired)
+                                {
+                                    <nop-required />
+                                }
+                                <span asp-validation-for="ZipPostalCode"></span>
+                            </div>
+                        }
+                        @if (Model.CountyEnabled)
+                        {
+                            <div class="inputs">
+                                <label asp-for="County" asp-postfix=":"></label>
+                                <input asp-for="County" />
+                                @if (Model.CountyRequired)
+                                {
+                                    <nop-required />
+                                }
+                                <span asp-validation-for="County"></span>
+                            </div>
+                        }
+                        @if (Model.CityEnabled)
+                        {
+                            <div class="inputs">
+                                <label asp-for="City" asp-postfix=":"></label>
+                                <input asp-for="City" />
+                                @if (Model.CityRequired)
+                                {
+                                    <nop-required />
+                                }
+                                <span asp-validation-for="City"></span>
+                            </div>
+                        }
+                        @if (Model.CountryEnabled)
+                        {
+                            <div class="inputs">
+                                <label asp-for="CountryId" asp-postfix=":"></label>
+                                <select asp-for="CountryId" asp-items="Model.AvailableCountries"
+                                        data-trigger="country-select"
+                                        data-url="@(Url.RouteUrl("GetStatesByCountryId"))"
+                                        data-stateprovince="#@Html.IdFor(model => model.StateProvinceId)"
+                                        data-loading="#states-loading-progress"></select>
+                                @if (Model.CountryRequired)
+                                {
+                                    <nop-required />
+                                }
+                                <span asp-validation-for="CountryId"></span>
+                            </div>
+                        }
+                        @if (Model.CountryEnabled && Model.StateProvinceEnabled)
+                        {
+                            <div class="inputs">
+                                <label asp-for="StateProvinceId" asp-postfix=":"></label>
+                                <select asp-for="StateProvinceId" asp-items="Model.AvailableStates"></select>
+                                @if (Model.StateProvinceRequired)
+                                {
+                                    <nop-required />
+                                }
+                                <span id="states-loading-progress" style="display: none;" class="please-wait">@T("Common.Wait...")</span>
+                                <span asp-validation-for="StateProvinceId"></span>
+                            </div>
+                        }
+
+                    }
+                    @if (Model.PhoneEnabled || Model.FaxEnabled)
+                    {
+
+                        @if (Model.PhoneEnabled)
+                        {
+                <div class="inputs">
+                    <label asp-for="Phone" asp-postfix=":"></label>
+                    <input asp-for="Phone" maxlength="10" max="10" id="phoneformat" onkeypress="validatephone(event)" />
+                    @if (Model.PhoneRequired)
+                    {
+                        <nop-required />
+                    }
+                    <span id="phoneformatValidation" style="display: none;">@T("account.fields.phone.notvalid").Text</span>
+                    <span asp-validation-for="Phone"></span>
+
+                </div>
+                        }
+                        @if (Model.FaxEnabled)
+                        {
+                            <div class="inputs">
+                                <label asp-for="Fax" asp-postfix=":"></label>
+                                <input asp-for="Fax" />
+                                @if (Model.FaxRequired)
+                                {
+                                    <nop-required />
+                                }
+                                <span asp-validation-for="Fax"></span>
+                            </div>
+                        }
+
+
+                    }
+
+
+                    @if (Model.NewsletterEnabled || Model.CustomerAttributes.Count > 0)
+                    {
+                        @if (Model.NewsletterEnabled)
+                        {
+                            <div class="inputs">
+                                <label asp-for="Newsletter" asp-postfix=":"></label>
+                                <input asp-for="Newsletter" />
+                                <span asp-validation-for="Newsletter"></span>
+                            </div>
+                        }
+                        @if (Model.CustomerAttributes.Count > 0)
+                        {
+                            @await Html.PartialAsync("_CustomerAttributes", Model.CustomerAttributes)
+                        }
+                    }
+                    @if (Model.AllowCustomersToSetTimeZone)
+                    {
+                        <div class="inputs">
+                            <label asp-for="TimeZoneId" asp-postfix=":"></label>
+                            <select asp-for="TimeZoneId" asp-items="Model.AvailableTimeZones"></select>
+                            <span asp-validation-for="TimeZoneId"></span>
+                        </div>
+                    }
+                    @if (!Model.IsUaePass)
+                    {
+
+                        <div class="inputs">
+                            <label asp-for="Password" asp-postfix=":"></label>
+                            <input asp-for="Password" />
+                            <nop-required />
+                            <span asp-validation-for="Password"></span>
+                        </div>
+                        <div class="inputs">
+                            <label asp-for="ConfirmPassword" asp-postfix=":"></label>
+                            <input asp-for="ConfirmPassword" />
+                            <nop-required />
+                            <span asp-validation-for="ConfirmPassword"></span>
+                        </div>
+
+                        @if (Model.DisplayCaptcha)
+                        {
+                            <nop-captcha />
+                        }
+                        @if (Model.HoneypotEnabled)
+                        {
+                            @Html.Raw(Html.GenerateHoneypotInput())
+                        }
+
+
+                    }
+
+                    @if (Model.RequestType.ToLower().Equals("merchant"))
+                    {
+                        <div class="inputs">
+                            <label asp-for="SellerName" asp-postfix=":"></label>
+                            <nop-editor asp-for="SellerName" />
+                            <span asp-validation-for="SellerName"></span>
+                        </div>
+
+                        <div class="inputs">
+                            <label asp-for="TradeLicenseNumber" asp-postfix=":"></label>
+                            <nop-editor asp-for="TradeLicenseNumber" />
+                            <span asp-validation-for="TradeLicenseNumber"></span>
+                            <span id="error-tradeLicenseNumber" class="field-validation-error" data-valmsg-replace="true" />
+                            <span id="error-tradeLicenseNumber-success" class="retrieve-success" data-valmsg-replace="true" ></span>
+                        </div>
+                        <div class="licenseDate">
+                            <div class="inputs">
+                                <label asp-for="IssueDate" asp-postfix=":"></label>
+                                @*<input class="form-control" id="IssueDate" name="IssueDate" type="text" value="@Model.IssueDate">*@
+                                <nop-editor asp-for="IssueDate" />
+                                <span asp-validation-for="IssueDate"></span>
+                            </div>
+                            <div class="inputs">
+                                <label asp-for="ExpiryDate" asp-postfix=":"></label>
+                                @*<input class="form-control" id="ExpiryDate" name="IssueDate" type="text" value="@Model.ExpiryDate">*@
+                                <nop-editor asp-for="ExpiryDate" disabled />
+                                <span asp-validation-for="ExpiryDate"></span>
+                            </div>
+                        </div>
+                        <div class="inputs" style="font-size:15px">
+
+
+                            <label style="display: inline;">@T("account.vendorinfo.categoryid"):</label>    <nop-required />
+
+                            <select asp-for="@Model.CategoryId" asp-items="Model.Categories"></select>
+                            <script>
+                                $(document).ready(function () {
+                                   $("#@Html.IdFor(model => model.CategoryId)").kendoMultiSelect({
+                                        select: function (e) {
+                                            var current = this.value();
+
+                                            if (this.dataSource.view()[e.item.index()].value === "0") {
+                                                this.value("");
+                                            }
+                                            else if (current.indexOf("0") !== -1) {
+                                                current = $.grep(current, function (value) {
+                                                    return value !== "0";
+                                                });
+
+                                                this.value(current);
+                                            }
+                                        },
+                                        change: function (e) {
+                                            if (this.value().length === 0)
+                                                this.value(["0"]);
+                                        }
+                                    }).data("kendoMultiSelect");
+                                });
+                            </script>
+                            <span asp-validation-for="CategoryId"></span>
+                        </div>
+                        <div class="inputs" style="font-size:15px">
+
+                            <label asp-for="TradeLicenseFile" asp-postfix=":"></label>
+
+                            <input type="file" style="display:none" id="tradeLicenseFile" name="tradeLicenseFile" accept=".pdf, .doc, .docx,.png,.jpg,.jpeg" />
+
+                            <div class="dropzone" id="dropzone">
+                                <p>@T("account.licenseuplaodclick")</p>
+                                <label style="font-size: 12px; color: #009ddc;" id="uploadfilename"></label>
+                            </div>
+                            <label style="font-size: 10px; color: #009ddc">(pdf,doc,docx,png,jpg,jpeg only allowed)   <span id="file-error" style="color:red"></span></label>
+
+                            <input type="hidden" id="fileData" name="fileData" />
+                        
+
+
+                            @if (!string.IsNullOrEmpty(Model.TradeLicenseFile))
+                            {
+                                <div class="vendor-picture">
+                                    <img src="@(Model.TradeLicenseFile)" alt="TradeFile" />
+                                    <input type="submit" name="remove-picture" class="button-2 remove-picture-button" value="@T("Account.VendorInfo.TradeLicenseFile.Remove")" />
+                                </div>
+                            }
+                        </div>
+
+
+                    }
+                    @if (!Model.IsUaePass)
+                    {
+                        <script type="text/javascript">
+                    $(document).ready(function () {
+                        $('#register-button').click(function () {
+                            if ($('#HasAcceptedTermsAndConditions').is(':checked')) {
+                                $('#@Html.IdFor(model => model.HasAcceptedTermsAndConditions)').val(true);
+                                return true;
+                            }
+                            else {
+                                //just show validation errors, dont post
+                                alert('@Html.Raw(JavaScriptEncoder.Default.Encode(T("checkout.termsofservice.pleaseaccept").Text))');
+                                return false;
+                            }
+                        });
+                    });
+                        </script>
+                        <div class="inputs">
+                        </div>
+                        <div class="accept-terms-conditions">
+                            @*<input id="accept-terms-conditions" type="checkbox" name="accept-terms-conditions" />*@
+                            <nop-editor asp-for="HasAcceptedTermsAndConditions" />
+                            <label for="accept-terms-conditions">@T("checkout.termsofservice.iaccept")</label>
+                            <span class="read" id="read-privacyinfo">@T("Account.Fields.AcceptPrivacyPolicy.Read")</span>
+                            <script>
+                    $(document).ready(function () {
+                            $('#read-privacyinfo').on('click', function (e) {
+                                displayPopupContentFromUrl('@Url.RouteUrl("TopicPopup", new { SystemName = "LoginRegisterationTermsAndConditions" })', '@T("checkout.termsofservice")', null, null, 'top');
+                                $(".ui-dialog").css({ "top": "1089.4px" });
+                                setTimeout(
+                                    function () {
+                                        //do something special
+                                        //$("#ui-id-1").css({ "overflow-y": "auto" });
+                                        $(".ui-dialog-content").css({ "overflow-y": "auto" });
+                                        $(".ui-dialog").css({ "top": "1089.4px" });
+                                        var topic = $("#ph-topic").find('p');
+                                        if (isArabic(topic[0].innerText))
+                                            $("#ph-topic").css({ "text-align": "right" });
+                                        else
+                                            $("#ph-topic").css({ "text-align": "left" });
+                                    }, 1000);
+
+                            });
+                           /* $(".ui-dialog-content ui-widget-content").css({ "overflow-y": "auto" });*/
+
+                    });
+                    function isArabic(strInput) {
+                        var arregex = /[\u0600-\u06FF]/;
+                        if (arregex.test(strInput)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                            </script>
+                        </div>
+                    }
+                    @if (Model.AcceptPrivacyPolicyEnabled || Model.GdprConsents.Count > 0)
+                    {
+                        <div class="fieldset">
+                            <div class="title">
+                                <strong>@T("Account.UserAgreement")</strong>
+                            </div>
+                            <div class="form-fields">
+                                @if (Model.AcceptPrivacyPolicyEnabled)
+                                {
+                                    <script asp-location="Footer">
+                                $(document).ready(function() {
+                                    $('#register-button').on('click', function() {
+                                        if ($('#accept-consent').is(':checked')) {
+                                            //do some stuff
+                                            return true;
+                                        } else {
+                                            //just show validation errors, don't post
+                                            alert('@Html.Raw(JavaScriptEncoder.Default.Encode(T("Account.Fields.AcceptPrivacyPolicy.Required").Text))');
+                                            return false;
+                                        }
+                                    });
+                                });
+                                    </script>
+                                    <div class="inputs accept-consent">
+                                        <input id="accept-consent" type="checkbox" name="accept-consent" />
+                                        <label for="accept-consent">@T("Account.Fields.AcceptPrivacyPolicy")</label>
+                                        @if (Model.AcceptPrivacyPolicyPopup)
+                                        {
+                                            <span class="read" id="read-privacyinfo">@T("Account.Fields.AcceptPrivacyPolicy.Read")</span>
+                                            <script asp-location="Footer">
+                                    $(document).ready(function() {
+                                        $('#read-privacyinfo').on('click',
+                                            function(e) {
+                                                displayPopupContentFromUrl(
+                                                    '@Url.RouteUrl("TopicPopup", new {SystemName = "privacyinfo"})',
+                                                    '@T("Account.Fields.AcceptPrivacyPolicy")');
+                                            });
+                                    });
+                                            </script>
+                                        }
+                                        else
+                                        {
+                                            <a class="read" id="read-privacyinfo" href="@Url.RouteUrl("Topic", new {SeName = Html.GetTopicSeName("privacyinfo") })">@T("Account.Fields.AcceptPrivacyPolicy.Read")</a>
+                                        }
+                                    </div>
+                                }
+
+                                @if (Model.GdprConsents.Count > 0)
+                                {
+                                    foreach (var consent in Model.GdprConsents)
+                                    {
+                                        if (consent.IsRequired)
+                                        {
+                                            <script asp-location="Footer">
+                                    $(document).ready(function() {
+                                        $('#register-button').on('click', function() {
+                                            if ($('#consent@(consent.Id)').is(':checked')) {
+                                                    //do some stuff
+                                                    return true;
+                                                } else {
+                                                    //just show validation errors, don't post
+                                               alert('@Html.Raw(JavaScriptEncoder.Default.Encode(consent.RequiredMessage))');
+                                                    return false;
+                                                }
+                                            });
+                                    });
+                                            </script>
+                                        }
+                                        <div class="inputs accept-consent">
+                                            <input id="consent@(consent.Id)" type="checkbox" name="consent@(consent.Id)" checked="@consent.Accepted" />
+                                            <label for="consent@(consent.Id)">@consent.Message</label>
+                                        </div>
+                                    }
+
+                                }
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+            <div asp-validation-summary="ModelOnly" class="message-error"></div>
+            <div class="buttons">
+
+                <input type="submit" id="register-button" class="button-1 register-next-step-button" value="@T("Account.Register.Button")" name="register-button" />
+            </div>
+        </form>
+        @*<div class="external-authentication">
+                @await Component.InvokeAsync("ExternalMethods", "ExternalAuthentication")
+            </div>*@
+    </div>
+</div>
+
+
+<script asp-location="Footer">
+
+
+    $(document).ready(function () {
+
+        // Get the div and file input elements
+        const div = document.querySelector('#dropzone');
+        const fileInput = document.querySelector('#tradeLicenseFile');
+
+        // Add a click event listener to the div element
+        div.addEventListener('click', () => {
+            // Trigger the click event of the file input element
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (event) => {
+            const filename = event.target.value.split('\\').pop(); // Get the filename without the fake path
+            console.log(filename);
+            const mySpan = $('#uploadfilename');
+
+            mySpan.text(filename);
+        });
+
+        document.getElementById("file-error").innerHTML = "";
+       $('#@Html.IdFor(mdoel => Model.IssueDate)').prop('readonly', true);
+       // $('#@Html.IdFor(mdoel => Model.ExpiryDate)').prop('readonly', true);
+
+
+          $("#@Html.IdFor(model => model.TradeLicenseNumber)").change(function () {
+
+                var licenseNumber = $(this).val();
+                var tradeField = $("#@Html.IdFor(model => model.TradeLicenseNumber)");
+                var issueDate= $("#@Html.IdFor(model => model.IssueDate)");
+                var expiryDate = $("#@Html.IdFor(model => model.ExpiryDate)");
+
+
+                $.ajax({
+                    cache: false,
+                    type: "GET",
+                    url: "@(Url.Action("GetTradeLicense", "Vendor"))",
+                    data: {
+                        "licenseNumber": licenseNumber
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        issueDate.val(data.GetLicenseDetailsResponse.IssueDate);
+                        expiryDate.val(data.GetLicenseDetailsResponse.ExpiryDate);
+                        $("#error-tradeLicenseNumber").html("");
+                        //$("#error-tradeLicenseNumber-success").html('DED Verified successfully');
+                        const successmsg = $('#error-tradeLicenseNumber-success');
+
+                        // Change the text of the span element
+                        successmsg.text("@T("vendors.applyaccount.dedsuccess")");
+
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        issueDate.val("");
+                        expiryDate.val("");
+                        $("#error-tradeLicenseNumber").html("Error happaned");
+                    }
+                });
+          });
+        $(document).ready(function () {
+            $("#tradeLicenseFile").change(function () {
+                var file = this.files[0];
+                var fileType = file.type;
+                var fileSize = file.size / 1024 / 1024; //size in MB
+
+                //validate file type
+                if (fileType != "image/png" && fileType != "image/jpeg" && fileType != "image/jpg" && fileType != "application/pdf" && fileType != "application/msword" && fileType != "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+                    document.getElementById("file-error").innerHTML = "Invalid File Type";
+                    $("#tradeLicenseFile").val('');
+                    return false;
+                }
+
+                //validate file size
+                if (fileSize > 5) { //10 MB
+                    document.getElementById("file-error").innerHTML = "File size should be less than 5 MB.";
+                    $("#tradeLicenseFile").val('');
+                    return false;
+                }
+
+            });
+        });
+
+    });
+
+
+
+</script>
+<script>
+    $(document).ready(function () {
+        
+        today = new Date();
+        $('.datepicker-panel').datepicker({
+            format: 'mm-dd-yyyy',
+            autoclose: true,
+            endDate: "today",
+            maxDate: today
+        }).on('changeDate', function (ev) {
+            $(this).datepicker('hide');
+        });
+
+
+        $('.datepicker-panel').keyup(function () {
+            if (this.value.match(/[^0-9]/g)) {
+                this.value = this.value.replace(/[^0-9^-]/g, '');
+            }
+        });
+    });
+    function allowDrop(event) {
+        event.preventDefault();
+    }
+
+    function drop(event) {
+        event.preventDefault();
+        var file = event.dataTransfer.files[0];
+        var reader = new FileReader();
+        reader.onload = function (event) {
+            var fileData = event.target.result;
+            document.getElementById("fileData").value = fileData;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function leaveDrop(event) {
+        event.preventDefault();
+    }
+    function validatephone(evt) {
+        var theEvent = evt || window.event;
+        var phonenumber = document.getElementById('phoneformat').value;
+        if (phonenumber != undefined && phonenumber != null && phonenumber.length >= 1) {
+            const first2 = phonenumber.slice(0, 2);
+            if (first2 !== '05') {
+                // document.getElementById('phoneformatValidation').innerHTML = @T("account.fields.phone.notvalid").Text;
+                document.getElementById('phoneformatValidation').style.display = 'block';
+            } else {
+                document.getElementById('phoneformatValidation').style.display = 'none';
+            }
+        }
+        // Handle paste
+        if (theEvent.type === 'paste') {
+            key = event.clipboardData.getData('text/plain');
+        } else {
+            // Handle key press
+            var key = theEvent.keyCode || theEvent.which;
+            key = String.fromCharCode(key);
+        }
+        var regex = /[0-9]|\./;
+        if (!regex.test(key)) {
+            theEvent.returnValue = false;
+            if (theEvent.preventDefault) theEvent.preventDefault();
+        }
+    }
+    function hidefutureDate() {
+        debugger;
+        today = new Date();
+        $('.datepicker-panel').datepicker({
+            format: 'mm-dd-yyyy',
+            autoclose: true,
+            endDate: "today",
+            maxDate: today
+        }).on('changeDate', function (ev) {
+            $(this).datepicker('hide');
+        });
+
+
+        $('.datepicker-panel').keyup(function () {
+            if (this.value.match(/[^0-9]/g)) {
+                this.value = this.value.replace(/[^0-9^-]/g, '');
+            }
+        });
+    }
+</script>
+
+

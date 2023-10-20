@@ -1,0 +1,77 @@
+﻿@model BlackPointModel
+@using Nop.Web.Models.Blackpoint
+@{
+    Layout = "_ColumnsOne";
+    //title
+    Html.AddTitleParts(T("PageTitle.blackpoint").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-contact-page");
+}
+<style>
+    .center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
+
+@if (Model.VendorOrCustomerId > 0)
+{
+<div class="page contact-page black-point-container">
+    <div class="page-title">
+        <h1>@T("PageTitle.blackpoint")</h1>
+    </div>
+    <div class="page-body">
+        @if (!string.IsNullOrEmpty(Model.Imgname))
+        {
+            <img src="~/images/@Model.Imgname" class="center" />
+        }
+
+        @*@Html.ActionLink("TopicBlock", "Topic", new { systemName = "BlackPoint" })*@
+        @await Component.InvokeAsync("TopicBlock", new { systemName = "BlackPoint" })
+
+        @if (Model.SuccessfullyAdded)
+        {
+            <div class="result success-black-point">
+                @Model.Result
+            </div>
+        }
+        else
+        {
+            using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                var validationSummary = Html.ValidationSummary(true);
+                @*if (!MvHtmlString.IsNullOrEmpty(validationSummary))
+                {
+                <div class="message-error">@validationSummary</div>
+                }*@
+                <div class="fieldset">
+                    <div class="form-fields">
+                        <div class="inputs">
+                            @Html.LabelFor(model => model.Comment)
+                            @Html.TextAreaFor(model => model.Comment, new { @class = "enquiry", placeholder = T("blackpoint.comment.Placehoder") })
+                            @Html.ValidationMessageFor(model => model.Comment)
+                        </div>
+                    </div>
+                </div>
+                @Html.HiddenFor(model => model.VendorOrCustomerId)
+                @Html.HiddenFor(model => model.BlackPointType)
+                @Html.HiddenFor(model => model.OrderId)
+                <div class="buttons">
+                    <input type="submit" name="send-email" class="button-1 contact-us-button" value="@T(" ContactUs.Button")" />
+                </div>
+            }
+        }
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ContactUsBottom })
+        @*@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ContactUsBottom })
+        @await Component.InvokeAsync("ContactUsBottom")*@
+    </div>
+</div>
+}
+else
+{
+<div class="vendor-empty">
+    <p>@T("vendor.noresult")</p>
+</div>
+}

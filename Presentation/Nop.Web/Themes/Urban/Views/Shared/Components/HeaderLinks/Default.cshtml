@@ -1,0 +1,309 @@
+﻿@model HeaderLinksModel
+
+@using Nop.Core
+@using Nop.Services.Configuration
+@using Nop.Services.Customers
+
+@inject IStoreContext storeContext
+@inject ISettingService settingService
+@inject IWorkContext workContext
+@inject Nop.Core.IWebHelper webHelper
+@inject ICustomerService customerService
+@{ var isMenuMobile = settingService.GetSettingByKey("urbanthemesettings.ismenumobile", false, storeContext.CurrentStore.Id, true);
+
+    var customername = workContext.CurrentCustomer!=null?customerService.GetCustomerFullName(workContext.CurrentCustomer):"";
+
+}
+
+<style>
+    .button-2 {
+        cursor: pointer;
+        background: #009ddc;
+        /* background: #333333; */
+        border: 1px solid #009ddc;
+        /* border: 1px solid #333; */
+        color: #ffffff;
+        display: inline-block;
+        font-family: 'proxima-nova', 'Droid Arabic Kufi';
+        font-size: 14px;
+        letter-spacing: 0.5px;
+        line-height: 43px;
+        width: auto;
+        min-width: 118px;
+        -webkit-transition: all .25s ease;
+        transition: all .25s ease;
+        text-align: center;
+    }
+    /*  .account:hover {
+        background: 0% 0% no-repeat padding-box padding-box rgb(197, 231, 241);
+    }*/
+    /*.header-top-strip .header-buttons li {
+        height: 50px;
+    }
+    .header .header-strip .header-top-strip .header-buttons li a {
+        font-size: 14px;
+        text-decoration: none;
+
+    }
+    .header .header-strip .header-top-strip .header-buttons li span {
+        font-size: 14px
+    }*/
+    .account {
+        /* UI Properties */
+        text-align: center;
+        font: normal normal bold 14px/17px Proxima Nova;
+    }
+</style>
+<div class="header-strip" style="margin-right: 0px; display: flex; flex-direction: column;">
+    <div class="header-top-strip">
+
+        @if (!isMenuMobile)
+        {
+            @await Component.InvokeAsync("Logo")}
+
+        <ul class="header-buttons" style=" float: unset; display: flex; align-items: center;">
+
+            @await Component.InvokeAsync("AdminHeaderLinks")
+
+            @if (Model.ShoppingCartEnabled)
+            {
+                <li class="shopping-cart-opener">
+                    <a href="@Url.RouteUrl("ShoppingCart")" title="@T("ShoppingCart")" onclick="shopingmenu()" style="display: flex; align-items: center; justify-content: center;">
+                        <i>
+                            <img src="~/icons/shoppingbag.svg" />
+                            <span class="cart-qty">@T("ShoppingCart.HeaderQuantity", Model.ShoppingCartItems)</span>
+                        </i>
+                    </a>
+                </li>
+                @*<li style="min-width: 7px; margin-bottom: 10px">
+                        <span style="font-size: 39px; top: 0px; color: #C5E7F1;">|</span>
+                    </li>*@
+            }
+            @if (Model.WishlistEnabled)
+            {
+                <li class="wishlist-opener">
+                    <a href="@Url.RouteUrl("Wishlist")" class="ico-wishlist" title="@T("Wishlist")" style="display: flex; align-items: center; justify-content: center;">
+                        <i>
+                            <img src="~/icons/wishlist.svg" />
+                            <span class="wishlist-qty">@T("Wishlist.HeaderQuantity", Model.WishlistItems)</span>
+                        </i>
+
+                    </a>
+                </li>
+                @*<li style="min-width: 8px; margin-bottom: 10px">
+                        <span style="font-size: 39px; top: 0px; color: #C5E7F1;">|</span>
+                    </li>*@
+
+            }
+            @*<li class="user-links-opener" title="@T(" SevenSpikes.Themes.Urban.HeaderLinks.UserLinks")">
+                    <a>
+                        <i class="fi-username"></i>
+                    </a>
+                </li>*@
+
+            <li class="search-opener" title="@T(" Search")">
+                <a onclick="shopingmenu()" style="display: flex; align-items: center; justify-content: center; margin-top: 3px; ">
+                    <img src="~/icons/search.svg" />
+                </a>
+            </li>
+            @*<li style="min-width: 8px; margin-bottom: 10px">
+                    <span style="font-size: 39px; top: 0px; color: #C5E7F1;">|</span>
+                </li>*@
+            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderLinksBefore })
+            @if (Model.IsAuthenticated)
+            {
+                if (Model.AllowPrivateMessages)
+                {
+                    <li>
+                        <a href="@Url.RouteUrl("PrivateMessages", new { tab = "" })" class="ico-inbox">
+                            <span class="inbox-label">@T("PrivateMessages.Inbox")</span>
+                            <span class="inbox-unread">@Model.UnreadPrivateMessages</span>
+                        </a>
+                        @if (!string.IsNullOrEmpty(Model.AlertMessage))
+                        {
+                            //new private message notification
+                            <script asp-location="Footer">
+                                            $(document).ready(function () {
+                                                displayPopupNotification('@Html.Raw(JavaScriptEncoder.Default.Encode(Model.AlertMessage))', 'success', false);
+                                            });
+                            </script>
+                        }
+                    </li>
+                }
+
+
+
+
+                @*<li style="line-height: 0px; width: 119px; text-align: left">
+                        <img src="~/icons/profile.svg" style="float: left" /> <span style=" font-size: small; color: black;">Welcome</span><br />
+                        <a href="@Url.RouteUrl("CustomerInfo")" class="account">   @Model.CustomerName</a>
+                    </li>*@
+                <li class="profile-li" style="text-align: center; display: flex; align-items: center; gap: 3px;">
+                    <img src="~/icons/profile.svg" class="profile-img">
+                    <span style="text-align: center; letter-spacing: 0px; color: #333333; opacity: 1; display: flex; flex-direction: column; align-items: flex-start; font: normal normal 600 12px/15px Proxima Nova; ">
+                        @T("account.welcome")
+                        <a href="@Url.RouteUrl("CustomerInfo")" style="font: normal normal bold 14px/17px Proxima Nova; color: #189EC8; ">@(customername.Length > 11 ? customername.Substring(0,11) : customername)</a>
+                    </span>
+                    <span class="user-links-opener" title="User Links"><a onclick="dropdownMenu()"> <img src="~/icons/arrow.svg" class="arrow-icon"></a></span>
+                </li>
+                @*<li class="profile-li" style="text-align:center">
+                        <img src="~/icons/profile.svg" />
+                    </li>
+                    <li style="text-align: left;" class="welcome-li">
+
+                        <span style="text-align: center; letter-spacing: 0px; color: #333333; opacity: 1;">@T("account.welcome")</span><br />
+                        <span><a href="@Url.RouteUrl("CustomerInfo")" class="account"> <b>@Model.CustomerName</b>  </a></span>
+
+                    </li>*@
+                @*<li id="arrow-li">
+                        <span class="user-links-opener" title="@T(" SevenSpikes.Themes.Urban.HeaderLinks.UserLinks")"><a onclick="dropdownMenu()"> <img src="~/icons/arrow.svg" style="margin-right: 7px;" /></a></span>
+                    </li>*@
+            }
+            else
+            {
+
+                @*<li><a href="~/Registerinit" class="ico-register">@T("Account.Register")</a></li>*@
+                <li class="li-login">
+
+                    <a href="~/Login" class="ico-login">
+                        <b>@T("Account.Login")</b>
+                    </a>
+                </li>
+
+            }
+            @*<li style="min-width: 8px; margin-bottom: 10px">
+                    <span style="font-size: 39px; top: 0px; color: #C5E7F1;">|</span>
+                </li>*@
+            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderLinksAfter })
+            <li class="li-language-selector">
+                @await Component.InvokeAsync("LanguageSelector")
+
+            </li>
+
+
+        </ul>
+
+        <div class="header-menu">
+            <div class="close-menu">
+                <span>@T("SevenSpikes.Themes.Common.CloseMenu")</span>
+            </div>
+            @{ var menuHtml = await Component.InvokeAsync("Widget", new { widgetZone = "theme_header_menu" }); }
+            @if (!String.IsNullOrEmpty(menuHtml.ToHtmlString()))
+            {
+                @menuHtml }
+            else
+            {
+                @await Component.InvokeAsync("TopMenu")}
+        </div>
+    </div>
+    <div class="header-bottom-strip" style="display: flex; border-radius: 6px; width: 168px; top: 42px; flex-direction: row;">
+        <div class="header-links-wrapper" style="width: 100%; margin:0">
+            @if (Model.ShoppingCartEnabled)
+            {
+                <div class="shopping-cart-wrapper">
+                    @await Component.InvokeAsync("FlyoutShoppingCart")
+                </div>}
+            <div class="user-links-wrapper">
+                <div class="header-links">
+                    <ul style="display: flex; flex-direction: column;">
+                        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderLinksBefore })
+                        @if (Model.IsAuthenticated)
+                        {
+                            if (Model.AllowPrivateMessages)
+                            {
+                                <li>
+                                    <a href="@Url.RouteUrl("PrivateMessages", new { tab = "" })" class="ico-inbox">
+                                        <span class="inbox-label">@T("PrivateMessages.Inbox")</span>
+                                        <span class="inbox-unread">@Model.UnreadPrivateMessages</span>
+                                    </a>
+                                    @if (!string.IsNullOrEmpty(Model.AlertMessage))
+                                    {
+                                        //new private message notification
+                                        <script asp-location="Footer">
+                                            $(document).ready(function () {
+                                                displayPopupNotification('@Html.Raw(JavaScriptEncoder.Default.Encode(Model.AlertMessage))', 'success', false);
+                                            });
+                                        </script>
+                                    }
+                                </li>
+                            }
+                            <li>
+
+                                <img src="~/icons/user-icon.svg" class="user-icon" /> <a class="user-icon-a" href="@Url.RouteUrl("CustomerInfo")">@T("account.myaccountInfo")</a>
+                            </li>
+                            <li><img src="~/icons/logout.svg" class="logout-icon" /><a href="@Url.RouteUrl("Logout")" class="ico-logout">@T("Account.Logout")</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="~/Registerinit" class="ico-register">@T("Account.Register")</a></li>
+                            <li><a href="~/Login" class="ico-login">@T("Account.Login")</a></li>
+                        }
+                        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HeaderLinksAfter })
+                    </ul>
+                </div>
+            </div>
+            <div class="search-box-wrapper">
+                <div class="search-box store-search-box">
+                    @await Component.InvokeAsync("SearchBox")
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        var language = document.getElementById('english');
+        var administrationExist = document.getElementsByClassName('administration')[0]
+        if (language != null && language != undefined && administrationExist == undefined) {
+            $('.shopping-cart-opener').css("border-right", "none");
+        }
+
+        var login = document.getElementsByClassName('ico-login');
+
+        if (login != null && login != undefined)
+            $('.li-language-selector:before').css('border', 'none');
+
+
+    });
+    function dropdownMenu() {
+        var language = document.getElementById('english');
+        $('.header-bottom-strip').css('margin-left', '');
+        $('.header-bottom-strip').css('margin-right', '');
+
+        $('.header-bottom-strip').css('width', ' 167px');
+        $('.header-bottom-strip').css('top', '33px');
+        $('.header-bottom-strip').css('border-radius', '6px');
+        $('.header-bottom-strip').css('display', 'flex');
+        $('.header-bottom-strip').css('flex-direction', 'row');
+
+
+        if (language != null && language != undefined) {
+            $('.header-bottom-strip').css('margin-left', '');
+            $('.header-bottom-strip').css('margin-right', '199px');
+            /* $('.header-links').css('text-align', 'right');*/
+            $('.header-bottom-strip').css('top', '55px');
+            $('.header-bottom-strip').css('width', '172px');
+            if (administrationExist != null && administrationExist != undefined && language == null) {
+                $('.header-bottom-strip').css('margin-right', '304px');
+            }
+
+        } else {
+            //
+            var administrationExist = document.getElementsByClassName('administration')[0]
+
+            if (administrationExist != null && administrationExist != undefined && language == null) {
+                $('.header-bottom-strip').css('margin-left', '289px');
+            } else {
+                $('.header-bottom-strip').css('margin-left', '185px');
+            }
+
+        }
+
+    }
+    function shopingmenu() {
+        $('.header-bottom-strip').css('border-radius', '');
+        $('.header-bottom-strip').css('margin-left', '');
+        $('.header-bottom-strip').css('width', '');
+    }
+</script>

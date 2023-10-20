@@ -1,0 +1,42 @@
+﻿@using Nop.Core.Infrastructure
+@using Nop.Web.Models.Common;
+@using Nop.Services.Localization
+@using Nop.Web.Framework.Themes
+@using Nop.Core
+
+@model LogoModel
+
+@inject IThemeContext themeContext
+@inject IStoreContext storeContext
+@inject ILocalizationService localizationService
+@{
+
+    var currentThemeName = themeContext.WorkingThemeName;
+
+    var themeLogo = await Component.InvokeAsync("Widget", new { widgetZone = "urban_theme_logo" });
+    //var logoPath = "https://www.matjery.ae/Themes/" + currentThemeName + "/Content/img/logo.png";
+    var logoPath = storeContext.CurrentStore.Url + currentThemeName + "/Content/img/logo.png";
+    var home = storeContext.CurrentStore.Url + "?Store=public";
+
+}
+
+<div class="header-logo">
+    <a href="@home" class="logo">
+        @*Url.RouteUrl("HomePage")*@
+
+        @*@{
+            string storeName = localizationService.GetLocalized(storeContext.CurrentStore, x => x.Name);
+            <img title="" alt="@Model.StoreName" src="@logoPath">
+        }*@
+
+        @if (!String.IsNullOrEmpty(themeLogo.ToHtmlString()))
+        {
+            @themeLogo
+        }
+        else
+        {
+            string storeName = localizationService.GetLocalized(storeContext.CurrentStore, x => x.Name);
+            <img title="" alt="@storeName" src="@Url.Content(logoPath)">
+        }
+    </a>
+</div>

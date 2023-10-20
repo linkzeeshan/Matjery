@@ -1,0 +1,191 @@
+﻿@model BulkEditSearchModel
+
+@using Nop.Core.Domain.Tax;
+@using Nop.Core.Domain.Catalog;
+
+<div class="panel-body">
+    <div class="form-group">
+        <div class="col-md-12" style="overflow-x: auto;">
+            @foreach (var item in Model.BulkEditListModel)
+            {
+                <script>
+                    $(document).ready(function () {
+                        toggleOrderItemEdit@(item.Id)(false);
+                    });
+                </script>
+
+                <script>
+                    function toggleOrderItemEdit@(item.Id)(editMode) {
+                        if (editMode) {
+                            $('#pnlEditPvName@(item.Id)').show();
+                            $('#pnlEditPvSku@(item.Id)').show();
+                            $('#pnlEditPvPrice@(item.Id)').show();
+                            $('#pnlEditPvOldPrice@(item.Id)').show();
+                            $('#pnlEditPvManageInventoryMethod@(item.Id)').show();
+                            $('#pnlEditPvStockQuantity@(item.Id)').show();
+                            $('#pnlEditPvPublished@(item.Id)').show();
+
+                            $('#btnEditOrderItem@(item.Id)').hide();
+                            $('#btnDeleteOrderItem@(item.Id)').hide();
+                            $('#btnSaveOrderItem@(item.Id)').show();
+                            $('#btnCancelOrderItem@(item.Id)').show();
+                        } else {
+                            $('#pnlEditPvName@(item.Id)').show();
+                            $('#pnlEditPvSku@(item.Id)').show();
+                            $('#pnlEditPvPrice@(item.Id)').show();
+                            $('#pnlEditPvOldPrice@(item.Id)').show();
+                            $('#pnlEditPvManageInventoryMethod@(item.Id)').show();
+                            $('#pnlEditPvStockQuantity@(item.Id)').show();
+                            $('#pnlEditPvPublished@(item.Id)').show();
+
+                            $('#btnEditOrderItem@(item.Id)').hide();
+                            $('#btnDeleteOrderItem@(item.Id)').hide();
+                            $('#btnSaveOrderItem@(item.Id)').show();
+                            $('#btnCancelOrderItem@(item.Id)').show();
+                        }
+                    }
+                </script>
+            }
+
+            <table class="table table-hover table-bordered">
+                <col />
+                <col />
+                <col />
+                <col />
+                <col />
+                <col />
+                <col />
+            <thead>
+                <tr>
+                    <th>
+                      Name  @*@T("Admin.Catalog.BulkEdit.Fields.Name")*@
+                    </th>
+                    <th>
+                       SKU @*@T("Admin.Catalog.BulkEdit.Fields.SKU")*@
+                    </th>
+                    <th>
+                       Price @*@T("Admin.Catalog.BulkEdit.Fields.Price")*@
+                    </th>
+                    <th>
+                      Old Price  @*@T("Admin.Catalog.BulkEdit.Fields.OldPrice")*@
+                    </th>
+                    <th class="visible-lg">
+                        Manage Inventory Method @*@T("Admin.Catalog.BulkEdit.Fields.ManageInventoryMethod")*@
+                    </th>
+                    <th>
+                        Stock Quantity @*@T("Admin.Catalog.BulkEdit.Fields.StockQuantity")*@
+                    </th>
+                    <th>
+                        Published  @*@T("Admin.Catalog.BulkEdit.Fields.Published")*@
+                    </th>
+                </tr>
+            </thead>
+                <tbody>
+                    @foreach (var item in Model.BulkEditListModel)
+                    {
+                    <tr>
+                        <td class="text-center">
+                            <div>@item.Name</div>
+                            <div id="pnlEditPvName@(item.Id)">
+                                <div class="form-group">
+                                    <div class="col-md-8 col-md-offset-2">
+                                        <input name="pvName@(item.Id)" type="text" value="@item.Name" id="pvName@(item.Id)" class="form-control input-sm" />
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div>@item.Sku</div>
+                            <div id="pnlEditPvSku@(item.Id)">
+                                <div class="form-group">
+                                    <div class="col-md-8 col-md-offset-2">
+                                        <input name="pvSku@(item.Id)" type="text" value="@item.Sku" id="pvSku@(item.Id)" class="form-control input-sm" />
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div>@item.OldPrice</div>
+                            <div id="pnlEditPvOldPrice@(item.Id)">
+                                <div class="form-group">
+                                    <div class="col-md-8 col-md-offset-2">
+                                        <input name="pvOldPrice@(item.Id)" type="text" value="@item.OldPrice" id="pvOldPrice@(item.Id)" class="form-control input-sm" />
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div>@item.ManageInventoryMethod</div>
+                            <div id="pnlEditPvManageInventoryMethod@(item.Id)">
+                                <div class="form-group">
+                                    <div class="col-md-8 col-md-offset-2">
+                                        <input name="pvManageInventoryMethod@(item.Id)" type="text" value="@item.ManageInventoryMethod" id="pvManageInventoryMethod@(item.Id)" class="form-control input-sm" />
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div>@item.StockQuantity</div>
+                            <div id="pnlEditPvStockQuantity@(item.Id)">
+                                <div class="form-group">
+                                    <div class="col-md-8 col-md-offset-2">
+                                        <input name="pvStockQuantity@(item.Id)" type="text" value="@item.StockQuantity" id="pvStockQuantity@(item.Id)" class="form-control input-sm" />
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <div>@item.Published</div>
+                            <div id="pnlEditPvPublished@(item.Id)">
+                                <div class="form-group">
+                                    <div class="col-md-8 col-md-offset-2">
+                                        <input name="pvPublished@(item.Id)" type="text" value="@item.Published" id="pvPublished@(item.Id)" class="form-control input-sm" />
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        @*@if (!Model.IsLoggedInAsVendor)
+        {*@
+                        <td style="width: 15%;" class="text-center">
+                            <button type="submit" class="btn btn-default" name="btnEditOrderItem@(item.Id)" onclick="toggleOrderItemEdit@(item.Id)(true);return false;" id="btnEditOrderItem@(item.Id)">
+                                <i class="fa fa-pencil"></i>
+                                @T("~/Admin/Product/BulkEditSelect/")
+                            </button>
+
+                            <button type="submit" class="btn btn-default" name="btnDeleteOrderItem@(item.Id)" id="btnDeleteOrderItem@(item.Id)">
+                                <i class="fa fa-trash"></i>
+                                @T("Admin.Common.Delete")
+                            </button>
+                            <nop-action-confirmation asp-button-id="@("btnDeleteOrderItem" + item.Id)" />
+                            <script>
+                                            $(function () {
+                                                $('#btnDeleteOrderItem@(item.Id), #btnSaveOrderItem@(item.Id)').click(function () {
+                                                    var scrollAction = [{
+                                                        property: 'scrollAction',
+                                                        value: true,
+                                                        cacheFix: (new Date()).getTime() + Math.floor(Math.random() * 1000000)
+                                                    }];
+                                                    window.parent.postMessage(JSON.stringify(scrollAction), '*');
+                                                });
+                                            });
+                            </script>
+
+                            <button type="submit" class="btn btn-default" name="btnSaveOrderItem@(item.Id)" id="btnSaveOrderItem@(item.Id)" style="display: none;">
+                                <i class="fa fa-floppy-o"></i>
+                                @T("Admin.Common.Save")
+                            </button>
+                            <nop-action-confirmation asp-button-id="@("btnSaveOrderItem" + item.Id)" />
+
+                            <button type="submit" class="btn btn-default" name="btnCancelOrderItem@(item.Id)" onclick="toggleOrderItemEdit@(item.Id)(false);return false;" id="btnCancelOrderItem@(item.Id)" style="display: none;">
+                                <i class="fa fa-close"></i>
+                                @T("Admin.Common.Cancel")
+                            </button>
+                        </td>
+                        @*}*@
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

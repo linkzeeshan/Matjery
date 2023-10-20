@@ -1,0 +1,154 @@
+﻿@model FooterModel
+
+@using Nop.Core
+@using Nop.Core.Domain.Tax
+@using Nop.Services.Configuration
+
+@inject IWorkContext workContext
+@inject IStoreContext storeContext
+@inject ISettingService settingService
+
+@{
+    var storeId = storeContext.CurrentStore.Id;
+    
+    var removeDesignedBy = settingService.GetSettingByKey("urbanthemesettings.removedesignedby", false, storeId, true);
+    var removeCopyright = settingService.GetSettingByKey("urbanthemesettings.removecopyright", false, storeId, true);
+    var instagramUrl = settingService.GetSettingByKey("urbanthemesettings.instagramurl", String.Empty, storeId, true).ToLowerInvariant();
+}
+
+<div class="footer">
+    <div class="footer-upper">
+        <div class="social-buttons">
+            @await Component.InvokeAsync("NewsletterBox")
+
+            @await Component.InvokeAsync("Widget", new { widgetZone = "urban_footer_map" })
+        </div>
+    </div>
+    <div class="footer-middle">
+        <div class="rightside">
+            <div class="footer-box">
+                <div class="footer-aboutus">
+                    <p>@T("supportedbyfoundationid")</p>
+                    <div class="footer-aboutus-logo">
+                        <a href="https://www.gwu.ae/" target="_blank"><img class="matjery" src="~/Themes/Urban/Content/img/matjery-logo.png" /></a>
+                        <a href="https://www.tra.gov.ae/en/home.aspx" target="_blank"><img class="tra" src="~/Themes/Urban/Content/img/tra-logo.png" /></a>
+                    </div>
+                    <p>@T("Footer.Address")</p>
+                    <p>@T("Footer.CallUs")</p>
+                    <p><a href="mailto:@T("Footer.Email")">@T("Footer.Email")</a></p>
+                    <p><a href="mailto:@T("Support.Email")">@T("Support.Text"): @T("Support.Email")</a></p>
+                    <div class="social-media">
+                        <a target="_blank" href="https://www.facebook.com"><i class="icon-facebook"></i></a>
+                        <a target="_blank" href="https://mobile.twitter.com/MatjeryA"><i class="icon-twitter"></i></a>
+                        @*<a target="_blank" href="#"><i class="icon-youtube"></i></a>*@
+                        <a target="_blank" href="https://www.instagram.com/matjery.ae"><i class="icon-instagram"></i></a>
+                        @*<a target="_blank" href="#"><i class="icon-pinterest"></i></a>*@
+                    </div>
+                    @await Component.InvokeAsync("SocialButtons")
+                </div>
+            </div>
+            @*@if (!string.IsNullOrWhiteSpace(instagramUrl))
+                {
+                    <div class="footer-box">
+                        <a class="instagram" href="@instagramUrl" target="_blank"></a>
+                    </div>
+                }*@
+            <div class="footer-box">
+                <div class="footer-aboutus-logo">
+
+                </div>
+                <ul>
+                    @foreach (var topic in Model.Topics.Where(x => x.IncludeInFooterColumn1).ToList())
+                    {
+                        <li><a href="@Url.RouteUrl("Topic", new { SeName = topic.SeName })">@topic.Name</a></li>
+                    }
+                    @*<li><a href="@Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("LoginRegistrationInfo") })">@T("SevenSpikes.Themes.Urban.Common.LoginRegistrationInfo")</a></li>*@
+                </ul>
+            </div>
+            <div class="footer-box">
+                <div class="footer-aboutus-logo">
+
+                </div>
+                <ul>
+                    @foreach (var topic in Model.Topics.Where(x => x.IncludeInFooterColumn2).ToList())
+                    {
+                        <li><a href="@Url.RouteUrl("Topic", new { SeName = topic.SeName })">@topic.Name</a></li>
+                    }
+                    <li><a href="@Url.RouteUrl("ContactUs")">@T("ContactUs")</a></li>
+                    @if (Model.BlogEnabled)
+                    {
+                        <li><a href="@Url.RouteUrl("Blog")">@T("Blog")</a></li>
+                    }
+                    @if (Model.AllowCustomersToApplyForVendorAccount)
+                    {
+                        <li><a href="@Url.RouteUrl("ApplyVendorAccount")">@T("Vendors.ApplyAccount")</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <span class="icon-divider"></span>
+    </div>
+    <div class="footer-lower">
+        <ul class="footer-lower-links">
+            @if (Model.SitemapEnabled)
+            {
+                <li><a href="@Url.RouteUrl("Sitemap")">@T("Sitemap")</a></li>
+            }
+            <li><a href="@Url.RouteUrl("ProductSearch")">@T("Search")</a> </li>
+            <li><a href="@Url.RouteUrl("CustomerOrders")">@T("Account.CustomerOrders")</a></li>
+            <li><a href="@Url.RouteUrl("CustomerAddresses")">@T("Account.CustomerAddresses")</a></li>
+        </ul>
+        <div class="footer-disclaimer">
+            @T("Content.CopyrightNotice", DateTime.Now.Year, Model.StoreName)
+        </div>
+
+        @*<ul class="accepted-payment-methods">
+                <li class="method1"></li>
+                <li class="method2"></li>
+                <li class="method3"></li>
+                <li class="method4"></li>
+                <li class="method5"></li>
+                <li class="method6"></li>
+            </ul>*@
+
+
+        @*<div class="footer-store-theme">
+            @Html.Action("StoreThemeSelector", "Common")
+            </div>
+            <div class="footer-links-wrapper">
+            @if (!removeCopyright)
+            {
+                <div class="footer-powered-by">
+
+                    @*Would you like to remove the "Powered by nopCommerce" link in the bottom of the footer?
+                        Find more info here http://www.nopcommerce.com/copyrightremoval.aspx
+                    </div>
+                }
+                @if (!removeDesignedBy)
+                {
+                    <div class="footer-designed-by">
+
+                    </div>
+                }
+                @if (Model.DisplayTaxShippingInfoFooter)
+                {
+                    var inclTax = EngineContext.Current.Resolve<IWorkContext>().TaxDisplayType == TaxDisplayType.IncludingTax;
+                    <div class="footer-tax-shipping">
+                        @T(inclTax ? "Footer.TaxShipping.InclTax" : "Footer.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
+                    </div>
+                }
+            </div>*@
+    </div>
+    <div class="footer-lower" style="background-color: #189ec8; max-width: 100%; margin: 0px">
+        <div class="" style="color:white">
+            <b>@T("footer.poweredby").Text</b>
+            <a href="https://www.maqta.ae/en"><img src="~/images/maqta-logo.svg" style="width: 43%" /></a>
+            @*@T("Content.CopyrightNotice", DateTime.Now.Year, Model.StoreName)- Zeeshan Ayyub*@
+        </div>
+        <div class="" style="color:white">
+            <b>@T("footer.partof").Text</b>
+            <a href="https://www.adports.ae/"><img src="~/images/AD-ports-logo.svg" style="width: 48%" /></a>
+        </div>
+    </div>
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.Footer })
+    </div>

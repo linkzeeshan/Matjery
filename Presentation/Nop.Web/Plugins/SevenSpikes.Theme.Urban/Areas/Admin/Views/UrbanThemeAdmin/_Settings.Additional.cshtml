@@ -1,0 +1,421 @@
+﻿@model UrbanThemeSettingsModel
+
+@using Nop.Services.Customers;
+@using Nop.Services.Directory;
+
+@inject AdminAreaSettings adminAreaSettings
+@inject IWorkContext workContext
+@inject ICustomerService customerService
+@inject ICountryService  countryService
+
+@{
+	var defaultGridPageSize = adminAreaSettings.DefaultGridPageSize;
+	var gridPageSizes = adminAreaSettings.GridPageSizes;
+
+	var customerCity = string.Empty;
+	var customerCountry = string.Empty;
+
+	var defaultAddress = customerService.GetAddressesByCustomerId(workContext.CurrentCustomer.Id).FirstOrDefault();
+	if (defaultAddress != null)
+	{
+		customerCity = defaultAddress.City ?? string.Empty;
+
+		var countryId = defaultAddress.CountryId == null ? 0 : (int)defaultAddress.CountryId;
+
+		var country = countryService.GetCountryById(countryId);
+
+		if (country != null)
+		{
+			customerCountry = country.Name;
+		}
+	}
+}
+
+<div class="panel-group">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-override-store-checkbox asp-for="IsMenuMobile_OverrideForStore" asp-input="IsMenuMobile" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                    <nop-label asp-for="IsMenuMobile" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="IsMenuMobile" />
+                    <span asp-validation-for="IsMenuMobile"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-override-store-checkbox asp-for="ItemBoxHoverEffect_OverrideForStore" asp-input="ItemBoxHoverEffect" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                    <nop-label asp-for="ItemBoxHoverEffect" />
+                </div>
+                <div class="col-md-9">
+                    <nop-select asp-for="ItemBoxHoverEffect" asp-items="Model.ItemBoxHoverEffectOptions" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-override-store-checkbox asp-for="IsDefaultCategoryNavigationEnabled_OverrideForStore" asp-input="IsDefaultCategoryNavigationEnabled" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                    <nop-label asp-for="IsDefaultCategoryNavigationEnabled" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="IsDefaultCategoryNavigationEnabled" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-override-store-checkbox asp-for="IsCategoryPageOneColumn_OverrideForStore" asp-input="IsCategoryPageOneColumn" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                    <nop-label asp-for="IsCategoryPageOneColumn" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="IsCategoryPageOneColumn" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-override-store-checkbox asp-for="IsQuickTabsOneColumn_OverrideForStore" asp-input="IsQuickTabsOneColumn" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                    <nop-label asp-for="IsQuickTabsOneColumn" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="IsQuickTabsOneColumn" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-override-store-checkbox asp-for="IsHeaderInsideHomePageMainSlider_OverrideForStore" asp-input="IsHeaderInsideHomePageMainSlider" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                    <nop-label asp-for="IsHeaderInsideHomePageMainSlider" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="IsHeaderInsideHomePageMainSlider" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-override-store-checkbox asp-for="GoogleApiKey_OverrideForStore" asp-input="GoogleApiKey" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                    <nop-label asp-for="GoogleApiKey" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="GoogleApiKey" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-override-store-checkbox asp-for="EnableFooterMapOnHomePage_OverrideForStore" asp-input="EnableFooterMapOnHomePage" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                    <nop-label asp-for="EnableFooterMapOnHomePage" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="EnableFooterMapOnHomePage" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-override-store-checkbox asp-for="EnableFooterMapOnAllPages_OverrideForStore" asp-input="EnableFooterMapOnAllPages" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                    <nop-label asp-for="EnableFooterMapOnAllPages" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="EnableFooterMapOnAllPages" />
+                </div>
+            </div>
+            <div class="home-page-map">
+                <input id="shop-address-input" type="text" placeholder="Search Address" />
+
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="Latitude_OverrideForStore" asp-input="Latitude" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="Latitude" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="Latitude" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="IsDefaultCategoryNavigationEnabled_OverrideForStore" asp-input="IsDefaultCategoryNavigationEnabled" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="IsDefaultCategoryNavigationEnabled" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="IsDefaultCategoryNavigationEnabled" />
+                        <span asp-validation-for="IsDefaultCategoryNavigationEnabled"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="Longitude_OverrideForStore" asp-input="Longitude" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="Longitude" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="Longitude" />
+                        <span asp-validation-for="Longitude"></span>
+                    </div>
+                </div>
+                <div id="chooseLocationMap" data-pathtoimages="@Url.RouteUrl("HomePage")@Plugin.PathToImagesFolder"></div>
+
+                <input type="hidden" value="@(customerCity), @(customerCountry)" id="customer-nop-address"
+                       data-googleapikey="@Model.GoogleApiKey"
+                       data-mapstyles="@Model.CustomMapStyles" />
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <nop-override-store-checkbox asp-for="HomepageCategoriesIds_OverrideForStore" asp-input="HomepageCategoriesIds" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+            @T("SevenSpikes.Themes.Urban.Admin.Settings.HomepageCategoriesIds")
+        </div>
+        <div class="panel-body pluginSettings home-categories">
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-override-store-checkbox asp-for="NumberOfHomepageCategoryProducts_OverrideForStore" asp-input="NumberOfHomepageCategoryProducts" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                    <nop-label asp-for="NumberOfHomepageCategoryProducts" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="NumberOfHomepageCategoryProducts" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-9">
+                    @Html.HiddenFor(model => model.HomepageCategoriesIds)
+                </div>
+            </div>
+            <div id="categories-grid"></div>
+        </div>
+        <div class="panel-footer">
+            <em>@T("SevenSpikes.Themes.Urban.Admin.Settings.HomepageCategoriesIds.Hint")</em>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-override-store-checkbox asp-for="CustomMapStyles_OverrideForStore" asp-input="CustomMapStyles" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                    <nop-label asp-for="CustomMapStyles" />
+                </div>
+                <div class="col-md-9">
+                    <nop-textarea asp-for="CustomMapStyles" style="height: 450px;" />
+                </div>
+            </div>
+            <div class="adminHint">
+                <div class="col-md-3">
+                </div>
+                <div class="col-md-9">
+                    <div class="summary">
+                        To generate the <strong>Custom Map Styles</strong> do the following:
+                    </div>
+                    <ul>
+                        <li>Go to Google Maps Styling Wizard: <a href="https://mapstyle.withgoogle.com/" target="_blank">https://mapstyle.withgoogle.com/</a>.</li>
+                        <li>Customize colors, roads, labels of the map.</li>
+                        <li>Click on <strong>Finish</strong> and copy the <strong>JSON</strong> from the pop-up.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+    $(document)
+        .ready(function() {
+            $("#categories-grid")
+                .kendoGrid({
+                    dataSource: {
+                        type: "json",
+                        transport: {
+                            read: {
+                                url: "@Html.Raw(Url.Action("CategoryGridList", "UrbanThemeAdmin"))",
+                                type: "POST",
+                                dataType: "json",
+                                data: function() {
+                                    var data = {
+                                        storeId: getStoreId()
+                                    };
+
+                                    addAntiForgeryToken(data);
+
+                                    return data;
+                                },
+                                complete: updateHomepageCategoriesIds
+                            },
+                            update: {
+                                url: "@Html.Raw(Url.Action("Update", "UrbanThemeAdmin"))",
+                                type: "POST",
+                                dataType: "json",
+                                data: function() {
+                                    var data = {
+                                        storeId: getStoreId()
+                                    };
+
+                                    addAntiForgeryToken(data);
+
+                                    return data;
+                                },
+                                complete: updateHomepageCategoriesIds
+                            },
+                            destroy: {
+                                url: "@Html.Raw(Url.Action("Delete", "UrbanThemeAdmin"))",
+                                type: "POST",
+                                dataType: "json",
+                                data: function() {
+                                    var data = {
+                                        storeId: getStoreId()
+                                    };
+
+                                    addAntiForgeryToken(data);
+
+                                    return data;
+                                },
+                                complete: updateHomepageCategoriesIds
+                            },
+                            create: {
+                                url: "@Html.Raw(Url.Action("Create", "UrbanThemeAdmin"))",
+                                type: "POST",
+                                dataType: "json",
+                                data: function() {
+                                    var data = {
+                                        storeId: getStoreId()
+                                    };
+
+                                    addAntiForgeryToken(data);
+
+                                    return data;
+                                },
+                                complete: function(data) {
+                                    data.success(function(datas) {
+                                        $("#@Html.IdFor(model => model.HomepageCategoriesIds)").val(datas.ExtraData);
+                                    });
+
+                                    $("#categories-grid").data("kendoGrid").dataSource.read();
+                                }
+                            }
+                        },
+                        schema: {
+                            data: "Data",
+                            total: "Total",
+                            errors: "Errors",
+                            model: {
+                                id: "Id",
+                                fields: {
+                                    Name: { editable: true, type: "string" },
+                                    DisplayOrder: { editable: true, type: "number" }
+                                }
+                            }
+                        },
+                        requestEnd: function(e) {
+                            if (e.type == "update") {
+                                this.read();
+                            }
+                        },
+                        error: function(e) {
+                            display_kendoui_grid_error(e);
+                            // Cancel the changes
+                            this.cancelChanges();
+                        },
+                        pageSize: @(defaultGridPageSize),
+                    },
+                    pageable: {
+                        refresh: true,
+                        pageSizes: [@(gridPageSizes)]
+                    },
+                    editable: {
+                        confirmation: true,
+                        mode: "popup",
+                        createAt: "bottom",
+                        window: {
+                            animation: false,
+                            width: 480
+                        }
+                    },
+                    scrollable: false,
+                    toolbar: ["create"],
+                    edit: function(e) {
+                        if (!e.model.isNew()) {
+                            //replacing the whole dropdown with the specification name
+                            var dropdown = e.container.find('.k-widget.k-dropdown.k-header')
+                                .replaceWith(e.model.Name);
+                        }
+                    },
+                    columns: [
+                        {
+                            field: "Name",
+                            title: "@T("SevenSpikes.Themes.Urban.Admin.Catalog.Name")",
+                            editor: specificationEditor
+                        }, {
+                            field: "DisplayOrder",
+                            title: "@T("SevenSpikes.Themes.Urban.Admin.Catalog.DisplayOrder")"
+                        }, {
+                            command: [
+                                {
+                                    name: "edit",
+                                    text: "@T("Admin.Common.Edit")"
+                                }, {
+                                    name: "destroy",
+                                    text: "@T("Admin.Common.Delete")"
+                                }
+                            ],
+                            width: 200
+                        }
+                    ]
+                });
+        });
+
+    function specificationEditor(container) {
+        $('<select style="width: 100%" required data-bind="value: Id" />')
+            .appendTo(container)
+            .kendoDropDownList({
+                dataTextField: "Text",
+                dataValueField: "Value",
+                optionLabel: "@T("SevenSpikes.Themes.Urban.Admin.Categories")",
+                autoBind: false,
+                select: function(e) {
+                    if (e.item.text() == "@T("SevenSpikes.Themes.Urban.Admin.NoResults")") {
+                        e.preventDefault();
+                    }
+                },
+                dataSource: {
+                    transport: {
+                        read: {
+                            url: "@Html.Raw(Url.Action("GetCategories", "UrbanThemeAdmin"))",
+                            data: function() {
+                                return {
+                                    storeId: getStoreId()
+                                };
+                            }
+                        }
+                    },
+                    requestEnd: function(e) {
+                        if (!e.response.length) {
+                            e.response.push({ Text: "@T("SevenSpikes.Themes.Urban.Admin.NoResults")", Value: 0 });
+                        }
+                    }
+                }
+            });
+    }
+
+    function updateHomepageCategoriesIds(data) {
+        data.success(function(datas) {
+            $("#@Html.IdFor(model => model.HomepageCategoriesIds)").val(datas.ExtraData);
+        });
+    }
+
+    function getStoreId() {
+        var storeId = 0;
+        var storeSelector = $('#store-scope-configuration');
+
+        if (storeSelector.length > 0) {
+            var splitted = storeSelector.val().split('?')[1];
+
+            if (splitted != 'undefined') {
+                splitted = splitted.split('&')[0];
+
+                if (splitted != 'undefined') {
+                    var parts = splitted.split('=');
+
+                    if (typeof parts[1] != 'undefined' && parts[0].toLowerCase() == 'storeid') {
+                        storeId = parseInt(parts[1]);
+                    }
+                }
+            }
+        }
+
+        return storeId;
+    }
+</script>
+

@@ -1,0 +1,73 @@
+﻿@model CampaignModel
+@using Nop.Core.Domain.Common;
+@using Nop.Core.Domain.Seo;
+@using Nop.Core.Infrastructure;
+@using Nop.Web.Models.Catalog;
+@using Nop.Web.Extensions;
+
+
+@{
+    Layout = "_ColumnsTwo";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Manufacturers").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-manufacturer-list-page");
+}
+@section CategoryTop
+{
+    <div class="page-title">
+        <h1>@Model.Name</h1>
+    </div>
+}
+
+<div class="page category-page">
+    <div class="page-body">
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.CategoryDetailsTop, Model.Id })
+        @*@await Component.InvokeAsync("categorydetails_top")*@
+        @if (Model.Products.Count > 0)
+        {
+            if (Model.PagingFilteringContext.ViewMode == "list")
+            {
+                @*list mode*@
+                <div class="product-list">
+                    <div class="item-grid">
+                        @foreach (var product in Model.Products)
+                        {
+                            <div class="item-box">
+                                @await Html.PartialAsync("_ProductListBox", product)
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                @*grid mode*@
+                <div class="product-grid">
+                    <div class="item-grid">
+                        @foreach (var product in Model.Products)
+                        {
+                            <div class="item-box">
+                                @await Html.PartialAsync("_ProductBox", product)
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+
+        @{
+            var pager = Html.Pager(Model.PagingFilteringContext).QueryParam("pagenumber");
+        }
+        @if (!pager.IsEmpty())
+        {
+            <div class="pager">
+                @pager
+            </div>
+        }
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.CategoryDetailsBottom, Model.Id })
+        @*@await Component.InvokeAsync("categorydetails_bottom")*@
+    </div>
+</div>
+

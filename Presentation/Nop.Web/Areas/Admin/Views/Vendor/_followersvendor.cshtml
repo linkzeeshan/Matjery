@@ -1,0 +1,65 @@
+﻿@model VendorFollowerListModel
+@using Nop.Web.Areas.Admin.Models.Vendors;
+@*@using Nop.Web.Framework.Models.DataTables*@
+
+
+
+
+<div class="content">
+    <div class="form-horizontal">
+        <div class="panel-group">
+            <input type="hidden" asp-for="@Model.SearchVendorId" />
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    @await Html.PartialAsync("Table", new DataTablesModel
+               {
+                   Name = "followers-grid",
+                   UrlRead = new DataUrl("List", "VendorFollower", new RouteValueDictionary { [nameof(Model.SearchVendorId)] = Model.SearchVendorId }),
+                   Length = Model.PageSize,
+                   LengthMenu = Model.AvailablePageSizes,
+                   Filters = new List<FilterParameter>
+                          {
+                          new FilterParameter(nameof(Model.SearchVendorId))
+                          },
+                   ColumnCollection = new List<ColumnProperty>
+                        {
+                            new ColumnProperty(nameof(VendorFollowerModel.CustomerName))
+                {
+                Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorFollowers.Fields.Customer").Text,
+                Width = "350"
+                },
+
+                new ColumnProperty(nameof(VendorFollowerModel.FollowOnUtcStr))
+                {
+                Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorFollowers.Fields.FollowOnUtc").Text,
+                Width = "200",
+                },
+                  new ColumnProperty(nameof(VendorFollowerModel.Status))
+                {
+                Title = T("nop.plugin.nopwarehouse.vendorreview.admin.vendorfollowers.fields.following").Text,
+                Width = "200",
+                },
+
+                new ColumnProperty(nameof(VendorFollowerModel.UnFollowOnUtcStr))
+                {
+                Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorFollowers.Fields.Following").Text,
+                Width = "200",
+                ClassName =  NopColumnClassDefaults.CenterAll
+                },
+                new ColumnProperty(nameof(VendorFollowerModel.VendorId))
+                {
+                Title = T("Admin.Common.Edit").Text,
+                Width = "100",
+                ClassName =  NopColumnClassDefaults.Button,
+                Render = new RenderButtonView(new DataUrl("~/Admin/Vendor/Edit/"))
+                }
+                }
+               })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

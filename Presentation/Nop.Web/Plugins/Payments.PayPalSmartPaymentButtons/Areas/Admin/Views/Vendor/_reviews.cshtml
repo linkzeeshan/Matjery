@@ -1,0 +1,79 @@
+﻿@model VendorReviewListModel
+
+@using Nop.Web.Areas.Admin.Models.Vendors;
+
+<div class="content">
+    <div class="form-horizontal">
+        <div class="panel-group">
+            <input type="hidden" asp-for="@Model.SearchVendorId" />
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    @await Html.PartialAsync("Table", new DataTablesModel
+               {
+                   Name = "reviews-grid",
+
+                   UrlRead = new DataUrl("List", "VendorReview", new RouteValueDictionary { [nameof(Model.SearchVendorId)] = Model.SearchVendorId }),
+                   Length = Model.PageSize,
+                   LengthMenu = Model.AvailablePageSizes,
+                   Filters = new List<FilterParameter>
+                          {
+                          new FilterParameter(nameof(Model.SearchVendorId))
+                          },
+                   ColumnCollection = new List<ColumnProperty>
+                   {
+                        new ColumnProperty(nameof(AdminVendorReviewModel.CustomerInfo))
+                          {
+                          Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews.Fields.Customer").Text,
+                          ClassName =  NopColumnClassDefaults.CenterAll
+                          },
+                         new ColumnProperty(nameof(AdminVendorReviewModel.Title))
+                          {
+                          Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews.Fields.Title").Text,
+
+                          ClassName =  NopColumnClassDefaults.CenterAll
+                          },
+                         new ColumnProperty(nameof(AdminVendorReviewModel.ReviewText))
+          {
+          Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews.Fields.ReviewText").Text,
+          ClassName =  NopColumnClassDefaults.CenterAll
+          },
+             new ColumnProperty(nameof(AdminVendorReviewModel.Rating))
+          {
+          Title = T("Admin.Catalog.ProductReviews.Fields.Rating").Text,
+          ClassName =  NopColumnClassDefaults.CenterAll
+          },
+          new ColumnProperty(nameof(AdminVendorReviewModel.IsApproved))
+          {
+          Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews.Fields.IsApproved").Text,
+          ClassName =  NopColumnClassDefaults.CenterAll,
+          Render = new RenderBoolean()
+          },
+           new ColumnProperty(nameof(AdminVendorReviewModel.CreatedOn))
+          {
+          Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews.Fields.CreatedOn").Text,
+          ClassName =  NopColumnClassDefaults.CenterAll
+          },
+          new ColumnProperty(nameof(AdminVendorReviewModel.Id))
+          {
+          Title = T("Admin.Common.Edit").Text,
+          Width = "100",
+          ClassName =  NopColumnClassDefaults.Button,
+                Render = new RenderButtonView(new DataUrl("~/Admin/VendorReview/Edit/"))
+          }
+                   }
+
+
+               })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+

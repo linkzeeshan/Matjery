@@ -1,0 +1,98 @@
+﻿@model SearchBoxModel
+@{
+    var searchTooltip = T("Search.SearchBox.Tooltip");
+}
+<style>
+    .ui-autocomplete.ui-menu.ui-widget.ui-widget-content img {
+        display: block;
+    }
+
+    .ui-menu-item {
+        height: 100px !important;
+    }
+</style>
+<form asp-route="ProductSearchNew" method="get" id="check_small_search_form_hdr">
+    @if (Model.ShowSearchBox)
+    {
+        <input type="text" class="search-box-text" id="small-searchterms" autocomplete="off" value="@searchTooltip" name="q" />
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.SearchBoxBeforeSearchButton })
+        <input type="submit" class="button-1 search-box-button" value="@T("Search.Button")" />
+        <div><a class="advanced-search-text" href="@Url.RouteUrl("ProductSearchNew")">@T("Search.AdvancedSearch")</a></div>
+        <input type="hidden" name="search_type" id="search_type" value="P" />
+        <script asp-location="Footer">
+        $(document).ready(function() {
+            $("#small-searchterms").focus(function() {
+                if (this.value == '@T("Search.SearchBox.Tooltip")') {
+                    this.value = '';
+                }
+            });
+
+            $("#small-searchterms").blur(function() {
+                if (this.value == '') {
+                    this.value = '@searchTooltip';
+                }
+            });
+            if (sevenSpikesCore.getViewPort().width >= 1000) {
+                instantSearchCustomWrapper();
+            }
+        });
+
+            function check_small_search_form_hdr() {
+            var search_terms = $("#small-searchterms");
+            if (search_terms.val() == "" || search_terms.val() == "@searchTooltip") {
+                alert('@Html.Raw(JavaScriptEncoder.Default.Encode(T("Search.EnterSearchTerms").Text))');
+                search_terms.focus();
+                return false;
+            }
+            return true;
+        }
+
+        //custom select
+            function instantSearchCustomWrapper() {
+
+                var customSelectElements = $('.search-box select');
+
+                customSelectElements.each(function () {
+                    $(this).wrap('<div class="custom-select" />');
+                    $('<div class="custom-select-text" />').prependTo($(this).parent('.custom-select'));
+                    $(this).siblings('.custom-select-text').text($(this).children('option:selected').text());
+                }).change(function () {
+                    $(this).siblings('.custom-select-text').text($(this).children('option:selected').text());
+                });
+            }
+
+
+        </script>
+
+        @if (Model.AutoCompleteEnabled)
+        {
+<script asp-location="Footer">
+            $(document).ready(function() {
+                $('#small-searchterms').autocomplete({
+                        delay: 500,
+                        minLength: @(Model.SearchTermMinimumLength.ToString()),
+                        source: '@(Url.RouteUrl("ProductSearchAutoComplete"))',
+                        appendTo: '.search-box',
+                        select: function(event, ui) {
+                            $("#small-searchterms").val(ui.item.label);
+                            setLocation(ui.item.producturl);
+                            return false;
+                        }
+                    })
+                    .data("ui-autocomplete")._renderItem = function(ul, item) {
+                        var t = item.label;
+                        var p = item.productprice;
+                        //html encode
+                        t = htmlEncode(t);
+                     
+                        return $("<li></li>")
+                            .data("item.autocomplete", item)
+                            .append("<a>@(Model.ShowProductImagesInSearchAutoComplete ? Html.Raw("<img src='\" + item.productpictureurl + \"'>") : null)<span style='position:relative;top:-67px;color:black;left:40px;'>" + t + "<p style='color:#D3D3D3;top:35px;position:relative;font-weight:600;font-size:25px;'>" + p + "</p></span></a>")
+                        .appendTo(ul);
+                };
+            });
+</script>
+        }
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.SearchBox })
+    }
+</form>

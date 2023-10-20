@@ -1,0 +1,37 @@
+﻿@model VendorFollowerListModel
+@using Nop.Web.Areas.Admin.Models.Vendors;
+@*@using Nop.Web.Framework.Models.DataTables*@
+
+
+
+
+<div class="content">
+    <div class="form-horizontal">
+        <div class="panel-group">
+
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    @await Html.PartialAsync("Table", new DataTablesModel
+               {
+                   Name = "followers-grid",
+                   UrlRead = new DataUrl("List", "VendorFollower", new RouteValueDictionary { [nameof(Model.SearchVendorId)] = Model.SearchVendorId }),
+                   Length = Model.PageSize,
+                   LengthMenu = Model.AvailablePageSizes,
+                   ColumnCollection = new List<ColumnProperty>
+                        {
+                            new ColumnProperty(nameof(VendorFollowerModel.CustomerName))
+                            {
+                                Title = T("Admin.Vendors.Fields.Name").Text,
+                                Width = "300"
+                            },
+                     
+                        }
+               })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

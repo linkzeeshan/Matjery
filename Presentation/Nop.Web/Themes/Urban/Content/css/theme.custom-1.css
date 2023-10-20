@@ -1,0 +1,4 @@
+.item-box .product-item .picture > a:before,
+.mini-shopping-cart .picture a:before {
+  padding-top: 100%;
+}

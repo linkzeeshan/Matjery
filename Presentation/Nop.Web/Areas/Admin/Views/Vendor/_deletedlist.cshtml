@@ -1,0 +1,52 @@
+﻿@model VendorSearchModel
+
+@using Nop.Core.Domain.Common
+
+
+
+
+<div class="content">
+    <div class="form-horizontal">
+        <div class="panel-group">
+         
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    @await Html.PartialAsync("Table", new DataTablesModel
+                    {
+                        Name = "deleted-grid",
+                        UrlRead = new DataUrl("DeletedList", "Vendor", null),
+                        Length = Model.PageSize,
+                        LengthMenu = Model.AvailablePageSizes,
+                        ColumnCollection = new List<ColumnProperty>
+                        {
+                            new ColumnProperty(nameof(VendorModel.Name))
+                            {
+                                Title = T("Admin.Vendors.Fields.Name").Text,
+                                Width = "300"
+                            },
+                            new ColumnProperty(nameof(VendorModel.Email))
+                            {
+                                Title = T("Admin.Vendors.Fields.Email").Text,
+                                Width = "300"
+                            },
+                            new ColumnProperty(nameof(VendorModel.CreatedOnStr))
+                            {
+                                Title = T("Admin.Vendors.Fields.CreatedOn").Text,
+                                Width = "150"
+                            },
+                            new ColumnProperty(nameof(VendorModel.Id))
+                           {
+                                Title = T("Admin.Common.View").Text,
+                                Width = "80",
+                                ClassName = NopColumnClassDefaults.Button,
+                                Visible=Model.IsAdmin?true:false,
+                                Render = new RenderButtonView(new DataUrl("Edit"))
+
+                           }
+                        }
+                    })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

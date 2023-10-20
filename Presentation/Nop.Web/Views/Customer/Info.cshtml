@@ -1,0 +1,1044 @@
+﻿@using Nop.Core
+@using Nop.Services.Customers;
+@model CustomerInfoModel
+@inject Nop.Core.IWebHelper webHelper
+@{
+    Layout = "_ColumnsTwo";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-account-page");
+    Html.AppendPageCssClassParts("html-customer-info-page");
+    bool isUaePassAccountExist = false;
+    var externalUaePassAccount = Model.AssociatedExternalAuthRecords.Where(x => x.AuthMethodName == Provider.SystemName);
+    if (externalUaePassAccount != null && externalUaePassAccount.Count() > 0)
+    {
+        isUaePassAccountExist = true;
+    }
+    var ReasonDeleteAccount = "Please Select Reason for deleting Account";
+}
+<script src="~/lib/datepicker.js"></script>
+<style>
+    #DeleteCustomerAccountModel_ReasonId {
+        width: 80%;
+        margin-left: 5px;
+    }
+
+    #agreeTermncondition {
+        display: flex;
+        flex-direction: row;
+        align-content: center;
+        padding: 0px 0px 0px 15px;
+    }
+
+    td {
+        padding-right: 5px;
+        padding-left: 5px;
+    }
+
+    .centertd {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        margin-top: 25px;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    .rate {
+        float: left;
+        height: 46px;
+        padding: 0 10px;
+    }
+
+        .rate:not(:checked) > input {
+            position: absolute;
+            top: -9999px;
+        }
+
+        .rate:not(:checked) > label {
+            float: right;
+            width: 1em;
+            overflow: hidden;
+            white-space: nowrap;
+            cursor: pointer;
+            font-size: 30px;
+            color: #ccc;
+        }
+
+            .rate:not(:checked) > label:before {
+                content: '★ ';
+            }
+
+        .rate > input:checked ~ label {
+            color: #ffc700;
+        }
+
+        .rate:not(:checked) > label:hover,
+        .rate:not(:checked) > label:hover ~ label {
+            color: #deb217;
+        }
+
+        .rate > input:checked + label:hover,
+        .rate > input:checked + label:hover ~ label,
+        .rate > input:checked ~ label:hover,
+        .rate > input:checked ~ label:hover ~ label,
+        .rate > label:hover ~ input:checked ~ label {
+            color: #c59b08;
+        }
+    .btn-delete-account {
+        background: #dc0026;
+        border: 1px solid #dc0026;
+        color: #ffffff;
+        display: inline-block;
+        font-family: 'proxima-nova', 'Droid Arabic Kufi';
+        font-size: 14px;
+        letter-spacing: 0.5px;
+        line-height: 43px;
+        width: auto;
+        min-width: 160px;
+        text-transform: uppercase;
+        -webkit-transition: all .25s ease;
+        transition: all .25s ease;
+    }
+
+    .btn-cancel-popup {
+        background: #fff;
+        color: #333;
+        border: 1px solid #e1e1e1;
+    }
+</style>
+<script>
+
+    $(document).ready(function () {
+     
+        today = new Date();
+        $('[data-toggle="datepicker"]').datepicker({
+            format: 'dd/mm/yyyy',
+            autoHide: true,
+            autoclose: true,
+            endDate: "today",
+            maxDate: today
+        }).on('changeDate', function (ev) {
+            $(this).datepicker('hide');
+        });
+        $('[data-toggle="datepicker"]').keyup(function () {
+            if (this.value.match(/[^0-9]/g)) {
+                this.value = this.value.replace(/[^0-9^-]/g, '');
+            }
+        });
+    });
+</script>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 col-md-4">
+            @section left
+            {
+                @await Component.InvokeAsync("CustomerNavigation", new { selectedTabId = CustomerNavigationEnum.Info })
+            }
+        </div>
+        <div class="col-lg-8 col-md-8">
+            <div class="page account-page customer-info-page">
+                <div class="page-title">
+                    <h1>@T("Account.MyAccount") - @T("Account.CustomerInfo")</h1>
+                </div>
+                <div class="page-body">
+                    <form asp-route="CustomerInfo" method="post">
+                        <div asp-validation-summary="ModelOnly" class="message-error"></div>
+                        <div class="fieldset">
+                            <div class="title">
+                                <strong>@T("Account.YourPersonalDetails")</strong>
+                            </div>
+                            @if (Model.DeleteCustomerAccountModel.IsDeleted)
+                            {
+                                <div>
+                                    @T("Customers.Customer.deleteAccount").Text
+                                </div>
+                            }
+                            else
+                            {
+                                if (Model.isRequestedforDelete)
+                                {
+                                    <p style="color:red">@T("account.deleteaccountrequest.message")</p>
+                                }
+                            }
+                            <div class="form-fields">
+
+                                @if (Model.GenderEnabled)
+                                {
+                                    <div class="inputs">
+                                        <label>@T("Account.Fields.Gender"):</label>
+                                        <div class="gender">
+                                            <span class="male">
+                                                <input type="radio" asp-for="Gender" value="M" checked="@(Model.Gender == "M")" id="gender-male" />
+                                                <label class="forcheckbox" for="gender-male">@T("Account.Fields.Gender.Male")</label>
+                                            </span>
+                                            <span class="female">
+                                                <input type="radio" asp-for="Gender" value="F" checked="@(Model.Gender == "F")" id="gender-female" />
+                                                <label class="forcheckbox" for="gender-female">@T("Account.Fields.Gender.Female")</label>
+                                            </span>
+                                            @Html.HiddenFor(model => model.Gender)
+                                        </div>
+                                    </div>
+                                }
+
+                                <div class="inputs">
+                                    <label asp-for="FirstName" asp-postfix=":"></label>
+                                    <input asp-for="FirstName" />
+                                    @Html.HiddenFor(model => model.FirstName)
+                                    @if (Model.FirstNameRequired)
+                                    {
+                                        <nop-required />
+                                    }
+                                    <span asp-validation-for="FirstName"></span>
+                                </div>
+
+
+                                <div class="inputs">
+                                    <label asp-for="LastName" asp-postfix=":"></label>
+                                    <input asp-for="LastName" />
+                                    @Html.HiddenFor(model => model.LastName)
+                                    @if (Model.LastNameRequired)
+                                    {
+                                        <nop-required />
+                                    }
+                                    <span asp-validation-for="LastName"></span>
+                                </div>
+
+
+                                @if (Model.DateOfBirthEnabled)
+                                {
+                                    <div class="inputs date-of-birth" @(isUaePassAccountExist ? Html.Raw("style=\"display:none\"") : null)>
+
+
+                                        <label>@T("Account.Fields.DateOfBirth"):</label>
+                                        <input class="text-box single-line" id="DateOfBirth" name="DateOfBirth" type="text" data-toggle="datepicker" value="@Model.DateOfBirth">
+
+                                        @*<nop-date-picker asp-day-name="@Html.NameFor(x => x.DateOfBirthDay)"
+                    asp-month-name="@Html.NameFor(x => x.DateOfBirthMonth)"
+                    asp-year-name="@Html.NameFor(x => x.DateOfBirthYear)"
+                    asp-begin-year="@(DateTime.Now.Year - 110)"
+                    asp-end-year="@(DateTime.Now.Year)"
+                    asp-selected-day="@Model.DateOfBirthDay"
+                    asp-selected-month="@Model.DateOfBirthMonth"
+                    asp-selected-year="@Model.DateOfBirthYear" />*@
+                                        @if (Model.DateOfBirthRequired)
+                                        {
+                                            <nop-required />
+                                        }
+                                        <span asp-validation-for="DateOfBirth"></span>
+                                        @*<span asp-validation-for="DateOfBirthDay"></span>
+                    <span asp-validation-for="DateOfBirthMonth"></span>
+                    <span asp-validation-for="DateOfBirthYear"></span>*@
+                                    </div>
+                                }
+                                <div class="inputs">
+                                    <label asp-for="Email" asp-postfix=":"></label>
+                                    @Html.HiddenFor(model => model.Email)
+                                    <input asp-for="Email" />
+                                    <nop-required />
+                                    <span asp-validation-for="Email"></span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(Model.EmailToRevalidate))
+                                {
+                                    <div class="inputs">
+                                        <label asp-for="EmailToRevalidate"></label>
+                                        <span class="email-to-revalidate">@Model.EmailToRevalidate</span>
+                                        <span class="email-to-revalidate-note">
+                                            <em>@T("Account.Fields.EmailToRevalidate.Note")</em>
+                                        </span>
+                                    </div>
+                                }
+                                @if (Model.UsernamesEnabled)
+                                {
+                                    if (Model.AllowUsersToChangeUsernames)
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="Username" asp-postfix=":"></label>
+                                            @Html.HiddenFor(model => model.Username)
+                                            <input asp-for="Username" />
+                                            <nop-required />
+                                            <span asp-validation-for="Username"></span>
+                                            @if (Model.CheckUsernameAvailabilityEnabled)
+                                            {
+                                                @await Html.PartialAsync("_CheckUsernameAvailability")
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="Username" asp-postfix=":"></label>
+                                            @Html.HiddenFor(model => model.Username)
+                                            @Html.TextBoxFor(model => model.Username, new { disabled = "disabled" })
+                                            <span class="readonly-username">@Model.Username</span>
+                                        </div>
+                                    }
+                                }
+                                <div class="inputs">
+
+                                    <label asp-for="CountryNationalityId" asp-postfix=":"></label>
+                                    @if (isUaePassAccountExist)
+                                    {
+                                        @Html.HiddenFor(model => model.CountryNationalityId)
+                                    }
+                                    <nop-select asp-for="CountryNationalityId" asp-items="Model.AvailableNationalities" />
+                                    <span asp-validation-for="@Model.CountryNationalityId"></span>
+                                </div>
+                                <div class="inputs">
+
+                                    <label asp-for="StateProvinceId" asp-postfix=":"></label>
+                                    <nop-select asp-for="StateProvinceId" asp-items="Model.AvailableStates" />
+                                    <span asp-validation-for="@Model.StateProvinceId"></span>
+                                    <span id="states-loading-progress" style="display: none;" class="please-wait">@T("Common.Wait...")</span>
+                                </div>
+                                @if (Model.PhoneEnabled || Model.FaxEnabled)
+                                {
+
+                                    @if (Model.PhoneEnabled)
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="Phone" asp-postfix=":"></label>
+                                            <input asp-for="Phone" disabled="disabled" maxlength="10" max="10" id="phoneformat" onkeypress="validatephone(event)"/>
+                                            @if (Model.PhoneRequired)
+                                            {
+                                                <nop-required />
+                                            }
+                                            <span asp-validation-for="Phone"></span>
+                                            @Html.HiddenFor(model => model.Phone)
+                                            @Html.HiddenFor(model => model.Phone)
+                                        </div>
+                                    }
+                                    @if (Model.FaxEnabled)
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="Fax" asp-postfix=":"></label>
+                                            <input asp-for="Fax" />
+                                            @if (Model.FaxRequired)
+                                            {
+                                                <nop-required />
+                                            }
+                                            <span asp-validation-for="Fax"></span>
+                                        </div>
+                                    }
+
+                                }
+                            </div>
+                        </div>
+                        @if (Model.CompanyEnabled || Model.DisplayVatNumber)
+                        {
+                            <div class="fieldset">
+                                <div class="title">
+                                    <strong>@T("Account.CompanyDetails")</strong>
+                                </div>
+                                <div class="form-fields">
+                                    @if (Model.CompanyEnabled)
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="Company" asp-postfix=":"></label>
+                                            <input asp-for="Company" />
+                                            @if (Model.CompanyRequired)
+                                            {
+                                                <nop-required />
+                                            }
+                                            <span asp-validation-for="Company"></span>
+                                        </div>
+                                    }
+                                    @if (Model.DisplayVatNumber)
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="VatNumber" asp-postfix=":"></label>
+                                            <input asp-for="VatNumber" />
+                                            <span class="vat-status">@Model.VatNumberStatusNote</span>
+                                            <span class="vat-note">
+                                                <em>@T("Account.Fields.VatNumber.Note")</em>
+                                            </span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        @if (Model.StreetAddressEnabled ||
+Model.StreetAddress2Enabled ||
+Model.ZipPostalCodeEnabled ||
+Model.CityEnabled ||
+Model.CountyEnabled ||
+Model.CountryEnabled)
+                        {
+                            <div class="fieldset">
+                                <div class="title">
+                                    <strong>@T("Account.YourAddress")</strong>
+                                </div>
+                                <div class="form-fields">
+                                    @if (Model.StreetAddressEnabled)
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="StreetAddress" asp-postfix=":"></label>
+                                            <input asp-for="StreetAddress" />
+                                            @if (Model.StreetAddressRequired)
+                                            {
+                                                <nop-required />
+                                            }
+                                            <span asp-validation-for="StreetAddress"></span>
+                                        </div>
+                                    }
+                                    @if (Model.StreetAddress2Enabled)
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="StreetAddress2" asp-postfix=":"></label>
+                                            <input asp-for="StreetAddress2" />
+                                            @if (Model.StreetAddress2Required)
+                                            {
+                                                <nop-required />
+                                            }
+                                            <span asp-validation-for="StreetAddress2"></span>
+                                        </div>
+                                    }
+                                    @if (Model.ZipPostalCodeEnabled)
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="ZipPostalCode" asp-postfix=":"></label>
+                                            <input asp-for="ZipPostalCode" />
+                                            @if (Model.ZipPostalCodeRequired)
+                                            {
+                                                <nop-required />
+                                            }
+                                            <span asp-validation-for="ZipPostalCode"></span>
+                                        </div>
+                                    }
+                                    @if (Model.CityEnabled)
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="City" asp-postfix=":"></label>
+                                            <input asp-for="City" />
+                                            @if (Model.CityRequired)
+                                            {
+                                                <nop-required />
+                                            }
+                                            <span asp-validation-for="City"></span>
+                                        </div>
+                                    }
+                                    @if (Model.CountyEnabled)
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="County" asp-postfix=":"></label>
+                                            <input asp-for="County" />
+                                            @if (Model.CountyRequired)
+                                            {
+                                                <nop-required />
+                                            }
+                                            <span asp-validation-for="County"></span>
+                                        </div>
+                                    }
+                                    @if (Model.CountryEnabled)
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="CountryId" asp-postfix=":"></label>
+                                            <select asp-for="CountryId" asp-items="Model.AvailableCountries"
+                                                    data-trigger="country-select"
+                                                    data-url="@(Url.RouteUrl("GetStatesByCountryId"))"
+                                                    data-stateprovince="#@Html.IdFor(model => model.StateProvinceId)"
+                                                    data-loading="#states-loading-progress"></select>
+                                            @if (Model.CountryRequired)
+                                            {
+                                                <nop-required />
+                                            }
+                                            <span asp-validation-for="CountryId"></span>
+                                        </div>
+                                    }
+                                    @if (Model.CountryEnabled && Model.StateProvinceEnabled)
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="StateProvinceId" asp-postfix=":"></label>
+                                            <select asp-for="StateProvinceId" asp-items="Model.AvailableStates"></select>
+                                            @if (Model.StateProvinceRequired)
+                                            {
+                                                <nop-required />
+                                            }
+                                            <span id="states-loading-progress" style="display: none;" class="please-wait">@T("Common.Wait...")</span>
+                                            <span asp-validation-for="StateProvinceId"></span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        @if (Model.NewsletterEnabled || Model.CustomerAttributes.Count > 0)
+                        {
+                            <div class="fieldset">
+                                <div class="title">
+                                    <strong>@T("Account.Options")</strong>
+                                </div>
+                                <div class="form-fields">
+                                    @if (Model.NewsletterEnabled)
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="Newsletter" asp-postfix=":"></label>
+                                            <input asp-for="Newsletter" />
+                                            <span asp-validation-for="Newsletter"></span>
+                                        </div>
+                                    }
+                                    @if (Model.CustomerAttributes.Count > 0)
+                                    {
+                                        @await Html.PartialAsync("_CustomerAttributes", Model.CustomerAttributes)
+                                    }
+                                </div>
+                            </div>
+                        }
+                        @if (Model.AllowCustomersToSetTimeZone || Model.SignatureEnabled)
+                        {
+                            <div class="fieldset">
+                                <div class="title">
+                                    <strong>@T("Account.Preferences")</strong>
+                                </div>
+                                <div class="form-fields">
+                                    @if (Model.AllowCustomersToSetTimeZone)
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="TimeZoneId" asp-postfix=":"></label>
+                                            <select asp-for="TimeZoneId" asp-items="Model.AvailableTimeZones"></select>
+                                            <span asp-validation-for="TimeZoneId"></span>
+                                        </div>
+                                    }
+                                    @if (Model.SignatureEnabled)
+                                    {
+                                        <div class="inputs">
+                                            <label asp-for="Signature" asp-postfix=":"></label>
+                                            <textarea asp-for="Signature" class="account-signature-text"></textarea>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        @*@if (Model.NumberOfExternalAuthenticationProviders > 0)
+                            {
+                                <div class="fieldset">
+                                    <div class="title">
+                                        <strong>@T("Account.AssociatedExternalAuth")</strong>
+                                    </div>
+                                    @if (Model.AssociatedExternalAuthRecords.Count > 0)
+                                    {
+                                        //existing associated external records
+                                        <div class="table-wrapper">
+                                            <table class="data-table">
+                                                <colgroup>
+                                                    <col />
+                                                    <col />
+                                                    <col />
+                                                </colgroup>
+                                                <thead>
+                                                    <tr>
+                                                        <th class="auth-method-name">
+                                                            @T("Account.AssociatedExternalAuth.AuthMethodName")
+                                                        </th>
+                                                        <th class="email">
+                                                            @T("Account.AssociatedExternalAuth.Email")
+                                                        </th>
+                                                        <th class="external-id">
+                                                            @T("Account.AssociatedExternalAuth.ExternalIdentifier")
+                                                        </th>
+                                                        @if (Model.AllowCustomersToRemoveAssociations)
+                                                        {
+                                                            <th class="remove">
+                                                                @T("Account.AssociatedExternalAuth.Remove")
+                                                            </th>
+                                                        }
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var item in Model.AssociatedExternalAuthRecords)
+                                                    {
+                                                        <tr>
+                                                            <td class="auth-method-name">
+                                                                @item.AuthMethodName
+                                                            </td>
+                                                            <td class="email">
+                                                                @item.Email
+                                                            </td>
+                                                            <td class="external-id">
+                                                                @CommonHelper.EnsureMaximumLength(item.ExternalIdentifier, 40, "...")
+                                                            </td>
+                                                            @if (Model.AllowCustomersToRemoveAssociations)
+                                                            {
+                                                                <td class="remove">
+                                                                    <a href="#" onclick="return removeexternalassociation(@item.Id)">@T("Account.AssociatedExternalAuth.Remove")</a>
+                                                                </td>
+                                                            }
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
+                                    @if (Model.NumberOfExternalAuthenticationProviders > Model.AssociatedExternalAuthRecords.Count)
+                                    {
+                                        //we can add more external records
+                                        var loginUrl = Url.RouteUrl("Login", null, webHelper.CurrentRequestProtocol);
+                                        <div class="form-fields add-more-external-records">
+                                            @T("Account.AssociatedExternalAuth.AddMoreRecords")
+                                            <a href="@loginUrl">@loginUrl</a>
+                                        </div>
+                                    }
+                                </div>
+                            }*@
+
+                        @if (Model.GdprConsents.Count > 0)
+                        {
+                            <div class="fieldset">
+                                <div class="title">
+                                    <strong>@T("Account.UserAgreement")</strong>
+                                </div>
+                                <div class="form-fields">
+                                    @foreach (var consent in Model.GdprConsents)
+                                    {
+                                        if (consent.IsRequired)
+                                        {
+                                            <script asp-location="Footer">
+                                                 $(document).ready(function() {
+                                                         $('#save-info-button').on('click', function() {
+                                                          if ($('#consent@(consent.Id)').is(':checked')) {
+                                                              //do some stuff
+                                                               return true;
+                                                           } else {
+                                                    //just show validation errors, don't post
+                                                                       alert('@Html.Raw(JavaScriptEncoder.Default.Encode(consent.RequiredMessage))');
+                                                                       return false;
+                                                                  }
+                                            });
+                                    });
+                                          </script>
+                                        }
+                                        <div class="inputs accept-consent">
+                                            <input id="consent@(consent.Id)" type="checkbox" name="consent@(consent.Id)" checked="@consent.Accepted" />
+                                            <label for="consent@(consent.Id)">@consent.Message</label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        <div class="inputs">
+                            <div class="message-error disabled-field-notes">@T("account.vendorinfo.editingnotification")</div>
+                        </div>
+                        <div class="buttons">
+                            <input type="submit" id="save-info-button" value="@T("Common.Save")" name="save-info-button" class="button-1 save-customer-info-button" />
+                        </div>
+                    </form>
+                    @*Model display*@
+                    @if (Model.customerInfoStatus)
+                    {
+                        <div id="custom-modal-id" class="custom-modal custom-modal-class" @(Model.customerInfoStatus == true ? "style= display:block" : null)>
+
+                            <form class="custom-modal-content">
+
+                                <div class="custom-modal-container">
+
+                                    <div class="custom-modal-header">
+                                        <span onclick="document.getElementById('custom-modal-id').style.display='none'" class="custom-modal-close" title="Close Modal">
+                                            <img src="~/icons/cross-icon.svg"/>
+                                        </span>
+
+                                    </div>
+                                    <div class="custom-modal-body">
+                                        <img src="~/images/customerInfo.png" class="custom-modal-image" />
+                                        @*<h1>@T("admin.catalog.productreviews")</h1>*@
+                                    </div>
+                                    <div class="custom-modal-footer">
+                                        <b style="font: normal normal bold 19px/34px Proxima Nova; color: black">@T("account.contactinformation")</b>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@if (!Model.isRequestedforDelete)
+{
+    <div id="delete-modal-id" class="custom-modal custom-modal-class">
+
+        <form class="custom-modal-content">
+
+            <div class="custom-modal-container" style="width: 36%;top:-90px">
+
+                <div class="custom-modal-header">
+                    <img src="~/images/warning-img.png" style="margin-top: 27px; width: 82px;">
+                    <span onclick="document.getElementById('delete-modal-id').style.display='none'" class="custom-modal-close" title="Close Modal">
+
+                        <img src="~/icons/cross-icon.svg" />
+                    </span>
+
+                </div>
+                <div class="custom-modal-body" style="margin-top:0px">
+                    <div class="title" style="font-size: 26px; margin-bottom: 8px; text-align: center;">
+                        <b>@T("account.aboutdeleteaccount.message")</b>
+                    </div>
+                    <div class="delete-request-input">
+
+                       
+                        <label  asp-postfix=":">@T("account.deleteaccountreason")</label>
+                        <nop-select asp-for="DeleteCustomerAccountModel.ReasonId" asp-items="Model.DeleteCustomerAccountModel.AvailableReasons" />
+                        <span asp-validation-for="@Model.DeleteCustomerAccountModel.ReasonId"></span>
+                    </div>
+                    <div class="delete-request-input" id="deleterequest-comment" style="text-align:initial">
+
+                        @*<b>@T("account.deleterequests.comments")</b>*@
+                       
+                        <input placeholder="@T("account.deleterequests.comments")" asp-for="DeleteCustomerAccountModel.Comments" style="width:100%" />
+
+                    </div>
+                    <div class="delete-request-input" style="text-align: initial;">
+                        <ol>
+                            @if (Model.DeleteCustomerAccountModel.TermsnCondition != null)
+                            {
+                                @for (int i = 0; i < Model.DeleteCustomerAccountModel.TermsnCondition.Count(); i++)
+                                {
+
+                                    <li> <span> @(i + 1).</span><p style="padding: 0px 0px 0px 5px;">@Model.DeleteCustomerAccountModel.TermsnCondition[i]</p> </li>
+                                }
+
+                            }
+
+                        </ol>
+                    </div>
+                    <div class="delete-request-termcondition">
+                        <input type="checkbox" data-val="true" data-val-required="@T("account.cancel.agreement")" id="agreeTermncondition" name="RememberMe" value="true">
+                        <label style="padding: 0px 7px;">@T("account.cancel.agreement")</label>
+                       
+                    </div>
+                    <div>
+                        <p id="termsnconditionValidation" style="color: red; padding-left: 31px; padding-top: 5px">Please select terms and conditions</p>
+                    </div>
+                </div>
+                <div class="custom-modal-footer">
+                    <button class="button-2 btn-cancel-popup" value="Cancel">@T("admin.common.cancel")</button>
+                    <button class="button-2 btn-delete-account" value="Delete" id="delete-customer-account" disabled>@T("admin.common.delete")</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+}
+            else
+            {
+               
+            }
+<!--Product Review-->
+@*@if (Model.customerProductReviewModels.Count() > 0)
+{
+    <div id="productReview-modal-id" class="custom-modal custom-modal-class">
+
+        <form class="custom-modal-content">
+
+            <div class="custom-modal-container" style="top:-90px">
+
+                <div class="custom-modal-header">
+
+                    <span onclick="document.getElementById('productReview-modal-id').style.display='none'" class="custom-modal-close" title="Close Modal">
+
+                        <img src="~/icons/cross-icon.svg" />
+                    </span>
+                    <h3 style="padding-top: 45px; color: #189ec8">@T("ProductReviewRating.Title").Text</h3>
+                </div>
+                <div class="custom-modal-body" style="margin: 0px!important; overflow:scroll">
+                    <table class="table">
+                        <tbody>
+
+                            @foreach (var customerproductReview in Model.customerProductReviewModels)
+                            {
+                                <tr>
+                                    <td>
+                           
+                                        @if (customerproductReview.ProductImage == null || customerproductReview.ProductImage == "")
+                                        {
+                                            <img src="~/images/thumbs/default-image_250.png" style="width: 82px;">
+                                        }
+                                        else {<img src="@customerproductReview.ProductImage" style="width: 82px;"> }
+                                        
+                                    </td>
+                                    <td class="centertd">
+                                       @customerproductReview.ProductName
+                                        <div class="rate">
+                                            <input type="radio"  name="rate" value="5" id="star5" />
+                                            <label for="star5" id="star5_@customerproductReview.ProductId" title="Rating" onclick="rating(5, @customerproductReview.ProductId)">5 stars</label>
+                                            <input type="radio" id="star4" name="rate" value="4" />
+                                            <label for="star4"  id="star4_@customerproductReview.ProductId" title="Rating"  onclick="rating(4, @customerproductReview.ProductId)">4 stars</label>
+                                            <input type="radio" id="star3"  name="rate" value="3"  />
+                                            <label for="star3" id="star3_@customerproductReview.ProductId" title="Rating" onclick="rating(3, @customerproductReview.ProductId)">3 stars</label>
+                                            <input type="radio" id="star2"  name="rate" value="2" />
+                                            <label for="star2" id="star2_@customerproductReview.ProductId" title="Rating" onclick="rating(2, @customerproductReview.ProductId)">2 stars</label>
+                                            <input type="radio" id="star1" name="rate" value="1" />
+                                            <label for="star1"  id="star1_@customerproductReview.ProductId" title="Rating"  onclick="rating(1, @customerproductReview.ProductId)">1 star</label>
+                                        </div>
+                                    </td>
+                                    <td>
+                                      
+                                        <input asp-for="@customerproductReview.ReviewText" class="productReviewText" id="productReviewText_@customerproductReview.ProductId" onchange="productReviewText(this, @customerproductReview.ProductId)" style="border-radius: 5px; height: 33px;border: 1px solid #189ec8;" />
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+
+                    </table>
+                </div>
+                <div class="custom-modal-footer">
+                    <button class="btn btn-cancel" value="Submit" id="customerProductReview" style="background-color: #189ec8;
+    border-radius: 7px;
+    border: 1px solid #189ec8;
+    color: white;">@T("forum.submit").Text</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+}*@
+<script asp-location="Footer">
+    var customerproductReviews = [];
+    $(document).ready(function () {
+
+        //Product review Moodal
+
+        //Get the modal
+        var modal = document.getElementById("productReview-modal-id");
+        if(modal != null){
+            modal.style.display = "block";
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        }
+
+
+    $(window).resize(function() {
+        // This will execute whenever the window is resized
+        console.log("Window width : " + $(window).width());
+});
+
+        $('#deleterequest-comment').hide();
+        $('#termsnconditionValidation').show();
+        var modalId = document.getElementById('delete-modal-id');
+
+
+        $('#delete-account').click(function () {
+
+            modalId.style.display = "block";
+                $('#@Html.IdFor(mdoel => Model.DeleteCustomerAccountModel.Comments)').removeAttr("disabled");
+        });
+        $('#agreeTermncondition').click(function () {
+            ValidateTC();
+        });
+        function ValidateTC() {
+            var aggreement = $('#agreeTermncondition').is(":checked");
+            if (aggreement) {
+                $('#delete-customer-account').prop('disabled', false);
+                $('#termsnconditionValidation').hide();
+            } else {
+                $('#delete-customer-account').prop('disabled', true);
+                $('#termsnconditionValidation').show();
+            }
+        }
+
+
+        $('#delete-customer-account').click(function (e) {
+
+            e.preventDefault();
+            var reason = $('#DeleteCustomerAccountModel_ReasonId').val();
+            var comments = $('#@Html.IdFor(mdoel => Model.DeleteCustomerAccountModel.Comments)').val();
+            var aggreement = $('#agreeTermncondition').is(":checked");
+
+            if (aggreement) {
+                $('#termsnconditionValidation').hide();
+                var postData = {
+                    ReasonId: reason,
+                    Comments: comments
+                };
+                addAntiForgeryToken(postData);
+                $.ajax({
+                    cache: false,
+                    type: "POST",
+                    url: "@Url.Action("DeleteCustomerAccount", "Customer")",
+                    data: postData,
+                    dataType: "json",
+                    success: function (data, textStatus, jqXHR) {
+                        location.href = data.redirect;
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        //alert('Failed to delete');
+                    }
+                });
+
+            } else {
+                //$('#termsnconditionValidation').css('color', 'red');
+                //$('#termsnconditionValidation').show();
+                alert('please accept Terms and conditions')
+                ValidateTC();
+            }
+        });
+        $('#DeleteCustomerAccountModel_ReasonId').change(function () {
+
+            var reason = $(this).val();
+
+            if (parseInt(reason) == 5 || parseInt(reason) == 10) {
+                $('#deleterequest-comment').show();
+            }
+            else {
+                $('#deleterequest-comment').hide();
+            }
+        });
+        $('#customerProductReview').click(function (e) {
+            e.preventDefault();
+            var CustomerProductReviewModelRequest = [
+                { rating: 4, reviewtext: "Great product!", productId: 1 },
+                { rating: 3, reviewtext: "It's okay", productId: 2 },
+                { rating: 5, reviewtext: "Excellent!", productId: 3 }
+            ];
+                                   var postData = {
+                                       Reviews: CustomerProductReviewModelRequest
+                                    };
+                                    addAntiForgeryToken(CustomerProductReviewModelRequest);
+                                    debugger;
+                                    $.ajax({
+                                        cache: false,
+                                        type: "POST",
+                                        dataType: "json",
+                                        contentType: "application/json",
+                                        url: "@(Url.Action("CustomerBulkProductReview", "Customer"))",
+                                        data: JSON.stringify(CustomerProductReviewModelRequest),
+                                        traditional: true,
+                                        error: function (jqXHR, textStatus, errorThrown) {
+
+                                        },
+                                        success: function (jqXHR, textStatus) {
+
+                                        }
+                                    });
+
+        });
+    });
+
+     $('#@Html.IdFor(mdoel => Model.Phone)').mask("0500000000", {
+        placeholder: "05xxxxxxxx",
+        clearIfNotMatch: true
+    });
+    function removeexternalassociation(itemId) {
+        if (confirm('@T("Common.AreYouSure")')) {
+            var postData = {
+                id: itemId
+            };
+            addAntiForgeryToken(postData);
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@Url.Action("RemoveExternalAssociation", "Customer")",
+                data: postData,
+                dataType: "json",
+                success: function (data, textStatus, jqXHR) {
+                    location.href = data.redirect;
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert('Failed to delete');
+                }
+            });
+        }
+        return false;
+    }
+    function rating(value, productId) {
+
+        for (var r = value; r <= 5; r++) {
+            var starId = 'star' + r + '_' + productId;
+            $('#' + starId).css('color', '#ccc');
+        }
+
+        for (var i = value; i > 0; i--) {
+            //star3_4426 star4_5305
+            var startId = 'star' + i + '_' + productId;
+
+            $('#' + startId).css('color', '#deb217')
+
+        }
+        if (customerproductReviews != null && customerproductReviews != undefined && customerproductReviews.length > 0) {
+
+            var objectIndex = customerproductReviews.findIndex((obj => obj.productId == productId));
+            if (customerproductReviews[objectIndex] != null && customerproductReviews[objectIndex] != undefined && customerproductReviews[objectIndex].productId == productId)
+                customerproductReviews[objectIndex].rating = value;
+            else
+                customerproductReviews.push({ 'ProductId': productId, 'Rating': value, 'ReviewText': null });
+        } else {
+            customerproductReviews.push({ 'ProductId': productId, 'Rating': value, 'ReviewText': null });
+
+
+        }
+
+    }
+    function productReviewText(event, productId) {
+
+        var productReviewTextId = 'productReviewText_' + productId;
+
+        if (customerproductReviews != null && customerproductReviews != undefined && customerproductReviews.length > 0) {
+
+            var objectIndex = customerproductReviews.findIndex((obj => obj.productId == productId));
+            if (customerproductReviews[objectIndex] != null && customerproductReviews[objectIndex] != undefined && customerproductReviews[objectIndex].productId == productId)
+                customerproductReviews[objectIndex].reviewText = event.value;
+            else
+                customerproductReviews.push({ 'ProductId': productId, 'Rating': 0, 'ReviewText': event.value });
+        } else {
+            customerproductReviews.push({ 'ProductId': productId, 'Rating': 0, 'PeviewText': event.value });
+        }
+
+    }
+     function validatephone(evt) {
+        var theEvent = evt || window.event;
+        var phonenumber = document.getElementById('phoneformat').value;
+        if (phonenumber != undefined && phonenumber != null && phonenumber.length >= 1) {
+            const first2 = phonenumber.slice(0, 2);
+            if (first2 !== '05') {
+                // document.getElementById('phoneformatValidation').innerHTML = @T("account.fields.phone.notvalid").Text;
+                document.getElementById('phoneformatValidation').style.display = 'block';
+            } else {
+                document.getElementById('phoneformatValidation').style.display = 'none';
+            }
+        }
+        // Handle paste
+        if (theEvent.type === 'paste') {
+            key = event.clipboardData.getData('text/plain');
+        } else {
+            // Handle key press
+            var key = theEvent.keyCode || theEvent.which;
+            key = String.fromCharCode(key);
+        }
+        var regex = /[0-9]|\./;
+        if (!regex.test(key)) {
+            theEvent.returnValue = false;
+            if (theEvent.preventDefault) theEvent.preventDefault();
+        }
+    }
+</script>
+    @if (isUaePassAccountExist)
+    {
+<script>
+            $(document).ready(function () {
+
+                $('input[type="text"]').attr('disabled', true);
+                $('input[type="radio"]').attr('disabled', true);
+                $("select[name='DateOfBirthDay']").attr('disabled', true);
+                $("select[name='DateOfBirthMonth']").attr('disabled', true);
+                $("select[name='DateOfBirthYear']").attr('disabled', true);
+                $("select[id=CountryNationalityId]").attr("disabled", true);
+                $('#@Html.IdFor(mdoel => Model.DeleteCustomerAccountModel.Comments)').removeAttr("disabled");
+
+               
+            });
+</script>
+    }
+
+

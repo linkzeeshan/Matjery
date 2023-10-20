@@ -1,0 +1,87 @@
+﻿@model AdminVendorReviewModel
+@using Nop.Plugin.NopWarehouse.VendorReview.Models;
+@using Nop.Web.Framework;
+
+@Html.ValidationSummary(false)
+@Html.HiddenFor(model => model.Id)
+
+<div class="content">
+    <div class="form-horizontal">
+        <div class="panel-group">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-md-3">
+
+                            <nop-label asp-for="VendorName" />:
+                        </div>
+                        <div class="col-md-9">
+                            @Html.ActionLink(Model.VendorName, "Edit", "Vendor", new { id = Model.VendorId }, new { })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="StoreName" />:
+                        </div>
+                        <div class="col-md-9">
+                            <div class="text-row">@Model.StoreName</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="CustomerInfo" />:
+                        </div>
+                        <div class="col-md-9">
+                            @Html.ActionLink(Model.CustomerInfo, "Edit", "Customer", new { id = Model.CustomerId }, new { })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="Title" />:
+
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="Title" asp-required="true" />
+                            @Html.ValidationMessageFor(model => model.Title)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="ReviewText" />:
+                        </div>
+                        <div class="col-md-9">
+                            <nop-textarea asp-for="ReviewText" />
+                            @*  @Html.TextAreaFor(model => model.ReviewText, new { style = "Width: 500px; Height: 150px;" })*@
+                            @Html.ValidationMessageFor(model => model.ReviewText)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="Rating" />:
+                        </div>
+                        <div class="col-md-9">
+                            @Html.DisplayFor(model => model.Rating)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="IsApproved" />:
+                        </div>
+                        <div class="col-md-9">
+                            @Html.EditorFor(model => model.IsApproved)
+                            @Html.ValidationMessageFor(model => model.IsApproved)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="CreatedOn" />:
+                        </div>
+                        <div class="col-md-9">
+                            @Html.DisplayFor(model => model.CreatedOn)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

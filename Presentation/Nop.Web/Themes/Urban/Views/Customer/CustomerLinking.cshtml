@@ -1,0 +1,36 @@
+﻿@model UaePassLinkingModel
+@using Nop.Web.Models.Customer
+@{
+    Layout = "_ColumnsOne";
+    //title
+    Html.AddTitleParts(T("PageTitle.UaePass").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-registration-page");
+}
+<div class="page login-page register-init-page uae-pass">
+    <div class="page-title">
+        <h1>@T("Account.Login.uaepass.linking")</h1>
+    </div>
+    @if (!string.IsNullOrEmpty(Model.idn) || !string.IsNullOrEmpty(Model.uuid))
+    {
+    <div class="page-body">
+        <div class="customer-blocks">
+            <div class="new-wrapper register-block">
+                <div class="text">
+                    @T("Account.Login.uaepass.linkingtext")
+                </div>
+                <div class="buttons">
+                    <a class="button-customer register-button uae-pass-button" href="@(Url.Action("Login", new { type="uaepass" }))">
+                        <span>@T("common.yes")</span>
+                    </a>
+                    <a class="button-merchant register-button uae-pass-button" href="@(Url.Action("registerInit", new { type="uaepass" }))">
+                        <span>@T("common.no")</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+</div>
+
+

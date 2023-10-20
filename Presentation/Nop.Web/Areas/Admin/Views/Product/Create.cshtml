@@ -1,0 +1,50 @@
+@model ProductModel
+
+@{
+    //page title
+    ViewBag.PageTitle = T("Admin.Catalog.Products.AddNew").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Products");
+}
+<div class="product-create">
+
+<form asp-controller="Product" asp-action="Create" method="post" id="product-form">
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @T("Admin.Catalog.Products.AddNew")
+            <small>
+                <i class="fa fa-arrow-circle-left"></i>
+                <a asp-action="List">@T("Admin.Catalog.Products.BackToList")</a>
+            </small>
+        </h1>
+        <div class="pull-right">
+            @*<button type="submit" name="save" class="btn bg-blue">
+                <i class="fa fa-floppy-o"></i>
+                @T("Admin.Common.Save")
+            </button>*@
+            <button type="submit" name="save-continue" class="btn bg-blue">
+                <i class="fa fa-floppy-o"></i>
+                @T("Admin.Common.Next")
+            </button>
+            @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.ProductDetailsButtons })
+        </div>
+    </div>
+    @await Html.PartialAsync("_CreateOrUpdate", Model)
+</form>
+</div>
+<script>
+    var currentPageData = [{
+        property: 'currentPage',
+        value: {
+            name: 'product-create',
+            title: '@T("Admin.Catalog.Products.AddNew").Text'
+        }
+    }];
+    window.parent.postMessage(JSON.stringify(currentPageData), '*');
+</script>
+
+@if (!Model.IsLoggedInAsVendor)
+{
+    //product editor settings modal
+    @await Html.PartialAsync("_ProductEditorSettingsModal", Model)
+}

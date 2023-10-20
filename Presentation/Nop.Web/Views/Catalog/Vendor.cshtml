@@ -1,0 +1,263 @@
+﻿@model VendorModel
+@using Nop.Core.Domain.Seo
+@inject Nop.Core.IWebHelper webHelper
+@inject SeoSettings seoSettings
+@{
+    Layout = "_ColumnsTwo";
+
+    //title
+    Html.AddTitleParts(!String.IsNullOrEmpty(Model.MetaTitle) ? Model.MetaTitle : Model.Name);
+    //meta
+    Html.AddMetaDescriptionParts(Model.MetaDescription);
+    Html.AddMetaKeywordParts(Model.MetaKeywords);
+    //page class
+    Html.AppendPageCssClassParts("html-vendor-page");
+
+    if (seoSettings.CanonicalUrlsEnabled)
+    {
+        var vendorUrl = Url.RouteUrl("Vendor", new { SeName = Model.SeName }, webHelper.CurrentRequestProtocol).ToLowerInvariant();
+        Html.AddCanonicalUrlParts(vendorUrl, seoSettings.QueryStringInCanonicalUrlsEnabled);
+    }
+}
+<div class="page vendor-page">
+    <script asp-location="Footer" lang="en" type="text/javascript">
+        $(document).ready(function(){
+
+            var ImF =@Json.Serialize(Model.imFollowing);
+            showHidefollowBtn(ImF);
+
+            $('.follow-unfollow-vendor-button').click(function() {
+                var vendorId = @Model.Id;
+                var getReportColumnsParams = {
+                    "vendorId": vendorId
+                };
+                $.ajax({
+                    type: "POST",
+                    traditional: true,
+                    async: false,
+                    cache: false,
+                    url: "@Url.RouteUrl("FollowVendor")",
+
+                    context: document.body,
+                    data: getReportColumnsParams,
+                    success: function (result) {
+                        showHidefollowBtn(result)
+                    },
+                    error: function (xhr) {
+                        //debugger;
+                        showHidefollowBtn(result)
+                        console.log(xhr.responseText);
+                        alert("Error has occurred..");
+                    }
+                });
+            });
+
+            function showHidefollowBtn(isfollow){
+                if (!isfollow) {
+                    $('#follow').show();
+                    $('#unfollow').hide();
+
+                }
+                else
+                {
+                    $('#follow').hide();
+                    $('#unfollow').show();
+                }
+            }
+        });
+    </script>
+    <div class="page-title">
+        <h1>@Model.Name</h1>
+    </div>
+    <div class="page-body">
+
+        @*@await Component.InvokeAsync("VendorReview", new { vendorId = Model.Id, isEmptyModel = false })*@
+
+
+
+        @* @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.VendorDetailsTop, additionalData = Model, vendorId = Model.Id })*@
+        <div class="vendor-logo">
+            <img alt="@Model.PictureModel.AlternateText" src="@Model.PictureModel.ImageUrl" title="@Model.PictureModel.Title" />
+        </div>
+        @*description*@
+        @if (!String.IsNullOrWhiteSpace(Model.Description))
+        {
+            <div class="vendor-description">
+                @Html.Raw(Model.Description)
+            </div>
+        }
+        @*vendor license*@
+        <div class="license-container">
+            @if (Model.HasUploadedLicense)
+            {
+                <div class="vendor-licence-verified-image"></div> <h4 class="verified-licence-label">@(T("admin.vendors.fields.licensedby")) - @(Model.LicensedBy)</h4>
+            }
+            else
+            {
+                <div class="vendor-licence-unverified-image"></div> <h4 class="verified-licence-label">@T("account.vendorinfo.unverified")</h4>
+            }
+        </div>
+        @*contact vendor*@
+        <div class="use-action-button">
+            @if (Model.AllowCustomersToContactVendors)
+            {
+                <div class="contact-vendor">
+                    <input type="button" value="@T("ContactVendor")" class="button-2 contact-vendor-button" onclick="setLocation('@Url.RouteUrl("ContactVendor", new { vendorId = Model.Id })')" />
+                </div>
+            }
+            @if (Model.ShowFollowbutton)
+            {
+                <div class="follow-vendor contact-vendor">
+                    <div id="follow" style="display:none">
+                        <input type="button" name="followbtn" id="followbtn" value="@T("nop.plugin.nopwarehouse.vendorreview.followers.follow")" class="button-1 follow-unfollow-vendor-button green-button" />
+                    </div>
+                    <div id="unfollow" style="display:none">
+                        <input type="button" name="unfollowbtn" id="followbtn" value="@T("nop.plugin.nopwarehouse.vendorreview.followers.unfollow")" class="button-1 follow-unfollow-vendor-button red-button" />
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="vendor-social-buttons" style="display:none">
+            @{
+                if (!string.IsNullOrEmpty(Model.WhatsApp))
+                {
+                    <a href="https://api.whatsapp.com/send?phone=@(Model.WhatsApp)" target="_blank" title="Whatsup">
+                        <i class="fi-whatsapp"></i>
+                    </a>
+                }
+                if (!string.IsNullOrEmpty(Model.Facebook))
+                {
+                    <a href="@(Model.Facebook)" target="_blank" title="@T("footer.followus.facebook")">
+                        <i class="fi-facebook"></i>
+                    </a>
+                }
+                if (!string.IsNullOrEmpty(Model.Twitter))
+                {
+                    <a href="@(Model.Twitter)" target="_blank" title="@T("whatsapp")">
+                        <i class="fi-twitter"></i>
+                    </a>
+                }
+
+                if (!string.IsNullOrEmpty(Model.Instagram))
+                {
+                    <a href="https://instagram.com/@(Model.Instagram)" target="_blank" title="@T("account.vendorinfo.instagram")">
+                        <i class="fi-instagram"></i>
+                    </a>
+                }
+                if (!string.IsNullOrEmpty(Model.Googleplus))
+                {
+                    <a href="@(Model.Googleplus)" target="_blank" title="@T("account.vendorinfo.googleplus")">
+                        <i class="fi-google-plus"></i>
+                    </a>
+                }
+                if (!string.IsNullOrEmpty(Model.BBM))
+                {
+                    <a href="@(Model.BBM)" target="_blank" title="Whatsup">
+                        <i class="fi-google-plus"></i>
+                    </a>
+                }
+            }
+
+        </div>
+        @*vendor supported by*@
+        <div class="vendor-supported">
+            @if (Model.SupportedByFoundationPictureModel != null)
+            {
+                if (!string.IsNullOrEmpty(Model.SupportedByFoundationPictureModel.FullSizeImageUrl))
+                {
+                    @*if (!string.IsNullOrEmpty(Model.SupportedByFoundationDescription))
+                    {
+                        <h3>@(Model.SupportedByFoundationDescription)</h3>
+                    }*@
+                    <h3 class="supportedby-foundation-description">@T("account.fields.supportedby")</h3>
+                    <div class="vendor-logo">
+                        <a href="@Url.RouteUrl("Vendor", new { SeName = Model.SupportedBySeName })"><img class="vendor-supported-image" alt="@Model.SupportedByFoundationPictureModel.AlternateText" src="@Model.SupportedByFoundationPictureModel.FullSizeImageUrl" title="@Model.SupportedByFoundationPictureModel.Title" /></a>
+                    </div>
+                }
+            }
+        </div>
+        @if (Model.Products.Count > 0)
+        {
+            @await Html.PartialAsync("_CatalogSelectors", Model.PagingFilteringContext)
+        }
+        @*product list*@
+        @if (Model.Products.Count > 0)
+        {
+            if (Model.PagingFilteringContext.ViewMode == "list")
+            {
+                @*list mode*@
+                <div class="product-list">
+                    <div class="item-grid">
+                        @foreach (var product in Model.Products)
+                        {
+                            <div class="item-box">
+                                @await Html.PartialAsync("_ProductListBox", product)
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                @*grid mode*@
+                <div class="product-grid">
+                    <div class="item-grid">
+                        @foreach (var product in Model.Products)
+                        {
+                            <div class="item-box">
+                                @await Html.PartialAsync("_ProductBox", product)
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        @{
+            var pager = Html.Pager(Model.PagingFilteringContext).QueryParam("pagenumber");
+        }
+        @if (!pager.IsEmpty())
+        {
+            <div class="pager">
+                @pager
+            </div>
+        }
+        @*Vendors supported by foundation*@
+        @{
+            if (Model.SearchedVendors.Count > 0)
+            {
+                <div class="vendor-grid">
+                    <div class="item-grid">
+                        @foreach (var item in Model.SearchedVendors)
+                        {
+                            <div class="item-box">
+                                <div class="vendor-item">
+                                    <h2 class="title">
+                                        <a href="@Url.RouteUrl("Vendor", new { SeName = item.SeName })" title="@item.PictureModel.Title">
+                                            @item.Name
+                                        </a>
+                                    </h2>
+                                    <div class="picture">
+                                        <a href="@Url.RouteUrl("Vendor", new { SeName = item.SeName })" title="@item.PictureModel.Title">
+                                            <img alt="@item.PictureModel.AlternateText" src="@item.PictureModel.ImageUrl" title="@item.PictureModel.Title" />
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                var pager_stores = Html.Pager(Model.PagingFilteringContext).QueryParam("pagenumber");
+
+                <div class="pager">
+                    @pager_stores
+                </div>
+            }
+        }
+        <hr style="margin-bottom: 10px;" />
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.VendorDetailsBottom, additionalData = Model })
+        @await Component.InvokeAsync("VendorReview", new { vendorId = Model.Id, isEmptyModel = false })
+
+
+    </div>
+</div>

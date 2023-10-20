@@ -1,0 +1,72 @@
+﻿@model VendorModel
+@using Nop.Web.Framework.Models.DataTables
+@{
+    const string hideInfoBlockAttributeName = "VendorPage.HideInfoBlock";
+    var hideInfoBlock = genericAttributeService.GetAttribute<bool>(workContext.CurrentCustomer, hideInfoBlockAttributeName);
+
+    const string hideDisplayBlockAttributeName = "VendorPage.HideDisplayBlock";
+    var hideDisplayBlock = genericAttributeService.GetAttribute<bool>(workContext.CurrentCustomer, hideDisplayBlockAttributeName, defaultValue: true);
+
+    const string hideSeoBlockAttributeName = "VendorPage.HideSEOBlock";
+    var hideSeoBlock = genericAttributeService.GetAttribute<bool>(workContext.CurrentCustomer, hideSeoBlockAttributeName, defaultValue: true);
+
+    const string hideProductsBlockAttributeName = "VendorPage.HideProductsBlock";
+    var hideVendorProductsBlock = genericAttributeService.GetAttribute<bool>(workContext.CurrentCustomer, hideProductsBlockAttributeName, defaultValue: true);
+}
+
+@Html.ValidationSummary(false)
+<input type="hidden" asp-for="Id" />
+<input type="hidden" asp-for="VendorProductSearchModel.SearchVendorId" />
+<input type="hidden" id="selected-tab-name" name="selected-tab-name" value="@(Html.GetSelectedTabName())">
+<div class="content">
+
+    <div class="form-horizontal">
+        <div id="vendor-edit" class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="nav-item active"><a data-toggle="tab" href="#vendor-info">@T("Admin.Vendors.Info")</a></li>
+                <li class="nav-item"><a data-toggle="tab" href="#vendor-display">@T("Admin.Vendors.Display")</a></li>
+                <li class="nav-item"><a data-toggle="tab" href="#vendor-seo">@T("Admin.Common.SEO")</a></li>
+                <li class="nav-item"><a data-toggle="tab" href="#vendor-products">@T("Admin.Catalog.Categories.Products")</a></li>
+                <li class="nav-item"><a data-toggle="tab" href="#vendor-reviews">@T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews")</a></li>
+                <li class="nav-item"><a data-toggle="tab" href="#vendor-followers">@T("Nop.Plugin.NopWarehouse.VendorReview.Followers.Admin.VendorFollowers")</a></li>
+
+            </ul>
+            <div class="tab-content">
+                <div id="vendor-info" class="tab-pane fade in active">
+                    @await Html.PartialAsync("_CreateOrUpdate.Info", Model)
+                </div>
+                <div id="vendor-display" class="tab-pane fade">
+                    @await Html.PartialAsync("_CreateOrUpdate.Display", Model)
+                </div>
+                <div id="vendor-seo" class="tab-pane fade">
+                    @await Html.PartialAsync("_CreateOrUpdate.Seo", Model)
+                </div>
+                <div id="vendor-products" class="tab-pane fade">
+                    @await Html.PartialAsync("_CreateOrUpdate.Products", Model.VendorProductSearchModel)
+                </div>
+                @if (Model.Id > 0)
+                {
+                    <div id="vendor-followers" class="tab-pane fade">
+                        @await Html.PartialAsync("_followersvendor", Model.VendorFollowerListModel)
+                    </div>
+                    <div id="vendor-reviews" class="tab-pane fade">
+                        @await Html.PartialAsync("_reviews", Model.VendorReviewListModel)
+                    </div>
+                }
+
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@{
+    @*//custom tabs
+    var eventMessage = new AdminTabStripCreated(this.Html, "vendor-edit");
+    EngineContext.Current.Resolve<IEventPublisher>().Publish(eventMessage);
+    foreach (var eventBlock in eventMessage.BlocksToRender)
+    {
+        @eventBlock
+    }*@
+}

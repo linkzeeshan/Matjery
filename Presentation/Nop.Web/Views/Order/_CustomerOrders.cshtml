@@ -1,0 +1,357 @@
+﻿    @model CustomerOrderListModel
+@using Nop.Core.Domain.Orders 
+<style>
+    .ordercount {
+        background: #3333331c 0% 0% no-repeat padding-box;
+        color: black;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        border-radius: 70%;
+        margin: 5px;
+        display: inline-block;
+        text-align: center;
+    }
+</style>
+<div>
+    @if (Model.Orders.Count > 0)
+    {
+            <button type="button" class="button-2 order-details-button" value=@T("account.customerorders.all") id="buttonallorder">
+                @T("account.customerorders.all") <span class="ordercount">
+                                                     <span class="btnordercounter"> @Model.Orders.Count().ToString()</span>
+                </span>
+            </button>
+
+        <button type="button" class="button-2" value=@T("account.customerorders.completed") id="buttoncompletedorder" style="color: black; background: white; border: 1px solid #dad7d7">
+            @T("account.customerorders.completed") 
+            <span class="ordercount">
+                                                       <span class="btnordercounter">@Model.Orders.Where(x => x.OrderStatusEnum == OrderStatus.Complete).Count().ToString()</span>
+            </span>
+        </button>
+        <button type="button" class="button-2" value=@T("account.customerorders.processing") id="buttonprocessingdorder" style="color: black; background: white; border: 1px solid #dad7d7">
+            @T("account.customerorders.processing")<span class="ordercount">
+                                                       <span class="btnordercounter">@Model.Orders.Where(x => x.OrderStatusEnum == OrderStatus.Processing).Count().ToString()</span> 
+            </span>
+        </button>
+        
+        <button type="button" class="button-2" value=@T("account.customerorders.pending") id="buttonpendingorder" style="color: black; background: white; border: 1px solid #dad7d7">
+            @T("account.customerorders.pending")<span class="ordercount">
+                                                    <span class="btnordercounter">@Model.Orders.Where(x => x.OrderStatusEnum == OrderStatus.Pending).Count().ToString()</span>
+            </span>
+        </button>
+        <button type="button" class="button-2" value=@T("account.customerorders.cancelled") id="buttoncancelledorder" style="color: black; background: white; border: 1px solid #dad7d7">
+            @T("account.customerorders.cancelled")<span class="ordercount">
+            <span class="btnordercounter"> @Model.Orders.Where(x => x.OrderStatusEnum == OrderStatus.Cancelled).Count().ToString()</span>
+            </span>
+        </button>
+       
+        <div class="order-list" id="allorder">
+            @foreach (var order in Model.Orders)
+            {
+                <div class="section order-item">
+                    <div class="title">
+                        <strong style="color: #009ddc">@T("Account.CustomerOrders.OrderNumber"): @order.CustomOrderNumber</strong>
+                    </div>
+                    <ul class="info">
+                        <li>@T("Account.CustomerOrders.OrderStatus"): <span class="order-status @order.OrderStatusEnum.ToString().ToLowerInvariant()">@order.OrderStatus</span></li>
+                        <li>@T("Account.CustomerOrders.OrderDate"): <span class="order-date">@order.CreatedOn.ToString()</span></li>
+                        <li>@T("Account.CustomerOrders.OrderTotal"): <span class="order-total">@order.OrderTotal</span></li>
+                    </ul>
+                    <div class="buttons">
+                        @*@if (order.IsReturnRequestAllowed)
+                            {
+                                <input type="button" value="@T("Account.CustomerOrders.ReturnItems")" class="button-2 return-items-button" onclick="setLocation('@Url.RouteUrl("ReturnRequest", new { orderId = order.Id })')" />
+                            }*@
+                        <input type="button" value="@T("Account.CustomerOrders.OrderDetails")" class="button-2 order-details-button" onclick="setLocation('@Url.RouteUrl("OrderDetails", new { orderId = order.Id })')" />
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="order-list" id="completedorder">
+            @foreach (var order in Model.Orders.Where(x => x.OrderStatusEnum== OrderStatus.Complete))
+            {
+                <div class="section order-item">
+                    <div class="title">
+                        <strong>@T("Account.CustomerOrders.OrderNumber"): @order.CustomOrderNumber</strong>
+                    </div>
+                    <ul class="info">
+                        <li>@T("Account.CustomerOrders.OrderStatus"): <span class="order-status @order.OrderStatusEnum.ToString().ToLowerInvariant()">@order.OrderStatus</span></li>
+                        <li>@T("Account.CustomerOrders.OrderDate"): <span class="order-date">@order.CreatedOn.ToString()</span></li>
+                        <li>@T("Account.CustomerOrders.OrderTotal"): <span class="order-total">@order.OrderTotal</span></li>
+                    </ul>
+                    <div class="buttons">
+                        @*@if (order.IsReturnRequestAllowed)
+                            {
+                                <input type="button" value="@T("Account.CustomerOrders.ReturnItems")" class="button-2 return-items-button" onclick="setLocation('@Url.RouteUrl("ReturnRequest", new { orderId = order.Id })')" />
+                            }*@
+                        <input type="button" value="@T("Account.CustomerOrders.OrderDetails")" class="button-2 order-details-button" onclick="setLocation('@Url.RouteUrl("OrderDetails", new { orderId = order.Id })')" />
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="order-list" id="processingorder">
+            @foreach (var order in Model.Orders.Where(x => x.OrderStatusEnum == OrderStatus.Processing))
+            {
+                <div class="section order-item">
+                    <div class="title">
+                        <strong>@T("Account.CustomerOrders.OrderNumber"): @order.CustomOrderNumber</strong>
+                    </div>
+                    <ul class="info">
+                        <li>@T("Account.CustomerOrders.OrderStatus"): <span class="order-status @order.OrderStatusEnum.ToString().ToLowerInvariant()">@order.OrderStatus</span></li>
+                        <li>@T("Account.CustomerOrders.OrderDate"): <span class="order-date">@order.CreatedOn.ToString()</span></li>
+                        <li>@T("Account.CustomerOrders.OrderTotal"): <span class="order-total">@order.OrderTotal</span></li>
+                    </ul>
+                    <div class="buttons">
+                        @*@if (order.IsReturnRequestAllowed)
+                            {
+                                <input type="button" value="@T("Account.CustomerOrders.ReturnItems")" class="button-2 return-items-button" onclick="setLocation('@Url.RouteUrl("ReturnRequest", new { orderId = order.Id })')" />
+                            }*@
+                        <input type="button" value="@T("Account.CustomerOrders.OrderDetails")" class="button-2 order-details-button" onclick="setLocation('@Url.RouteUrl("OrderDetails", new { orderId = order.Id })')" />
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="order-list" id="processingorder">
+            @foreach (var order in Model.Orders.Where(x => x.OrderStatusEnum == OrderStatus.Processing))
+            {
+                <div class="section order-item">
+                    <div class="title">
+                        <strong>@T("Account.CustomerOrders.OrderNumber"): @order.CustomOrderNumber</strong>
+                    </div>
+                    <ul class="info">
+                        <li>@T("Account.CustomerOrders.OrderStatus"): <span class="order-status @order.OrderStatusEnum.ToString().ToLowerInvariant()">@order.OrderStatus</span></li>
+                        <li>@T("Account.CustomerOrders.OrderDate"): <span class="order-date">@order.CreatedOn.ToString()</span></li>
+                        <li>@T("Account.CustomerOrders.OrderTotal"): <span class="order-total">@order.OrderTotal</span></li>
+                    </ul>
+                    <div class="buttons">
+                        @*@if (order.IsReturnRequestAllowed)
+                            {
+                                <input type="button" value="@T("Account.CustomerOrders.ReturnItems")" class="button-2 return-items-button" onclick="setLocation('@Url.RouteUrl("ReturnRequest", new { orderId = order.Id })')" />
+                            }*@
+                        <input type="button" value="@T("Account.CustomerOrders.OrderDetails")" class="button-2 order-details-button" onclick="setLocation('@Url.RouteUrl("OrderDetails", new { orderId = order.Id })')" />
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="order-list" id="pendingorder">
+            @foreach (var order in Model.Orders.Where(x => x.OrderStatusEnum == OrderStatus.Pending))
+            {
+                <div class="section order-item">
+                    <div class="title">
+                        <strong>@T("Account.CustomerOrders.OrderNumber"): @order.CustomOrderNumber</strong>
+                    </div>
+                    <ul class="info">
+                        <li>@T("Account.CustomerOrders.OrderStatus"): <span class="order-status @order.OrderStatusEnum.ToString().ToLowerInvariant()">@order.OrderStatus</span></li>
+                        <li>@T("Account.CustomerOrders.OrderDate"): <span class="order-date">@order.CreatedOn.ToString()</span></li>
+                        <li>@T("Account.CustomerOrders.OrderTotal"): <span class="order-total">@order.OrderTotal</span></li>
+                    </ul>
+                    <div class="buttons">
+                        @*@if (order.IsReturnRequestAllowed)
+                            {
+                                <input type="button" value="@T("Account.CustomerOrders.ReturnItems")" class="button-2 return-items-button" onclick="setLocation('@Url.RouteUrl("ReturnRequest", new { orderId = order.Id })')" />
+                            }*@
+                        <input type="button" value="@T("Account.CustomerOrders.OrderDetails")" class="button-2 order-details-button" onclick="setLocation('@Url.RouteUrl("OrderDetails", new { orderId = order.Id })')" />
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="order-list" id="cancelledorder">
+            @foreach (var order in Model.Orders.Where(x => x.OrderStatusEnum == OrderStatus.Cancelled))
+            {
+                <div class="section order-item">
+                    <div class="title">
+                        <strong>@T("Account.CustomerOrders.OrderNumber"): @order.CustomOrderNumber</strong>
+                    </div>
+                    <ul class="info">
+                        <li>@T("Account.CustomerOrders.OrderStatus"): <span class="order-status @order.OrderStatusEnum.ToString().ToLowerInvariant()">@order.OrderStatus</span></li>
+                        <li>@T("Account.CustomerOrders.OrderDate"): <span class="order-date">@order.CreatedOn.ToString()</span></li>
+                        <li>@T("Account.CustomerOrders.OrderTotal"): <span class="order-total">@order.OrderTotal</span></li>
+                    </ul>
+                    <div class="buttons">
+                        @*@if (order.IsReturnRequestAllowed)
+                            {
+                                <input type="button" value="@T("Account.CustomerOrders.ReturnItems")" class="button-2 return-items-button" onclick="setLocation('@Url.RouteUrl("ReturnRequest", new { orderId = order.Id })')" />
+                            }*@
+                        <input type="button" value="@T("Account.CustomerOrders.OrderDetails")" class="button-2 order-details-button" onclick="setLocation('@Url.RouteUrl("OrderDetails", new { orderId = order.Id })')" />
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="no-data">
+            @T("Account.CustomerOrders.NoOrders")
+        </div>
+    }
+    <script>
+        $(document).ready(function () {
+            $('#allorder').show();
+            $('#completedorder').hide();
+            $('#processingorder').hide();
+            $('#pendingorder').hide();
+            $('#cancelledorder').hide();
+
+            $('#buttonallorder').click(function () {
+                settingbuttoncolor("all");
+                $('#allorder').show();
+                $('#completedorder').hide();
+                $('#processingorder').hide();
+                $('#pendingorder').hide();
+                $('#cancelledorder').hide();
+               
+            });
+
+            $('#buttoncompletedorder').click(function () {
+
+                settingbuttoncolor("complete");
+                $('#completedorder').show();
+                $('#allorder').hide();
+                $('#processingorder').hide();
+                $('#pendingorder').hide();
+                $('#cancelledorder').hide();
+                
+            });
+            $('#buttonprocessingdorder').click(function () {
+
+                settingbuttoncolor("processing");
+                $('#processingorder').show();
+                $('#completedorder').hide();
+                $('#allorder').hide();
+                $('#pendingorder').hide();
+                $('#cancelledorder').hide();
+            });
+            $('#buttonpendingorder').click(function () {
+                settingbuttoncolor("pending");
+                $('#pendingorder').show();
+                $('#completedorder').hide();
+                $('#allorder').hide();
+                $('#processingorder').hide();
+                $('#cancelledorder').hide();
+
+            });
+            $('#buttoncancelledorder').click(function () {
+                settingbuttoncolor("cancel");
+                $('#cancelledorder').show();
+                $('#pendingorder').hide();
+                $('#completedorder').hide();
+                $('#allorder').hide();
+                $('#processingorder').hide();
+
+
+            });
+        });
+        function settingbuttoncolor(buttonName) {
+            if (buttonName == "all") {
+                $("#buttonallorder").css("color", '');
+                $("#buttonallorder").css('background', '');
+                $("#buttonallorder").css('border', '');
+
+
+                $("#buttoncancelledorder").css("color", 'black');
+                $("#buttoncancelledorder").css('background', 'white');
+                $("#buttoncancelledorder").css('border', '1px solid #dad7d7');
+
+                $("#buttonpendingorder").css("color", 'black');
+                $("#buttonpendingorder").css('background', 'white');
+                $("#buttonpendingorder").css('border', '1px solid #dad7d7');
+
+                $("#buttoncompletedorder").css("color", 'black');
+                $("#buttoncompletedorder").css('background', 'white');
+                $("#buttoncompletedorder").css('border', '1px solid #dad7d7');
+
+                $("#buttonprocessingdorder").css("color", 'black');
+                $("#buttonprocessingdorder").css('background', 'white');
+                $("#buttonprocessingdorder").css('border', '1px solid #dad7d7');
+            }
+            else if (buttonName == "complete") {
+                $("#buttoncompletedorder").css("color", '');
+                $("#buttoncompletedorder").css('background', '');
+                $("#buttoncompletedorder").css('border', '');
+
+
+                $("#buttoncancelledorder").css("color", 'black');
+                $("#buttoncancelledorder").css('background', 'white');
+                $("#buttoncancelledorder").css('border', '1px solid #dad7d7');
+
+                $("#buttonpendingorder").css("color", 'black');
+                $("#buttonpendingorder").css('background', 'white');
+                $("#buttonpendingorder").css('border', '1px solid #dad7d7');
+
+                $("#buttonallorder").css("color", 'black');
+                $("#buttonallorder").css('background', 'white');
+                $("#buttonallorder").css('border', '1px solid #dad7d7');
+
+                $("#buttonprocessingdorder").css("color", 'black');
+                $("#buttonprocessingdorder").css('background', 'white');
+                $("#buttonprocessingdorder").css('border', '1px solid #dad7d7');
+            }
+            else if (buttonName == "pending") {
+                $("#buttonpendingorder").css("color", '');
+                $("#buttonpendingorder").css('background', '');
+                $("#buttonpendingorder").css('border', '');
+
+
+                $("#buttoncancelledorder").css("color", 'black');
+                $("#buttoncancelledorder").css('background', 'white');
+                $("#buttoncancelledorder").css('border', '1px solid #dad7d7');
+
+                $("#buttoncompletedorder").css("color", 'black');
+                $("#buttoncompletedorder").css('background', 'white');
+                $("#buttoncompletedorder").css('border', '1px solid #dad7d7');
+
+                $("#buttonallorder").css("color", 'black');
+                $("#buttonallorder").css('background', 'white');
+                $("#buttonallorder").css('border', '1px solid #dad7d7');
+
+                $("#buttonprocessingdorder").css("color", 'black');
+                $("#buttonprocessingdorder").css('background', 'white');
+                $("#buttonprocessingdorder").css('border', '1px solid #dad7d7');
+            }
+            else if (buttonName == "cancel") {
+                $("#buttoncancelledorder").css("color", '');
+                $("#buttoncancelledorder").css('background', '');
+                $("#buttoncancelledorder").css('border', '');
+
+
+                $("#buttonpendingorder").css("color", 'black');
+                $("#buttonpendingorder").css('background', 'white');
+                $("#buttonpendingorder").css('border', '1px solid #dad7d7');
+
+                $("#buttoncompletedorder").css("color", 'black');
+                $("#buttoncompletedorder").css('background', 'white');
+                $("#buttoncompletedorder").css('border', '1px solid #dad7d7');
+
+                $("#buttonallorder").css("color", 'black');
+                $("#buttonallorder").css('background', 'white');
+                $("#buttonallorder").css('border', '1px solid #dad7d7');
+
+                $("#buttonprocessingdorder").css("color", 'black');
+                $("#buttonprocessingdorder").css('background', 'white');
+                $("#buttonprocessingdorder").css('border', '1px solid #dad7d7');
+            }
+            else if (buttonName == "processing") {
+                $("#buttonprocessingdorder").css("color", '');
+                $("#buttonprocessingdorder").css('background', '');
+                $("#buttonprocessingdorder").css('border', '');
+
+
+                $("#buttoncancelledorder").css("color", 'black');
+                $("#buttoncancelledorder").css('background', 'white');
+                $("#buttoncancelledorder").css('border', '1px solid #dad7d7');
+
+                $("#buttonpendingorder").css("color", 'black');
+                $("#buttonpendingorder").css('background', 'white');
+                $("#buttonpendingorder").css('border', '1px solid #dad7d7');
+
+                $("#buttoncompletedorder").css("color", 'black');
+                $("#buttoncompletedorder").css('background', 'white');
+                $("#buttoncompletedorder").css('border', '1px solid #dad7d7');
+
+                $("#buttonallorder").css("color", 'black');
+                $("#buttonallorder").css('background', 'white');
+                $("#buttonallorder").css('border', '1px solid #dad7d7');
+            }
+        }
+    </script>
+</div>

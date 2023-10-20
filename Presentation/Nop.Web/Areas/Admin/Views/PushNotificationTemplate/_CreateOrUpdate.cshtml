@@ -1,0 +1,108 @@
+﻿@model PushNotificationTemplateModel
+@inject AdminAreaSettings adminAreaSettings
+@using Nop.Core.Domain.Messages;
+@using Nop.Services
+
+@Html.ValidationSummary(false)
+@Html.HiddenFor(model => model.Id)
+
+<div class="content">
+    <div class="form-horizontal">
+
+        <div class="panel-group">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="margin-bottom">
+                        <em>@T($"Admin.ContentManagement.PushNotificationTemplate.Fields.Name.{Model.Name}")</em>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="Name" />
+                        </div>
+                        <div class="col-md-9">
+                            <div class="form-text-row">@Model.Name</div>
+                            <input asp-for="Name" type="hidden" />
+                        </div>
+                    </div>
+                    <script>
+                        function toggleLoadedAllowedTokens() {
+                            $('#pnlAllowedTokens').toggle();
+                            if ($('#pnlAllowedTokens').css('display') == 'none') {
+                                $('#allowedTokensShowHide').text('@T("Admin.Common.Show")');
+                            } else {
+                                $('#allowedTokensShowHide').text('@T("Admin.Common.Hide")');
+                            }
+                        }
+                    </script>
+                    @(Html.LocalizedEditor<PushNotificationTemplateModel, PushNotificationTemplateLocalizedModel>("pushnotificationtemplate-localized",
+                @<div>
+                     <div class="form-group">
+                        <div class="col-md-3">
+                             <nop-label asp-for="@Model.Locales[item].Title" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="@Model.Locales[item].Title" />
+                            <span asp-validation-for="@Model.Locales[item].Title"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                             <nop-label asp-for="@Model.Locales[item].Message" />
+                        </div>
+                        <div class="col-md-9">
+                              <nop-editor asp-for="@Model.Locales[item].Message" asp-template="RichEditor"/>
+                            <span asp-validation-for="@Model.Locales[item].Message"></span>
+                        </div>
+                    </div>
+                    @Html.HiddenFor(model => model.Locales[item].LanguageId)
+                </div>
+    ,
+                    @<div>
+                        <div class="form-group">
+                            <div class="col-md-3">
+                                  <nop-label asp-for="@Model.Title" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="@Model.Title"  asp-required="true"/>
+                            <span asp-validation-for="@Model.Title"></span>
+                            </div>
+                        </div>
+                       <div class="form-group">
+                        <div class="col-md-3">
+                             <nop-label asp-for="@Model.Message" />
+                        </div>
+                        <div class="col-md-9">
+                              <nop-editor asp-for="@Model.Message" asp-template="RichEditor"/>
+                            <span asp-validation-for="@Model.Message"></span>
+                        </div>
+                       </div>
+                    </div>
+    ))
+
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="@Model.IsActive" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="@Model.IsActive" />
+                            <span asp-validation-for="@Model.IsActive"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        @*$("#@Html.IdFor(model => model.Title)").keyup(function () {
+            AutoTranslate(this, "#@Html.IdFor(model => model.Locales[0].Title)",false);
+        });
+        function SetDescription(myval) {
+            AutoTranslate(myval, tinymce.get("@Html.IdFor(model => model.Locales[0].Message)"),true);
+        }*@
+    </script>
+</div>
+
+
+
+

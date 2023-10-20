@@ -1,0 +1,44 @@
+﻿@model OrderSearchModel
+
+@inject IStoreService storeService
+@using Nop.Services.Stores
+
+@{
+    //page title
+    ViewBag.PageTitle = T("Admin.Orders").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Orders");
+}
+
+@{
+    const string hideSearchBlockAttributeName = "OrdersPage.HideSearchBlock";
+    var hideSearchBlock = genericAttributeService.GetAttribute<bool>(workContext.CurrentCustomer, hideSearchBlockAttributeName);
+}
+
+
+<script>
+    $(document).ready(function () {
+        bindBootstrapTabSelectEvent('order-edit');
+    });
+</script>
+<div class="content">
+    <div class="form-horizontal">
+        <div id="customer-edit" class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="nav-item active"><a data-toggle="tab" href="#Products">@T("Admin.Orders")</a></li>
+
+                <li class="nav-item"><a data-toggle="tab" href="#deleted">@T("Admin.Orders.DeletedOrders")</a></li>
+
+            </ul>
+            <div class="tab-content">
+                <div id="Products" class="tab-pane fade in active">
+                    @await Html.PartialAsync("_List", Model)
+                </div>
+                <div id="deleted" class="tab-pane fade">
+                    @await Html.PartialAsync("_deleted", Model)
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

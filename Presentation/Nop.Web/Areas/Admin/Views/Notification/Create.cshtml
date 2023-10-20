@@ -1,0 +1,53 @@
+﻿@model NotificationModel
+@using Nop.Web.Areas.Admin.Models.Notification
+@using Nop.Core;
+@using Nop.Services.Customers;
+@using Nop.Core.Domain.Customers;
+@{
+    var _workContext = EngineContext.Current.Resolve<IWorkContext>();
+    var _customerService = EngineContext.Current.Resolve<ICustomerService>();
+    //page title
+    ViewBag.Title = T("Admin.Promotions.Notification.AddNew").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Manage Notification");
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "campaign-form" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @T("Admin.Promotions.Notification.AddNew")
+            <small><i class="fa fa-arrow-circle-left"></i>@Html.ActionLink(T("Admin.Promotions.Notification.BackToList").Text, "List")</small>
+        </h1>
+
+        @if (_customerService.IsAdmin(_workContext.CurrentCustomer))
+        {
+            <div class="pull-right">
+                <button type="submit" name="save" class="btn bg-blue add-loader" data-toggle="modal">
+                    <i class="fa fa-floppy-o"></i>
+                    @T("Admin.Common.Save")
+                </button>
+                <button type="submit" name="save-continue" class="btn bg-blue add-loade" data-toggle="modal">
+                    <i class="fa fa-floppy-o"></i>
+                    @T("Admin.Common.SaveContinue")
+                </button>
+            </div>
+        }
+    </div>
+    @await Html.PartialAsync("_CreateOrUpdate", Model)
+}
+<nop-delete-confirmation asp-model-id="@Model.Id" asp-button-id="pushnotification-delete" />
+<script>
+    $(".add-loader").on("click", function () {
+
+        var title = $("#Title").val();
+        var message = $("#Message").val();
+        if (title == "" || message == "") {
+            return;
+        }
+
+        var data = this;
+        data.dataset.target = "#back-drop-after-submit";
+    });
+</script>

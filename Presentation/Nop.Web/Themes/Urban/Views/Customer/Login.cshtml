@@ -1,0 +1,345 @@
+﻿@model LoginModel
+@using Nop.Core
+@using Nop.Core.Domain.Customers
+@using System.Text.Encodings.Web;
+@using Nop.Core.Domain.Common
+
+@inject IWebHelper webHelper
+@inject IWorkContext _workContext
+@inject CommonSettings settings
+@{
+    var workLanguage = EngineContext.Current.Resolve<IWorkContext>().WorkingLanguage;
+    var ResendTokenTimer = settings.ResendTokenTimer>0? settings.ResendTokenTimer:120;
+}
+@using Nop.Core.Infrastructure;
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Login").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-login-page");
+
+    //register URL with return URL (if specified)
+    var registerUrl = Url.RouteUrl("RegisterInit");
+    //var registerUrl = Url.RouteUrl("Register", new { returnUrl = this.Context.Request.Query["returnUrl"] }, webHelper.CurrentRequestProtocol);
+    var isUaePassStr = string.Empty;
+
+    //Request.QueryString
+    if (Context.Request.Query["type"].ToString() != null)
+    {
+        isUaePassStr = Context.Request.Query["type"].ToString().ToLower();
+    }
+    string uaePassSignIn = "Images/SignIn_" + _workContext.WorkingLanguage.UniqueSeoCode + ".png";
+
+    var errorMessage = TempData["ErrorMessage"] as string;
+    var ActivationMessage = TempData["ActivationMessage"] as string;
+}
+@{
+    string cookie = TempData["MATRequestType"] as string;// Context.Request.Cookies["RequestType"];
+    var ShowTimer = TempData["ShowTimer"];
+    var logindivstyle = "";
+    var activationdivStyle = "";
+    var forgotpassword = "position: inherit; margin-top: 20px";
+    string step = TempData["step"] as string;
+    if (cookie != null)
+    {
+        // step = TempData["step"];// Context.Request.Cookies["step"].ToString();
+
+        if (step == "1")
+        {
+            logindivstyle = "display:none";
+            activationdivStyle = "";
+        }
+        if (step == "2")
+        {
+            activationdivStyle = "display:none";
+            logindivstyle = "";
+        }
+
+    }
+    else
+    {
+        activationdivStyle = "display:none";
+        logindivstyle = "";
+    }
+}
+<div class="page login-page">
+
+    <div class="page-title">
+        <h1>@T("Account.Login.Welcome")</h1>
+    </div>
+    @await Html.PartialAsync("_ExternalAuthentication.Errors")
+    <div class="page-body">
+        <div class="customer-blocks">
+            @if (Model.RegistrationType == UserRegistrationType.Disabled)
+            {
+                <div class="new-wrapper">
+                    <div class="title">
+                        @T("Account.Register")
+                    </div>
+                    <div class="text">
+                        @T("Account.Register.Result.Disabled")
+                    </div>
+                </div>
+            }
+            else if (Model.CheckoutAsGuest)
+            {
+                @*<div class="new-wrapper checkout-as-guest-or-register-block">*@
+                <div class="new-wrapper checkout-as-guest-or-register-block" @(isUaePassStr == "uaepass" ? Html.Raw("style=\"display:none\"") : null)>
+                    <div class="title">
+                        <strong>@T("Account.Login.CheckoutAsGuestOrRegister")</strong>
+                    </div>
+                    <div class="text">
+                        @await Component.InvokeAsync("TopicBlock", new { systemName = "CheckoutAsGuestOrRegister" })
+                    </div>
+                    <div class="buttons">
+                        <input type="button" class="button-1 checkout-as-guest-button" onclick="location.href='@Url.RouteUrl("Checkout")'" value="@T("Account.Login.CheckoutAsGuest")" />
+                        <input type="button" class="button-1 register-button" onclick="location.href='@registerUrl'" value="@T("Account.Register")" />
+                    </div>
+                </div>
+            }
+            else
+            {
+                @*<div class="new-wrapper register-block">*@
+                @*<div class="new-wrapper register-block" @(isUaePassStr == "uaepass" ? Html.Raw("style=\"display:none\"") : null)>
+                        <div class="title">
+                            <strong>@T("Account.Login.NewCustomer")</strong>
+                        </div>
+                        <div class="text">
+                            @T("Account.Login.NewCustomerText")
+                        </div>
+                        <div class="buttons">
+                            <input type="button" class="button-1 register-button" onclick="location.href='@registerUrl'" value="@T("Account.Register")" />
+                        </div>
+                    </div>*@
+            }
+            @*<div class="returning-wrapper fieldset">*@
+            <div id="loginDiv" style="@logindivstyle" class="returning-wrapper fieldset">
+                @if (!string.IsNullOrEmpty(Model.Result))
+                {
+                    <p>@Model.Result</p>
+                }
+
+                <div class="form-fields">
+                    <form asp-route="~/Login" asp-route-returnurl="@Context.Request.Query["ReturnUrl"]" method="post" autocomplete="off">
+                        <div asp-validation-summary="ModelOnly" class="message-error">@T("Account.Login.Unsuccessful")</div>
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                            <div class="message-error">@errorMessage</div>
+                        }
+                        @if (!string.IsNullOrEmpty(ActivationMessage))
+                        {
+                            if (string.IsNullOrEmpty(Model.Result))
+                            {
+                                <div class="message-success">@ActivationMessage</div>
+                            }
+                        }
+                        <div class="form-fields">
+
+                            @if (Model.UsernamesEnabled)
+                            {
+                                <div class="inputs">
+                                    <label asp-for="Username" asp-postfix=":"></label>
+                                    <input asp-for="Username" class="username" autofocus="autofocus" />
+                                    <span asp-validation-for="Username"></span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="inputs">
+                                    <label asp-for="Email" asp-postfix=":"></label>
+                                    <input asp-for="Email" class="email" autofocus="autofocus" />
+                                    <span asp-validation-for="Email"></span>
+                                </div>
+                            }
+                            <div class="inputs">
+                                <label asp-for="Password" asp-postfix=":"></label>
+                                <input asp-for="Password" class="password" />
+                                <span asp-validation-for="Password"></span>
+                                @*<span class="forgot-password">
+                    <a asp-route="PasswordRecovery">@T("Account.Login.ForgotPassword")</a>
+                </span>*@
+                            </div>
+                            <div class="register-text">
+                                @T("account.login.createNewcustomer").Text &nbsp
+                                <span>
+                                    <a asp-route="registerInit">@T("account.login.pleaseRegister").Text</a>
+                                </span>
+                            </div>
+
+                            @if (!Model.HasAcceptedTermsAndConditions)
+                            {
+                                @Html.HiddenFor(model => model.HasAcceptedTermsAndConditions)
+                                <script asp-location="Footer" type="text/javascript">
+                                $(document).ready(function () {
+                                    $('#login-button').click(function () {
+                                        if ($('#accept-terms-conditions').is(':checked')) {
+                                            $('#@Html.IdFor(model => model.HasAcceptedTermsAndConditions)').val(true);
+                                            //do some stuff
+                                            return true;
+                                        }
+                                        else {
+                                            //just show validation errors, dont post
+                                            var encodedText = JavaScriptEncoder.Default.Encode(@T("checkout.termsofservice.pleaseaccept");
+                                            alert(encodedText);
+                                            return false;
+                                        }
+                                    });
+                                });
+                                </script>
+                                @*<div class="accept-terms-conditions">
+                    <input id="accept-terms-conditions" type="checkbox" name="accept-terms-conditions" />
+                    <label for="accept-terms-conditions">@T("checkout.termsofservice.iaccept")</label>
+                    <span class="read" id="read-privacyinfo">@T("Account.Fields.AcceptPrivacyPolicy.Read")</span>
+                    <script asp-location="Footer">
+                    $(document).ready(function () {
+                        $('#read-privacyinfo').on('click', function (e) {
+                            displayPopupContentFromUrl('@Url.RouteUrl("TopicPopup", new { SystemName = "LoginRegisterationTermsAndConditions" })', '@T("checkout.termsofservice")', null, null, 'top');
+                        });
+                    });
+                    </script>
+                </div>*@
+                            }
+                            @Html.HiddenFor(model => model.isUaePass)
+                            <div class="inputs reversed" @(isUaePassStr == "uaepass" ? Html.Raw("style=\"display:none\"") : null)>
+
+                                <input asp-for="RememberMe" />
+                                <label asp-for="RememberMe"></label>
+
+                                <span class="forgot-password">
+                                    @Html.RouteLink(T("Account.Login.ForgotPassword").Text, "PasswordRecovery")
+                                </span>
+                            </div>
+                            @if (Model.DisplayCaptcha)
+                            {
+                                <nop-captcha />
+                            }
+
+                        </div>
+                        <div class="buttons">
+                            <input class="button-1 login-button" id="login-button" type="submit" value="@T("Account.Login.LoginButton")" />
+                        </div>
+
+
+                    </form>
+
+                </div>
+                <div class="uae-pass-authentication-cancel" @(isUaePassStr == "uaepassauthenticationcancelled" ? null : Html.Raw("style=\"display:none\""))>
+                    <h4>@T("uaepass.authenticationcanceled.text")</h4>
+                </div>
+                @{ var validationSummary = Html.ValidationSummary(true, T("Account.Login.Unsuccessful").Text); }
+                <div class="title">
+                    <strong>@T("Account.Login.ReturningCustomer")</strong>
+                </div>
+                <div class="uae-pass-container" @(isUaePassStr == "uaepass" ? Html.Raw("style=\"display:none\"") : null)>
+                    <div class="uae-pass-link">
+                        <img src="@(uaePassSignIn)" class="add-uae-image uaepass-logout" onclick="setLocation('@Url.RouteUrl("UaePass", new { type ="login" , registrationType ="login"  })')" />
+                    </div>
+
+                    <div class="uae-pass-text">
+                        <h4>@T("uaepass.button.below.text")</h4>
+                    </div>
+
+                </div>
+            </div>
+            <div id="ActivateDiv" style="@activationdivStyle" class="returning-wrapper fieldset">
+                @using (Html.BeginForm("Activate", "Customer", FormMethod.Post, null))
+                {
+                    @Html.AntiForgeryToken()
+                    if (!string.IsNullOrEmpty(Model.Result))
+                    {
+                        <p>@Model.Result</p>
+                    }
+
+
+                    <div asp-validation-summary="ModelOnly" class="message-error">@T("Account.Login.Unsuccessful")</div>
+                    <div class="title">
+                        <strong>@T("Account.Login.activateaccounttitle")</strong>
+                    </div>
+                    if (!string.IsNullOrEmpty(validationSummary.ToHtmlString()))
+                    {
+                        <div class="message-error">@validationSummary</div>
+                    }
+                    <div class="form-fields">
+                        <div class="inputs">
+
+                            <label asp-for="ActivationCode" asp-postfix=":"></label>
+                            <input asp-for="ActivationCode" autofocus="autofocus" />
+                            @Html.ValidationMessageFor(m => m.ActivationCode)
+                        </div>
+
+                                <div style="display:none" id="timerdiv">@T("Account.Login.ResendActivationButton")<span style="margin:5px;" id="timer"></span></div>
+                    </div>
+                    <div class="buttons">
+                        <input class="button-1 login-button" name="activate-account" type="submit" value="@T("account.login.activateaccounttitle")" />
+
+
+                        <input class="button-1 login-button" id="activateresettoken" name="activate-resettoken" type="submit" value="@T("Account.Login.ResendActivationButton")" />
+                        <input class="button-1 login-button" type="submit" name="activate-Skip" id="btn-Skip" value="@T("common.cancel")" />
+                    </div>
+                    <div class="buttons">
+                    
+                    </div>
+                }
+            </div>
+
+        </div>
+
+        <div class="external-authentication" @(isUaePassStr == "uaepass" ? Html.Raw("style=\"display:none\"") : null)>
+            @await Component.InvokeAsync("ExternalMethods", "ExternalAuthentication")
+        </div>
+        @await Component.InvokeAsync("TopicBlock", new { systemName = "LoginRegistrationInfo" })
+    </div>
+</div>
+
+<script>
+
+    let timerOn = true;
+
+    function timer(remaining) {
+
+        var m = Math.floor(remaining / 60);
+        var s = remaining % 60;
+
+        m = m < 10 ? '0' + m : m;
+        s = s < 10 ? '0' + s : s;
+        document.getElementById('timer').innerHTML = m + ':' + s;
+        remaining -= 1;
+
+        if (remaining >= 0 && timerOn) {
+            setTimeout(function () {
+                timer(remaining);
+            }, 1000);
+            return;
+        }
+
+        if (!timerOn) {
+            // Do validate stuff here
+            return;
+        }
+        // Do timeout stuff here
+        $("#timer,#timerdiv").css("display", "none");
+        $("#activateresettoken").css("display", "inline");
+
+    }
+    $(document).ready(function () {
+        window.addEventListener("unload", function () {
+            // clear the cookie
+            console.log('clearing cookie');
+            document.cookie = "Flage=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "RequestType=register; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "step=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        });
+      
+            ResendToken();
+        
+    });
+    function ResendToken() {
+        timer(@ResendTokenTimer);
+        $("#timer,#timerdiv").css("display", "inline");
+        $("#activateresettoken").hide();
+        return true;
+    }
+
+</script>

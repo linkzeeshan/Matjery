@@ -1,0 +1,242 @@
+﻿@model IEnumerable<Nop.Web.Models.Customer.CustomerProductReviewModel>
+@using Nop.Core
+@using Nop.Core.Domain.Tax
+
+@inject IWebHelper webHelper
+@inject IWorkContext workContext
+@inject IStoreContext storeContextview
+@inject IViewComponentSelector viewComponentSelector
+@{
+    var home = storeContextview.CurrentStore.Url + "? Store =public";
+}
+
+<style>
+    td {
+        padding-right: 5px;
+        padding-left: 5px;
+    }
+
+    .centertd {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        margin-top: 25px;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    .rate {
+        float: left;
+        height: 46px;
+        padding: 0 10px;
+    }
+
+        .rate:not(:checked) > input {
+            position: absolute;
+            top: -9999px;
+        }
+
+        .rate:not(:checked) > label {
+            float: right;
+            width: 1em;
+            overflow: hidden;
+            white-space: nowrap;
+            cursor: pointer;
+            font-size: 30px;
+            color: #ccc;
+        }
+
+            .rate:not(:checked) > label:before {
+                content: '★ ';
+            }
+
+        .rate > input:checked ~ label {
+            color: #ffc700;
+        }
+
+        .rate:not(:checked) > label:hover,
+        .rate:not(:checked) > label:hover ~ label {
+            color: #deb217;
+        }
+
+        .rate > input:checked + label:hover,
+        .rate > input:checked + label:hover ~ label,
+        .rate > input:checked ~ label:hover,
+        .rate > input:checked ~ label:hover ~ label,
+        .rate > label:hover ~ input:checked ~ label {
+            color: #c59b08;
+        }
+    .custom-modal-body {
+        margin: 0px !important;
+        overflow-y: scroll;
+        position: relative;
+        height: 256px;
+    }
+</style>
+<div>
+    @if (Model.Count() > 0)
+    {
+        <div id="productReview-modal-id" class="custom-modal custom-modal-class">
+
+            <form class="custom-modal-content">
+
+                <div class="custom-modal-container" style="top:-90px">
+
+                    <div class="custom-modal-header">
+
+                        <span onclick="document.getElementById('productReview-modal-id').style.display='none'" class="custom-modal-close" title="Close Modal">
+
+                            <img src="~/icons/cross-icon.svg" />
+                        </span>
+                        <p id="productReviewSuccessMessage" style="color: red; padding-top: 20px; display: none">@T("admin.catalog.productreviews.added")</p>
+                        <h3 style="padding-top: 45px; color: #189ec8">@T("ProductReviewRating.Title").Text</h3>
+                    </div>
+                    <div class="custom-modal-body">
+                        <table class="table">
+                            <tbody>
+
+                                @foreach (var customerproductReview in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <!--  <img src="http://10.0.131.22/MatjryUpgrade/images/thumbs/0000535.jpeg" style="width: 82px;"> -->
+                                            @if (customerproductReview.ProductImage == null || customerproductReview.ProductImage == "")
+                                            {
+                                                <img src="~/images/thumbs/default-image_250.png" style="width: 82px;">
+                                            }
+                                            else
+                                            {<img src="@customerproductReview.ProductImage" style="width: 82px;">}
+
+                                        </td>
+                                        <td class="centertd">
+                                            @customerproductReview.ProductName
+                                            <div class="rate">
+                                                <input type="radio" name="rate" value="5" id="star5" />
+                                                <label for="star5" id="star5_@customerproductReview.ProductId" title="Rating" onclick="rating(5, @customerproductReview.ProductId)">5 stars</label>
+                                                <input type="radio" id="star4" name="rate" value="4" />
+                                                <label for="star4" id="star4_@customerproductReview.ProductId" title="Rating" onclick="rating(4, @customerproductReview.ProductId)">4 stars</label>
+                                                <input type="radio" id="star3" name="rate" value="3" />
+                                                <label for="star3" id="star3_@customerproductReview.ProductId" title="Rating" onclick="rating(3, @customerproductReview.ProductId)">3 stars</label>
+                                                <input type="radio" id="star2" name="rate" value="2" />
+                                                <label for="star2" id="star2_@customerproductReview.ProductId" title="Rating" onclick="rating(2, @customerproductReview.ProductId)">2 stars</label>
+                                                <input type="radio" id="star1" name="rate" value="1" />
+                                                <label for="star1" id="star1_@customerproductReview.ProductId" title="Rating" onclick="rating(1, @customerproductReview.ProductId)">1 star</label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <!-- <input type="text" style="border-radius: 5px; height: 33px;border: 1px solid #189ec8;" /> -->
+                                            <input asp-for="@customerproductReview.ReviewText" class="productReviewText" id="productReviewText_@customerproductReview.ProductId" onchange="productReviewText(this, @customerproductReview.ProductId)" style="border-radius: 5px; height: 33px;border: 1px solid #189ec8;" />
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+
+                        </table>
+                    </div>
+                    <div class="custom-modal-footer">
+                        <button class="btn btn-cancel" id="customerProductReview" style="background-color: #189ec8;
+    border-radius: 7px;
+    border: 1px solid #189ec8;
+    color: white;" >
+                            @T("forum.submit").Text
+</button>
+</div>
+
+</div>
+</form>
+</div>
+}
+</div>
+<script asp-location="Footer">
+    var customerproductReviews = [];
+    //Product review Moodal
+    $(document).ready(function () {
+        //Get the modal
+        var modal = document.getElementById("productReview-modal-id");
+        if (modal != null) {
+            console.log('this is modal : ' + modal);
+            modal.style.display = "block";
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        }
+        $('#customerProductReview').click(function (e) {
+            e.preventDefault();
+            addAntiForgeryToken(customerproductReviews);
+                     
+                                    $.ajax({
+                                        cache: false,
+                                        type: "POST",
+                                        dataType: "json",
+                                        contentType: "application/json",
+                                        url: "@(Url.Action("CustomerBulkProductReview", "Customer"))",
+                                        data: JSON.stringify(customerproductReviews),
+                                        traditional: true,
+                                        error: function (jqXHR, textStatus, errorThrown) {
+
+                                        },
+                                        success: function (jqXHR, textStatus) {
+                                            document.getElementById('productReviewSuccessMessage').style.display = 'block';
+                                            setTimeout(() => { modal.style.display = "none"; }, 5000);
+                                        }
+                                    });
+
+
+            });
+
+
+
+    });
+    function rating(value, productId) {
+
+        for (var r = value; r <= 5; r++) {
+            var starId = 'star' + r + '_' + productId;
+            $('#' + starId).css('color', '#ccc');
+        }
+
+        for (var i = value; i > 0; i--) {
+            //star3_4426 star4_5305
+            var startId = 'star' + i + '_' + productId;
+
+            $('#' + startId).css('color', '#deb217')
+
+        }
+        if (customerproductReviews != null && customerproductReviews != undefined && customerproductReviews.length > 0) {
+
+            var objectIndex = customerproductReviews.findIndex((obj => obj.productId == productId));
+            if (customerproductReviews[objectIndex] != null && customerproductReviews[objectIndex] != undefined && customerproductReviews[objectIndex].productId == productId)
+                customerproductReviews[objectIndex].rating = value;
+            else
+                customerproductReviews.push({ 'productId': productId, 'rating': value, 'reviewText': null });
+        } else {
+            customerproductReviews.push({ 'productId': productId, 'rating': value, 'reviewText': null });
+
+
+        }
+        console.log(customerproductReviews);
+    }
+    function productReviewText(event, productId) {
+
+        var productReviewTextId = 'productReviewText_' + productId;
+
+        if (customerproductReviews != null && customerproductReviews != undefined && customerproductReviews.length > 0) {
+
+            var objectIndex = customerproductReviews.findIndex((obj => obj.productId == productId));
+            if (customerproductReviews[objectIndex] != null && customerproductReviews[objectIndex] != undefined && customerproductReviews[objectIndex].productId == productId)
+                customerproductReviews[objectIndex].reviewText = event.value;
+            else
+                customerproductReviews.push({ 'productId': productId, 'rating': 0, 'reviewText': event.value });
+        } else {
+            customerproductReviews.push({ 'productId': productId, 'rating': 0, 'reviewText': event.value });
+        }
+
+    }
+
+</script>

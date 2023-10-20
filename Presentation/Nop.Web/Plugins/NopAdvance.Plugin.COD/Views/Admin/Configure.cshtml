@@ -1,0 +1,199 @@
+@*
+    // ***	 ** ****** ****** ****** ******* **     ** ****** ***   ** **** ****
+    // ****  ** **  ** **  ** **  **  **  **  **   **  **  ** ****  ** *    *
+    // ** ** ** **  ** ****** ******  **  **   ** **   ****** ** ** ** *    ***
+    // **  **** **  ** **	  **  **  **  **    ***    **  ** **  **** *    *
+    // **   *** ****** **	  **  ** *******     *     **  ** **   *** **** ****
+    //
+    // **************************************************************************
+    // *                                                                		*
+	// *          Cash On Delivery (COD) Plugin by NopAdvance team              *
+    // *			Copyright (c) NopAdvance LLP. All Rights Reserved			*
+    // *                                                                       	*
+    // **************************************************************************
+    // *                                                                       	*
+    // * Email:		contact@nopadvance.com										*
+    // * Website:	https://nopadvance.com										*
+    // *                                                                       	*
+    // **************************************************************************
+    // *                                                                       	*
+    // * Please see the  License file for the full End User License Agreement. 	*
+    // * The  complete license agreement is also available on  our  website at 	*
+    // * https://nopadvance.com/license-terms									*
+    // *                                                                       	*
+    // * This  software / plugin  is furnished  under a license  and  may   be  *
+    // * used  and modified  only in accordance with the terms of such license  *
+    // * and with the inclusion of the above copyright notice.  This  software	*
+    // * or any other copies thereof may not be  provided  or  otherwise  made	*
+    // * available  to any other person.  No title to  and  ownership  of  the  *
+    // * software is hereby transferred.                                        *
+    // *                                                                       	*
+    // * You may not reverse  engineer, decompile, defeat  license  encryption 	*
+    // * mechanisms  or  disassemble this software product or software product 	*
+    // * license.  NopAdvance may terminate this  license if you don't  comply 	*
+    // * with any of the terms & conditions set forth in our  end user license	*
+    // * agreement (EULA).  In such event , licensee agrees to return licensor	*
+    // * or destroy  all copies of software  upon termination  of the license.	*
+    // *                                                                       	*
+    // **************************************************************************
+*@
+@model ConfigurationModel
+@inject IGenericHelper genericHelper
+@{
+    Layout = genericHelper.GetPluginConfigureLayout();
+    ViewBag.SystemName = PluginDefaults.NOPADVANCE_COD_PLUGIN_SYSTEM_NAME;
+    ViewBag.PluginStatus = Model.PluginStatus;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName(PluginDefaults.CONFIGURE_MENU_SYSTEM_NAME);
+}
+<script>
+    $(document).ready(function() {
+        $("#@Html.IdFor(model => model.AdditionalFeePercentage)").click(toggleUsePercentage);
+        $("#@Html.IdFor(model => model.SkipPaymentInfo)").click(toggleSkipPaymentInfo);
+
+        toggleUsePercentage();
+        toggleSkipPaymentInfo();
+    });
+
+    function toggleUsePercentage() {
+        if ($('#@Html.IdFor(model => model.AdditionalFeePercentage)').is(':checked')) {
+            $('#pnlAdditionalFeePercentage').show();
+            $('#pnlAdditionalFee').hide();
+        } else {
+            $('#pnlAdditionalFeePercentage').hide();
+            $('#pnlAdditionalFee').show();
+        }
+    }
+    function toggleSkipPaymentInfo() {
+        if ($('#@Html.IdFor(model => model.SkipPaymentInfo)').is(':checked')) {
+            $('#pnlSkipPaymentInfo').hide();
+        } else {
+            $('#pnlSkipPaymentInfo').show();
+        }
+    }
+
+</script>
+@await Component.InvokeAsync("StoreScopeConfiguration")
+@Html.Raw(Model.PluginDesc)
+<form asp-controller=@PluginDefaults.NOPADVANCE_COD_CONTROLLER_NAME asp-action=@PluginDefaults.CONFIGURE_MENU_ACTION_NAME method="post">
+    <div class="panel-group">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="callout bg-gray-light no-margin">
+                    <i class="fa fa-info"></i>
+                    <b>@T(LocaleResourceDefaults.CONFIGURE_INFO)</b>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="MinimumPrice_OverrideForStore" asp-input="MinimumPrice" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="MinimumPrice" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="MinimumPrice" asp-postfix="@Model.PrimaryStoreCurrencyCode" />
+                        <span asp-validation-for="MinimumPrice"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="MaximumPrice_OverrideForStore" asp-input="MaximumPrice" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="MaximumPrice" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="MaximumPrice" asp-postfix="@Model.PrimaryStoreCurrencyCode" />
+                        <span asp-validation-for="MaximumPrice"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="AdditionalFeePercentage_OverrideForStore" asp-input="AdditionalFeePercentage" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="AdditionalFeePercentage" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="AdditionalFeePercentage" />
+                        <span asp-validation-for="AdditionalFeePercentage"></span>
+                    </div>
+                </div>
+                <nop-nested-setting asp-for="AdditionalFeePercentage">
+                    <div class="form-group" id="pnlAdditionalFeePercentage">
+                        <div class="col-md-3">
+                            <nop-override-store-checkbox asp-for="AdditionalFeePer_OverrideForStore" asp-input="AdditionalFeePer" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                            <nop-label asp-for="AdditionalFeePer" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="AdditionalFeePer" />
+                            <span asp-validation-for="AdditionalFeePer"></span>
+                        </div>
+                    </div>
+                </nop-nested-setting>
+                <div class="form-group" id="pnlAdditionalFee">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="AdditionalFee_OverrideForStore" asp-input="AdditionalFee" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="AdditionalFee" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="AdditionalFee" asp-postfix="@Model.PrimaryStoreCurrencyCode" />
+                        <span asp-validation-for="AdditionalFee"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="ShippableProductRequired_OverrideForStore" asp-input="ShippableProductRequired" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="ShippableProductRequired" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="ShippableProductRequired" />
+                        <span asp-validation-for="ShippableProductRequired"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        <nop-override-store-checkbox asp-for="SkipPaymentInfo_OverrideForStore" asp-input="SkipPaymentInfo" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                        <nop-label asp-for="SkipPaymentInfo" />
+                    </div>
+                    <div class="col-md-9">
+                        <nop-editor asp-for="SkipPaymentInfo" />
+                        <span asp-validation-for="SkipPaymentInfo"></span>
+                    </div>
+                </div>
+                <div id="pnlSkipPaymentInfo">
+                    @( Html.LocalizedEditor<ConfigurationModel, ConfigurationLocalizedModel>("plugin-settings-localized",
+                    @<div class="form-group">
+                        <div class="col-md-3">
+                            <nop-override-store-checkbox asp-for="DescriptionText_OverrideForStore" asp-input="Locales[item].DescriptionText" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                            <nop-label asp-for="Locales[item].DescriptionText" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-textarea asp-for="Locales[item].DescriptionText" />
+                            <span asp-validation-for="Locales[item].DescriptionText"></span>
+                            @Html.HiddenFor(model => model.Locales[item].LanguageId)
+                        </div>
+                    </div>,
+                    @<div class="form-group">
+                        <div class="col-md-3">
+                            <nop-override-store-checkbox asp-for="DescriptionText_OverrideForStore" asp-input="DescriptionText" asp-store-scope="Model.ActiveStoreScopeConfiguration" />
+                            <nop-label asp-for="DescriptionText" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-textarea asp-for="DescriptionText" />
+                            <span asp-validation-for="DescriptionText"></span>
+                        </div>
+                    </div>,
+                    //localizable settings per store (overrriden store settings) are not supported yet
+                    true))
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-9 col-md-offset-3">
+                        <input type="submit" name="save" class="btn bg-blue" value="@T("Admin.Common.Save")" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        function SetDescription(myval) {
+            AutoTranslate(myval, tinymce.get("@Html.IdFor(model => model.Locales[0].DescriptionText)"),true);
+        }
+    </script>
+</form>

@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Language Name="EN">
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.COD">
+    <Value>Cash On Delivery (COD)</Value>
+  </LocaleResource> 
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Help">
+    <Value>Help</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.CategorieIds">
+    <Value>Categories</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Info">
+    <Value>Note: "Additional fee" will support in only Paid and Trial license version.</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.CategorieIds.Hint">
+    <Value>Select Categories to restrict the COD payment method.</Value>
+  </LocaleResource>    
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure">
+    <Value>Configure</Value>
+  </LocaleResource>    
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.DescriptionText">
+    <Value>Description</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.DescriptionText.Hint">
+    <Value>Enter info that will be shown to customers during checkout</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.AdditionalFee">
+    <Value>Additional fee amount</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.AdditionalFee.Hint">
+    <Value>The additional fee amount.</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.AdditionalFeePer">
+    <Value>Additional fee percentage</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.AdditionalFeePer.Invalid">
+    <Value>Additional fee percentage must be between 0 to 100.</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.AdditionalFeePer.Hint">
+    <Value>The additional fee percentage.</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.AdditionalFeePercentage">
+    <Value>Additional fee. Use percentage</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.AdditionalFeePercentage.Hint">
+    <Value>Determines whether to apply a percentage additional fee to the order total. If not enabled, a fixed value is used.</Value>
+  </LocaleResource>  
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.ShippableProductRequired">
+    <Value>Shippable product required</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.ShippableProductRequired.Hint">
+    <Value>An option indicating whether shippable products are required in order to display this payment method during checkout.</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.PaymentMethodDescription">
+    <Value>Pay by Cash On Delivery (COD)</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.SkipPaymentInfo">
+    <Value>Skip payment information page</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.SkipPaymentInfo.Hint">
+    <Value>An option indicating whether we should display a payment information page for this plugin.</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.MinimumPrice">
+    <Value>Minimum order amount</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.MinimumPrice.Required">
+    <Value>Minimum order amount should be positive.</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.MinimumPrice.Hint">
+    <Value>It allows you to set the minimum order amount to show the Cash On Delivery option.</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.MaximumPrice">
+    <Value>Maximum order amount</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.MaximumPrice.Required">
+    <Value>Maximum order amount should be positive.</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.MaximumPrice.Invalid">
+    <Value>Maximum price must be greater than minimum price.</Value>
+  </LocaleResource>
+  <LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.MaximumPrice.Hint">
+    <Value>It allows you to set the maximum order amount to show the Cash On Delivery option.</Value>
+  </LocaleResource>
+	<LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.AppliedToAllProduct">
+		<Value>Applied to all products</Value>
+	</LocaleResource>
+	<LocaleResource Name="NopAdvance.Plugin.COD.Admin.Configure.Fields.AppliedToAllProduct.Hint">
+		<Value>Check to display Cash On Delivery payment method to all products including virtual gift card, Downloadable products.</Value>
+	</LocaleResource>
+</Language>

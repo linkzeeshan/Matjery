@@ -1,0 +1,34 @@
+﻿@model ProductSearchModel
+@{
+    //page title
+    ViewBag.Title = @T("Admin.Catalog.Products").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Products");
+}
+
+<script>
+    $(document).ready(function () {
+        bindBootstrapTabSelectEvent('customer-edit');
+    });
+</script>
+<div class="content">
+    <div class="form-horizontal">
+        <div id="customer-edit" class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="nav-item active"><a data-toggle="tab" href="#Products">@T("Admin.Catalog.Products")</a></li>
+               
+                <li class="nav-item"><a data-toggle="tab" href="#deleted">@T("Admin.Catalog.Products.DeletedProducts")</a></li>
+               
+            </ul>
+            <div class="tab-content">
+                <div id="Products" class="tab-pane fade in active">
+                    @await Html.PartialAsync("_List", Model)
+                </div>
+                <div id="deleted" class="tab-pane fade">
+                        @await Html.PartialAsync("_deleted", Model)
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>

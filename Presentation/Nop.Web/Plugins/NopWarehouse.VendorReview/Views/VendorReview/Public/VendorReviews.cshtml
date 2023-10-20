@@ -1,0 +1,158 @@
+﻿@model Nop.Plugin.NopWarehouse.VendorReview.Models.VendorReviewsModel
+
+@using Nop.Web.Framework;
+@using Nop.Web.Framework.UI
+@{
+    Layout = null;
+
+    int mainRatingPercent = 0;
+    if (Model.TotalReviews != 0)
+    {
+        mainRatingPercent = ((Model.RatingSum * 100) / Model.TotalReviews) / 5;
+    }
+}
+
+<div class="product-reviews-overview vendor-reviews" @if (Model.TotalReviews > 0) { <text> itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating" </text> }>
+    <div class="product-review-box">
+        <div class="rating">
+            <div style="width: @(mainRatingPercent)%">
+            </div>
+        </div>
+    </div>
+    <div class="write-review">
+        <div class="buttons">
+            <input type="button" id="btn-display-reviews" class="button-1" value="@(!Model.IsDisplayed ? T("Nop.Plugin.NopWarehouse.VendorReview.Reviews.ViewReviews") : T("Nop.Plugin.NopWarehouse.VendorReview.Reviews.HideReviews"))" />
+        </div>
+    </div>
+</div>
+
+<div class="page product-reviews-page" id="reviews-region" @if (!Model.IsDisplayed) { <text> style="display: none" </text> }>
+    <div class="page-body">
+        @if (Model.AddVendorReview.SuccessfullyAdded)
+        {
+            <div class="result">
+                @Model.AddVendorReview.Result
+            </div>
+        }
+        else
+        {
+            <div class="write-review" id="review-form">
+                @Html.ValidationSummary(true)
+
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    var validationSummary = Html.ValidationSummary(true);
+                    @*if (!MvcHtmlString.IsNullOrEmpty(validationSummary))
+                        {
+                            <div class="message-error">@validationSummary</div>
+                        }*@
+                    <div class="fieldset">
+                        <div class="form-fields">
+                            <div class="inputs">
+                                <nop-label asp-for="AddVendorReview.Title" />:
+                                @*<nop-editor asp-for=" AddVendorReview.Title" asp-required="true" />*@
+                                @Html.TextBoxFor(model => model.AddVendorReview.Title, Model.AddVendorReview.CanCurrentCustomerLeaveReview ? (object)(new { @class = "review-title" }) : (object)(new { @class = "review-title", disabled = "disabled" }))
+                                <nop-required />
+                                @Html.ValidationMessageFor(model => model.AddVendorReview.Title)
+                            </div>
+                            <div class="inputs">
+                                <nop-label asp-for="AddVendorReview.ReviewText" />:
+                                @Html.TextAreaFor(model => model.AddVendorReview.ReviewText, Model.AddVendorReview.CanCurrentCustomerLeaveReview ? (object)(new { @class = "review-text" }) : (object)(new { @class = "review-text", disabled = "disabled" }))
+                                <nop-required />
+                                @Html.ValidationMessageFor(model => model.AddVendorReview.ReviewText)
+                            </div>
+                            <div class="review-rating">
+                                <nop-label asp-for="AddVendorReview.Rating" />:
+                                <ul>
+                                    <li class="label first">@T("Nop.Plugin.NopWarehouse.VendorReview.Reviews.Fields.Rating.Bad")</li>
+                                    <li class="rating-options">
+                                        @Html.RadioButtonFor(model => model.AddVendorReview.Rating, "1", new { id = "addproductrating_1" })
+                                        @Html.RadioButtonFor(model => model.AddVendorReview.Rating, "2", new { id = "addproductrating_2" })
+                                        @Html.RadioButtonFor(model => model.AddVendorReview.Rating, "3", new { id = "addproductrating_3" })
+                                        @Html.RadioButtonFor(model => model.AddVendorReview.Rating, "4", new { id = "addproductrating_4" })
+                                        @Html.RadioButtonFor(model => model.AddVendorReview.Rating, "5", new { id = "addproductrating_5" })
+                                    </li>
+                                    <li class="label last">@T("Nop.Plugin.NopWarehouse.VendorReview.Reviews.Fields.Rating.Excellent")</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="buttons">
+                        @Html.Raw(Model.Button)
+                    </div>
+                }
+            </div>
+        }
+        @if (Model.Items.Count > 0)
+        {
+            <div class="product-review-list">
+                @foreach (var review in Model.Items)
+                {
+                    int ratingPercent = review.Rating * 20;
+                    <div class="product-review-item">
+                        <div class="review-item-head">
+                            <div class="review-title">
+                                <strong>@review.Title</strong>
+                            </div>
+                            <div class="product-review-box">
+                                <div class="rating">
+                                    <div style="width: @(ratingPercent)%">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="review-content">
+                            <div class="review-text">
+                                @Html.Raw(Nop.Core.Html.HtmlHelper.FormatText(review.ReviewText, false, true, false, false, false, false))
+                            </div>
+                            <div class="review-info">
+                                <span class="user">
+                                    <label>@T("Nop.Plugin.NopWarehouse.VendorReview.Reviews.From"):</label>
+                                    @if (review.AllowViewingProfiles)
+                                    {
+                                        <a href="@Url.RouteUrl("CustomerProfile", new { id = review.CustomerId })">@(review.CustomerName)</a>
+                                    }
+                                    else
+                                    {
+                                        @review.CustomerName
+                                    }
+                                </span>
+                                <span class="separator">|</span>
+                                <span class="date">
+                                    <label>@T("Nop.Plugin.NopWarehouse.VendorReview.Reviews.Date"):</label>
+                                    <span>@review.WrittenOnStr</span>
+                                </span>
+                            </div>
+                            @*@Html.Partial("_VendorReviewHelpfulness", review.Helpfulness, new ViewDataDictionary())*@
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+    var isDisplayed = @if (Model.IsDisplayed)
+                      {<text>true</text>}
+                      else
+                      {<text>false</text>}
+
+    $(document).ready(function () {
+
+        $("#btn-display-reviews").click(function (e) {
+            if (!isDisplayed) {
+                $("#reviews-region").show("fast");
+                $("#btn-display-reviews").val("@T("Nop.Plugin.NopWarehouse.VendorReview.Reviews.HideReviews")");
+            }
+            else {
+                $("#reviews-region").hide("fast");
+                $("#btn-display-reviews").val("@T("Nop.Plugin.NopWarehouse.VendorReview.Reviews.ViewReviews")");
+            }
+
+            isDisplayed = !isDisplayed;
+        });
+    });
+
+</script>

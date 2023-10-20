@@ -1,0 +1,136 @@
+@model CampaignModel
+
+@using Nop.Core;
+@using Nop.Core.Domain.Customers;
+@using Nop.Core.Domain.Messages;
+@using Nop.Services
+
+@{
+    var currentCustomer = EngineContext.Current.Resolve<IWorkContext>().CurrentCustomer;
+    bool isAdmin = Model.IsAdmin;
+}
+
+@if (Model.Id > 0)
+{
+
+<div class="panel-body">
+
+    <div class="panel-heading">
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="DiscountPercentage" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="DiscountPercentage" /> (@T("Admin.Promotions.Campaigns.Fields.MinDiscountPercentage").Text=@Model.MinDiscountPercentage
+                    @Html.ValidationMessageFor(model => model.DiscountPercentage)
+                </div>
+            </div>
+        </div>
+    @await Html.PartialAsync("Table", new DataTablesModel
+{
+    Name = "products-grid",
+    UrlRead = new DataUrl("ProductList", "Campaign", new RouteValueDictionary { [nameof(Model.CampaignProductSearchModel.campaignId)] = Model.Id }),
+    UrlDelete = new DataUrl("ProductDelete", "Campaign", null),
+    UrlUpdate = new DataUrl("ProductUpdate", "Campaign", null),
+    Length = Model.CampaignProductSearchModel.PageSize,
+    LengthMenu = Model.CampaignProductSearchModel.AvailablePageSizes,
+    ColumnCollection = new List<ColumnProperty>
+        {
+
+           new ColumnProperty(nameof(ProductModel.Id))
+    {
+    IsMasterCheckBox = true,
+    Render = new RenderCheckBox("checkbox_products"),
+    ClassName =  NopColumnClassDefaults.CenterAll,
+    Width = "50"
+    },
+    new ColumnProperty(nameof(ProductModel.PictureThumbnailUrl))
+    {
+                            Title = T("Admin.Catalog.Products.Fields.PictureThumbnailUrl").Text,
+                            Width = "100",
+                            Render = new RenderPicture()
+                            },
+        new ColumnProperty(nameof(CategoryProductModel.ProductName))
+        {
+        Title = T("Admin.Catalog.Categories.Products.Fields.Product").Text,
+         Width = "300"
+        },
+
+        new ColumnProperty(nameof(CategoryProductModel.DisplayOrder))
+        {
+        Title = T("Admin.Catalog.Categories.Products.Fields.DisplayOrder").Text,
+        Width = "150",
+        ClassName = NopColumnClassDefaults.CenterAll,
+        Editable = true,
+        EditType = EditType.Number
+        },
+        new ColumnProperty(nameof(CategoryProductModel.ProductId))
+        {
+        Title = T("Admin.Common.View").Text,
+        Width = "40",
+        ClassName = NopColumnClassDefaults.Button,
+        Render = new RenderButtonView(new DataUrl("~/Admin/Product/Edit/", nameof(CategoryProductModel.ProductId)))
+        },
+        new ColumnProperty(nameof(CategoryProductModel.Id))
+        {
+        Title = T("Admin.Common.Edit").Text,
+        Width = "40",
+        ClassName =  NopColumnClassDefaults.Button,
+        Render = new RenderButtonsInlineEdit()
+        },
+        new ColumnProperty(nameof(CategoryProductModel.Id))
+        {
+        Title = T("Admin.Common.Delete").Text,
+        Width = "40",
+        Render = new RenderButtonRemove(T("Admin.Common.Delete").Text),
+        ClassName = NopColumnClassDefaults.Button
+        }
+        }
+})
+</div>
+<div class="panel-footer">
+
+    @*<button type="submit" id="btnAddNewProduct"
+            onclick="openProductAddPopup(); return false;"
+            class="btn btn-primary" @(Model.DiscountPercentage >= Model.MinDiscountPercentage ? "" : " disabled=\"disabled\"")>
+        @T("Admin.Catalog.Categories.Products.AddNew")
+    </button>*@
+    <button type="submit" id="btnAddNewProduct"
+            onclick="javascript:OpenWindow('@(Url.Action("ProductAddPopup", "Campaign", new { campaignId = Model.Id, btnId = "btnRefreshProducts",discountPercentage=Model.DiscountPercentage, formId = "campaign-form" }))', 800, 800, true); return false;"
+            class="btn btn-primary">
+        @T("Admin.Catalog.Categories.Products.AddNew")
+    </button>
+    <input type="submit" id="btnRefreshProducts" style="display: none" />
+    <script>
+        $(document).ready(function () {
+            $('#btnRefreshProducts').click(function () {
+                //refresh grid
+             
+                updateTable('#products-grid');
+
+                //return false to don't reload a page
+                return false;
+            });
+        });
+        function openProductAddPopup() {
+
+                            var discountPercentage = $("#@Html.IdFor(model => model.DiscountPercentage)").val();
+                            var minDiscountPercentage = @Model.MinDiscountPercentage;
+                            if(discountPercentage >= minDiscountPercentage) {
+                                var currentPageUrl = encodeURI(window.location.href);
+                                var url = '@Html.Raw(Url.Action("ProductAddPopup", "Campaign", new { campaignId = Model.Id, btnId = "btnRefreshProducts", formId = "campaign-form"}))';
+                                url += '&discountPercentage=' + discountPercentage + '&currentPageUrl=' + currentPageUrl;
+
+                                //window.OpenWindow(url, 800, 800, true);
+                                window.location.href = url;
+                            }
+                        }
+    </script>
+</div>
+}
+else
+{
+<div class="panel-body">
+    @T("Admin.Catalog.Categories.Products.SaveBeforeEdit")
+</div>
+}

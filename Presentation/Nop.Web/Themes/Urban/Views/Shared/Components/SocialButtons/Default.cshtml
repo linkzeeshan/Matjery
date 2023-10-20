@@ -1,0 +1,70 @@
+﻿@model SocialModel
+
+@using Nop.Core
+@using Nop.Services.Configuration
+
+@inject IStoreContext storeContext
+@inject ISettingService settingService
+
+@{
+    var storeId = storeContext.CurrentStore.Id;
+
+    var instagramUrl = settingService.GetSettingByKey("urbanthemesettings.instagramurl", String.Empty, storeId, true).ToLowerInvariant();
+    var pinterestUrl = settingService.GetSettingByKey("urbanthemesettings.pinteresturl", String.Empty, storeId, true).ToLowerInvariant();
+    var vimeoUrl = settingService.GetSettingByKey("urbanthemesettings.vimeourl", String.Empty, storeId, true).ToLowerInvariant();
+}
+<div class="social-media">
+
+    @if (!string.IsNullOrEmpty(Model.FacebookLink))
+    {
+        <a href="@Model.FacebookLink" target="_blank"><i class="icon-facebook"></i></a>
+    }
+    @if (!string.IsNullOrEmpty(instagramUrl))
+    {
+        <a href="@instagramUrl" target="_blank"><i class="icon-instagram"></i></a>
+    }
+    @if (!string.IsNullOrEmpty(Model.TwitterLink))
+    {
+        <a href="@Model.TwitterLink" target="_blank"><i class="icon-twitter"></i></a>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.YoutubeLink))
+    {
+        <a href="@Model.YoutubeLink" target="_blank"><i class="icon-youtube"></i></a>
+    }
+    @if (!string.IsNullOrEmpty(Model.GooglePlusLink))
+    {
+        <a href="@Model.GooglePlusLink" target="_blank"><i class="icon-pinterest"></i></a>
+    }
+
+</div>
+@*<ul class="networks">
+	@if (!string.IsNullOrEmpty(Model.FacebookLink))
+	{
+		<li class="facebook"><a href="@Model.FacebookLink" target="_blank" aria-label="@T("Footer.FollowUs.Facebook")"></a></li>
+	}
+	@if (!string.IsNullOrEmpty(Model.TwitterLink))
+	{
+		<li class="twitter"><a href="@Model.TwitterLink" target="_blank" aria-label="@T("Footer.FollowUs.Twitter")"></a></li>
+	}
+    @if (!string.IsNullOrEmpty(pinterestUrl))
+    {
+        <li class="pinterest"><a href="@pinterestUrl" target="_blank" aria-label="@T("SevenSpikes.Themes.Common.Footer.FollowUs.Pinterest")"></a></li>
+    }
+    @if (!String.IsNullOrEmpty(instagramUrl))
+    {
+        <li class="instagram"><a href="@instagramUrl" target="_blank" aria-label="@T("SevenSpikes.Themes.Common.Footer.FollowUs.Instagram")"></a></li>
+    }
+    @if (!string.IsNullOrEmpty(vimeoUrl))
+    {
+        <li class="vimeo"><a href="@vimeoUrl" target="_blank" aria-label="@T("SevenSpikes.Themes.Common.Footer.FollowUs.Vimeo")"></a></li>
+    }
+	@if (!string.IsNullOrEmpty(Model.YoutubeLink))
+	{
+		<li class="youtube"><a href="@Model.YoutubeLink" target="_blank" aria-label="@T("Footer.FollowUs.Youtube")"></a></li>
+	}
+    @if (Model.NewsEnabled)
+    {
+        <li class="rss"><a href="@Url.RouteUrl("NewsRSS", new {languageId = Model.WorkingLanguageId})" aria-label="@T("Footer.FollowUs.RSS")"></a></li>
+    }
+</ul>*@

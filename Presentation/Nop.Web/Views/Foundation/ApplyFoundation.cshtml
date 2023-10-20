@@ -1,0 +1,77 @@
+﻿
+
+@using Nop.Web.Models.Foundation
+@model ApplyFoundationModel
+@{
+    Layout = "_ColumnsOne";
+    //title
+    Html.AddTitleParts(T("PageTitle.Foundations.Apply").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-apply-vendor-page");
+}
+
+
+
+<style>
+    .result {
+        text-align: center;
+    }
+</style>
+<div class="page apply-vendor-page">
+    <div class="page-title">
+        <h1>@T("PageTitle.Foundations.Apply")</h1>
+    </div>
+
+    <div class="page-body">
+
+        @await Component.InvokeAsync("TopicBlock", new { systemName = "ApplyFundation" })
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ApplyVendorTop })
+        @if (Model.DisableFormInput)
+        {
+            <div class="result">
+                @Model.Result
+            </div>
+        }
+        else
+        {
+            <form  method="post" enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+                @*var validationSummary = Html.ValidationSummary(true);*@
+
+                <div asp-validation-summary="ModelOnly" class="message-error"></div>
+
+                <div class="fieldset">
+                    <div class="form-fields">
+                        <div class="inputs">
+                            @Html.LabelFor(model => model.Name)
+                            @Html.TextBoxFor(model => model.Name, new { @class = "name" })
+                            <nop-required />
+                            @Html.ValidationMessageFor(model => model.Name)
+                        </div>
+                        <div class="inputs">
+                            @Html.LabelFor(model => model.Email)
+                            @Html.TextBoxFor(model => model.Email, new { @class = "email" })
+                            <nop-required />
+                            @Html.ValidationMessageFor(model => model.Email)
+                        </div>
+                        <div class="inputs">
+                            @Html.LabelFor(model => model.PhoneNumber)
+                            @Html.EditorFor(model => model.PhoneNumber, new { htmlAttributes = new { maxlength = "10", minlength = "9", required = "required" } })
+                            <nop-required />
+                            @Html.ValidationMessageFor(model => model.PhoneNumber)
+                        </div>
+                        <div class="inputs">
+                            @Html.LabelFor(model => model.Description)
+                            @Html.TextAreaFor(model => model.Description, new { @class = "description" })
+                        </div>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <input type="submit" name="ApplyFoundationSubmit" class="button-1 apply-vendor-button" value="@T("Foundations.ApplyAccount.Button")" />
+                </div>
+            </form>
+        }
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ApplyVendorBottom })
+    </div>
+</div>

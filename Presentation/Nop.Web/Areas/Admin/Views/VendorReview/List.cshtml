@@ -1,0 +1,361 @@
+﻿@model VendorReviewListModel
+
+@using Microsoft.AspNetCore.Routing
+@{
+ 
+
+    //page title
+    ViewBag.Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews").Text;
+}
+@Html.AntiForgeryToken()
+<div class="content-header clearfix">
+    <h1 class="pull-left">
+        @T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews")
+    </h1>
+    <div class="pull-right">
+        <button type="button" id="approve-selected" class="btn bg-green">
+            <i class="fa fa-check-square-o"></i>
+            @T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews.ApproveSelected")
+        </button>
+        <button type="button" id="disapprove-selected" class="btn bg-navy">
+            <i class="fa fa-minus-square-o"></i>
+            @T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews.DisapproveSelected")
+        </button>
+        <button type="button" id="delete-selected" class="btn bg-red">
+            <i class="fa fa-trash-o"></i>
+            @T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews.DeleteSelected")
+        </button>
+    </div>
+</div>
+
+<div class="content">
+    <input type="hidden" id="selectedIds" name="selectedIds" value="" />
+    <div class="form-horizontal">
+        <div class="panel-group">
+            <div class="panel panel-default panel-search">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div class="col-md-4">
+                                    <nop-label asp-for="@Model.CreatedOnFrom" />
+                                </div>
+                                <div class="col-md-8">
+                                    <nop-editor asp-for="@Model.CreatedOnFrom" />
+                           
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-4">
+                                    <nop-label asp-for="@Model.CreatedOnTo" />
+                                </div>
+                                <div class="col-md-8">
+                                    <nop-editor asp-for="@Model.CreatedOnTo" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-4">
+                                    <nop-label asp-for="@Model.SearchText" />
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(model => model.SearchText, new { @class = "form-control text-box single-line" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-4">
+                                    <nop-label asp-for="@Model.SearchVendorId" />
+                                </div>
+                                <div class="col-md-8">
+                                    <nop-select asp-for="SearchVendorId" asp-items="Model.AvailableVendors" />
+                                    <span asp-validation-for="SearchVendorId"></span>
+                                                            @*<input type="text" class="form-control" id="search-vendor-name" autocomplete="off" />
+                                <script type="text/javascript">
+                                    $(document).ready(function() {
+                                        $('#search-vendor-name').autocomplete({
+                                            delay: 500,
+                                            minLength: 3,
+                                            source: '@Html.Raw(Url.Action("VendorSearchAutoComplete", "VendorReview"))',
+                                        select: function(event, ui) {
+                                            $('#@Html.IdFor(model => model.SearchVendorId)').val(ui.item.vendorid);
+                                            $('#search-vendor-friendly-name').text(ui.item.label);
+                                            $('#search-vendor-clear').show();
+                                            return false;
+                                        }
+                                    });
+                                });
+                                </script>*@
+
+                                    <span id="search-vendor-friendly-name"></span>
+                                    <button type="button" id="search-vendor-clear" class="btn bg-gray" style="display: none; margin-top: 5px;">@T("Admin.Common.Clear")</button>
+                                    @Html.TextBoxFor(model => model.SearchVendorId, new { autocomplete = "off", style = "display:none;" })
+
+                                    <script>
+                                        //remove button
+                                        $('#search-vendor-clear').click(function() {
+                                            $('#@Html.IdFor(model => model.SearchVendorId)').val('0');
+                                        $('#search-vendor-friendly-name').text('');
+                                        $('#search-vendor-clear').hide();
+                                        return false;
+                                    });
+                                    </script>
+                                </div>
+                            </div>
+                            <div class="form-group" @(Model.AvailableStores.SelectionIsNotPossible() ? Html.Raw("style=\"display:none\"") : null)>
+                                <div class="col-md-4">
+
+                                    <nop-label asp-for="SearchStoreId" />
+                                </div>
+                                <div class="col-md-8">
+                                    <nop-select asp-for="SearchStoreId" asp-items="@Model.AvailableStores" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-8 col-md-offset-4">
+                                    <button type="button" id="search-vendorreviews" class="btn btn-primary btn-search">
+                                        <i class="fa fa-search"></i>
+                                        @T("Admin.Common.Search")
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div id="vvendorreviews-grid">
+                        @*reviews-grid*@
+                        @await Html.PartialAsync("Table", new DataTablesModel
+                   {
+                       Name = "vendorreviews-grid",
+                       UrlRead = new DataUrl("List", "VendorReview"),
+                       Length = Model.PageSize,
+                       SearchButtonId = "search-vendorreviews",
+                       LengthMenu = Model.AvailablePageSizes,
+                       Filters = new List<FilterParameter>
+                          {
+                          new FilterParameter(nameof(Model.SearchVendorId)),
+                          new FilterParameter(nameof(Model.SearchStoreId)),
+                          new FilterParameter(nameof(Model.SearchText)),
+                          new FilterParameter(nameof(Model.CreatedOnFrom), typeof(DateTime?)),
+                          new FilterParameter(nameof(Model.CreatedOnFrom), typeof(DateTime?))
+                          },
+                       ColumnCollection = new List<ColumnProperty>
+                   {
+                            new ColumnProperty(nameof(CategoryModel.Id))
+                            {
+                                IsMasterCheckBox = true,
+                                Render = new RenderCheckBox("checkbox_vendorreviews"),
+                                ClassName =  NopColumnClassDefaults.CenterAll,
+                                Width = "50"
+                            },
+                        new ColumnProperty(nameof(AdminVendorReviewModel.CustomerInfo))
+                          {
+                          Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews.Fields.Customer").Text,
+                          ClassName =  NopColumnClassDefaults.CenterAll
+                          },
+                         new ColumnProperty(nameof(AdminVendorReviewModel.Title))
+                          {
+                          Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews.Fields.Title").Text,
+
+                          ClassName =  NopColumnClassDefaults.CenterAll
+                          },
+                         new ColumnProperty(nameof(AdminVendorReviewModel.ReviewText))
+                  {
+                  Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews.Fields.ReviewText").Text,
+                  ClassName =  NopColumnClassDefaults.CenterAll
+                  },
+                     new ColumnProperty(nameof(AdminVendorReviewModel.Rating))
+                  {
+                  Title = T("Admin.Catalog.ProductReviews.Fields.Rating").Text,
+                  ClassName =  NopColumnClassDefaults.CenterAll
+                  },
+                  new ColumnProperty(nameof(AdminVendorReviewModel.IsApproved))
+                  {
+                  Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews.Fields.IsApproved").Text,
+                  ClassName =  NopColumnClassDefaults.CenterAll,
+                   Render = new RenderBoolean()
+                  },
+                   new ColumnProperty(nameof(AdminVendorReviewModel.CreatedOn))
+                  {
+                  Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorReviews.Fields.CreatedOn").Text,
+                  ClassName =  NopColumnClassDefaults.CenterAll
+                  },
+                  new ColumnProperty(nameof(AdminVendorReviewModel.Id))
+                  {
+                  Title = T("Admin.Common.Edit").Text,
+                  Width = "100",
+                  ClassName =  NopColumnClassDefaults.Button,
+                  Render = new RenderButtonEdit(new DataUrl("~/Admin/VendorReview/Edit/"))
+
+                  }
+                   }
+
+
+                   })
+                    </div>
+                    <script type="text/javascript">
+
+                       /* var selectedIds = [];*/
+
+                        $(document).ready(function () {
+
+                            //search button
+                            //$('#search-vendorreviews').click(function () {
+                            //    //search
+                            //    updateTable('#vendorreviews-grid');
+                            //    //var grid = $('#vendorreviews-grid').data('kendoGrid');
+                            //    //grid.dataSource.page(1);
+                            //    //new search. Set page size to 1
+                            //    //grid.dataSource.read(); we already loaded the grid above using "page" function
+                            //    //clear selected checkboxes
+                            //    $('.checkboxGroups').attr('checked', false).change();
+                            //    selectedIds = [];
+                            //    return false;
+                            //});
+
+                            //"approve selected" button
+                            $('#approve-selected').click(function (e) {
+                                e.preventDefault();
+
+                                var postData = {
+                                    selectedIds: selectedIds
+                                };
+                                addAntiForgeryToken(postData);
+
+                                $.ajax({
+                                    cache:false,
+                                    type: "POST",
+                                    url: "@(Url.Action("ApproveSelected", "VendorReview"))",
+                            data: postData,
+                            complete: function (data) {
+                                //reload grid
+                                updateTable('#vendorreviews-grid');
+                            },
+                            error:function (xhr, ajaxOptions, thrownError){
+                                alert(thrownError);
+                            },
+                            traditional: true
+                        });
+                        return false;
+                    });
+
+                    //"disapprove selected" button
+                    $('#disapprove-selected').click(function (e) {
+                        e.preventDefault();
+
+                        var postData = {
+                            selectedIds: selectedIds
+                        };
+                        addAntiForgeryToken(postData);
+
+                        $.ajax({
+                            cache:false,
+                            type: "POST",
+                            url: "@(Url.Action("DisapproveSelected", "VendorReview"))",
+                            data: postData,
+                            complete: function (data) {
+                                //reload grid
+                                updateTable('#vendorreviews-grid');
+                            },
+                            error:function (xhr, ajaxOptions, thrownError){
+                                alert(thrownError);
+                            },
+                            traditional: true
+                        });
+                        return false;
+                    });
+
+                    //"delete selected" button
+                    $('#delete-selected').click(function (e) {
+                        e.preventDefault();
+
+                        var postData = {
+                            selectedIds: selectedIds
+                        };
+                        addAntiForgeryToken(postData);
+
+                        $.ajax({
+                            cache:false,
+                            type: "POST",
+                            url: "@(Url.Action("DeleteSelected", "VendorReview"))",
+                            data: postData,
+                            complete: function (data) {
+                                //reload grid
+                                updateTable('#vendorreviews-grid');
+                                //var grid = $('#vendorreviews-grid').data('kendoGrid');
+                                //grid.dataSource.read();
+                            },
+                            error:function (xhr, ajaxOptions, thrownError){
+                                alert(thrownError);
+                            },
+                            traditional: true
+                        });
+                        return false;
+                    });
+
+
+                    $('#mastercheckbox').click(function () {
+                    
+                        $('.checkboxGroups').attr('checked', $(this).is(':checked')).change();
+                    });
+
+                    //wire up checkboxes.
+                    //$('#vendorreviews-grid').on('change', 'input[type=checkbox][id!=mastercheckbox]', function (e) {
+                    //    var $check = $(this);
+                    //    if ($check.is(":checked") == true) {
+                    //        var checked = jQuery.inArray($check.val(), selectedIds);
+                    //        if (checked == -1) {
+                    //            //add id to selectedIds.
+                    //            selectedIds.push($check.val());
+                    //        }
+                    //    }
+                    //    else {
+                    //        var checked = jQuery.inArray($check.val(), selectedIds);
+                    //        if (checked > -1) {
+                    //            //remove id from selectedIds.
+                    //            selectedIds = $.grep(selectedIds, function (item, index) {
+                    //                return item != $check.val();
+                    //            });
+                    //        }
+                    //    }
+                    //    updateMasterCheckbox();
+                    //});
+                });
+
+                @*function additionalDataForVendorReviews() {
+                    var data = {
+                        CreatedOnFrom: $('#@Html.IdFor(model => model.CreatedOnFrom)').val(),
+                        CreatedOnTo: $('#@Html.IdFor(model => model.CreatedOnTo)').val(),
+                        SearchText: $('#@Html.IdFor(model => model.SearchText)').val(),
+                        SearchStoreId: $('#@Html.IdFor(model => model.SearchStoreId)').val(),
+                        SearchVendorId: $('#@Html.IdFor(model => model.SearchVendorId)').val(),
+                    };
+                    addAntiForgeryToken(data);
+                    return data;
+                }*@
+
+                //function onDataBound(e) {
+
+                //    $('#vendorreviews-grid input[type=checkbox][id!=mastercheckbox]').each(function () {
+                //        var currentId = $(this).val();
+                //        var checked = jQuery.inArray(currentId, selectedIds);
+                //        //set checked based on if current checkbox's value is in selectedIds.
+                //        $(this).attr('checked', checked > -1);
+                //    });
+
+                //    updateMasterCheckbox();
+                //}
+
+                //function updateMasterCheckbox() {
+                //    var numChkBoxes = $('#vendorreviews-grid input[type=checkbox][id!=mastercheckbox]').length;
+                //    var numChkBoxesChecked = $('#vendorreviews-grid input[type=checkbox][id!=mastercheckbox]:checked').length;
+                //    $('#mastercheckbox').attr('checked', numChkBoxes == numChkBoxesChecked && numChkBoxes > 0);
+                //}
+
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

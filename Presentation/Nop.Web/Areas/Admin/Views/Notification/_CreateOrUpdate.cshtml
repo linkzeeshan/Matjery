@@ -1,0 +1,163 @@
+﻿@model NotificationModel
+@using Nop.Web.Areas.Admin.Models.Notification
+@using Nop.Core.Domain.Notifications;
+@using Nop.Services
+@Html.ValidationSummary(true)
+@Html.HiddenFor(model => model.Id)
+
+<script>
+    $(document).ready(function () {
+        bindBootstrapTabSelectEvent('campaign-edit');
+    });
+</script>
+
+<!--<div class="content">
+    <div class="form-horizontal">
+        <div id="category-edit" class="nav-tabs-custom">
+            <ul class="nav nav-tabs" style="display:none">-->
+                @*@Html.RenderBootstrapTabHeader("tab-info", @T("Admin.Promotions.Notification.Info"), true)*@
+            <!--</ul>
+            <div class="tab-content">-->
+                @*@Html.RenderBootstrapTabContent("tab-info", @TabInfo(), true)*@
+            <!--</div>
+        </div>
+    </div>
+</div>-->
+
+
+<div id="back-drop-after-submit" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="sendemail-window-title" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="notification-loader"></div>
+    </div>
+</div>
+
+@{
+    //custom tabs
+    var eventMessage = new AdminTabStripCreated(this.Html, "campaign-edit");
+    EngineContext.Current.Resolve<IEventPublisher>().Publish(eventMessage);
+    foreach (var eventBlock in eventMessage.BlocksToRender)
+    {
+        @eventBlock
+    }
+}
+
+@*save selected tab name*@
+<input type="hidden" id="selected-tab-name" name="selected-tab-name" value="@(Html.GetSelectedTabName())">
+
+@if (Model.TypeId > 0)
+{
+  //  @helper TabInfo()
+  //{
+<div class="content">
+    <div class="form-horizontal">
+        <div class="panel-group">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="@Model.Type" />
+                        </div>
+                        <div class="col-md-9">
+                            @*<nop-editor asp-for="@Model.TypeName" />*@
+                            <div class="form-text-row">@Model.TypeName</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    @(Html.LocalizedEditor<NotificationModel, NotificationLocalizedModel>("notification-localized",
+                    @<div>
+                        <div class="form-group">
+                            <div class="col-md-3">
+                                <nop-label asp-for="@Model.Locales[item].Title" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="@Model.Locales[item].Title"/>
+                                 <span asp-validation-for="@Model.Locales[item].Title"></span>
+                            </div>
+                        </div>
+                        @if (Model.TypeId == (int)NotificationTypeEnum.Notification)
+                        {
+                            <div class="form-group">
+                                <div class="col-md-3">
+                                   <nop-label asp-for="@Model.Locales[item].Message" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="@Model.Locales[item].Message" asp-template="RichEditor"/>
+                                    <span asp-validation-for="@Model.Locales[item].Message"></span>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="form-group">
+                                <div class="col-md-3">
+                                   <nop-label asp-for="@Model.Locales[item].Message" />
+                                </div>
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="@Model.Locales[item].Message"  asp-template="RichEditor"/>
+                                    <span asp-validation-for="@Model.Locales[item].Message"></span>
+                                </div>
+                            </div>
+                        }
+
+                        @Html.HiddenFor(model => model.Locales[item].LanguageId)
+                    </div>,
+                    @<div>
+                        <div class="form-group">
+                            <div class="col-md-3">
+                                 <nop-label asp-for="@Model.Title" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="@Model.Title" />
+                                <span asp-validation-for="@Model.Title"></span>
+                            </div>
+                        </div>
+                        @if (Model.TypeId == (int)NotificationTypeEnum.Notification)
+                        {
+                            <div class="form-group">
+                                <div class="col-md-3">
+                                     <nop-label asp-for="@Model.Message" />
+                                </div>
+                                <div class="col-md-9">
+                                   <nop-editor asp-for="@Model.Message"  asp-template="RichEditor"/>
+                                    <span asp-validation-for="@Model.Message"></span>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                           <div class="form-group">
+                                <div class="col-md-3">
+                                     <nop-label asp-for="@Model.Message" />
+                                </div>
+                                <div class="col-md-9">
+                                   <nop-editor asp-for="@Model.Message"  asp-template="RichEditor"/>
+                                    <span asp-validation-for="@Model.Message"></span>
+                                </div>
+                            </div>
+                        }
+                        @Html.HiddenFor(model => model.TypeId)
+                    </div>
+                    {
+                    }
+                  ))
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        $("#@Html.IdFor(model => model.Title)").keyup(function () {
+            AutoTranslate(this, "#@Html.IdFor(model => model.Locales[0].Title)",false);
+        });
+        function SetDescription(myval) {
+            AutoTranslate(myval, tinymce.get("@Html.IdFor(model => model.Locales[0].Message)"),true);
+        }
+    </script>
+</div>
+        @*//}*@
+   
+ }
+

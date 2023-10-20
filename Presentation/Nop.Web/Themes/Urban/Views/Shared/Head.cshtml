@@ -1,0 +1,79 @@
+﻿@using Nop.Web.Framework;
+@using Nop.Core.Infrastructure;
+@using Nop.Web.Framework.UI;
+@using Nop.Core;
+@{
+    var supportRtl = EngineContext.Current.Resolve<IWorkContext>().WorkingLanguage.Rtl;
+    if (supportRtl)
+    {
+        Html.AppendCssFileParts("~/Themes/Urban/Content/CSS/custom.rtl.css");
+
+    }
+
+    Html.AppendCssFileParts("~/Themes/Urban/Content/CSS/ficon.css");
+    Html.AppendCssFileParts("~/Themes/Urban/Content/css/owl.carousel.css");
+    Html.AppendCssFileParts("~/Plugins/SevenSpikes.Core/Styles/perfect-scrollbar.min.css");
+    Html.AppendCssFileParts("~/Themes/Urban/Content/CSS/custom-mobile.css");
+    Html.AppendCssFileParts("~/Themes/Urban/Content/CSS/custom.css");
+    Html.AppendCssFileParts("~/Themes/Urban/Content/CSS/fi-font.css");
+    Html.AppendCssFileParts("~/css/admin/jquery-confirm.min.css");
+
+
+    if (supportRtl)
+    {
+        Html.AppendCssFileParts("~/Themes/Urban/Content/css/1280.rtl.css");
+        Html.AppendCssFileParts("~/Themes/Urban/Content/css/1024.rtl.css");
+        Html.AppendCssFileParts("~/Themes/Urban/Content/css/768.rtl.css");
+        Html.AppendCssFileParts("~/Themes/Urban/Content/css/480.rtl.css");
+        Html.AppendCssFileParts("~/Themes/Urban/Content/css/mobile.rtl.css");
+        Html.AppendCssFileParts("~/Themes/Urban/Content/css/tables.rtl.css");
+
+
+    }
+    else
+    {
+        Html.AppendCssFileParts("~/Themes/Urban/Content/css/1280.css");
+        Html.AppendCssFileParts("~/Themes/Urban/Content/css/1024.css");
+        Html.AppendCssFileParts("~/Themes/Urban/Content/css/768.css");
+        Html.AppendCssFileParts("~/Themes/Urban/Content/css/480.css");
+        Html.AppendCssFileParts("~/Themes/Urban/Content/css/mobile.css");
+        Html.AppendCssFileParts("~/Themes/Urban/Content/css/tables.css");
+    }
+
+    if (supportRtl)
+    {
+        Html.AppendCssFileParts("~/Themes/Urban/Content/css/styles.rtl.css");
+
+    }
+    else
+    {
+        Html.AppendCssFileParts("~/Themes/Urban/Content/css/styles.css");
+    }
+
+    Html.AppendCssFileParts("~/lib/kendo/2020.1.406/styles/web/kendo.default.min.css");
+
+
+
+    Html.AddCssFileParts("~/lib/fontAwesome/css/font-awesome.min.css");
+
+
+    Html.AddScriptParts("~/Themes/Urban/Content/scripts/jquery.min.js");
+
+
+
+
+    //Html.AddScriptParts("~/Themes/Urban/Content/scripts/owl.carousel.min.js");
+    //Html.AddScriptParts("~/js/jquery.mask.min.js");
+
+
+
+    Html.AddScriptParts(ResourceLocation.Footer, "~/Plugins/SevenSpikes.Core/Scripts/footable.min.js");
+    Html.AddScriptParts(ResourceLocation.Footer, "~/Plugins/SevenSpikes.Core/Scripts/perfect-scrollbar.min.js");
+    Html.AddScriptParts(ResourceLocation.Footer, "~/Plugins/SevenSpikes.Core/Scripts/sevenspikes.core.min.js");
+    Html.AddScriptParts(ResourceLocation.Footer, "~/Plugins/SevenSpikes.Core/Scripts/sevenspikes.theme.ex.min.js");
+
+    Html.AddScriptParts(ResourceLocation.Footer, "~/Themes/Urban/Content/scripts/Urban.js");
+ 
+
+    //Html.AddScriptParts("~/Themes/Urban/Content/scripts/queryloader2.min.js");
+}

@@ -1,0 +1,44 @@
+﻿@model CustomerSearchModel
+
+@using System.Globalization;
+@using Nop.Core.Domain.Media
+
+@inject MediaSettings _mediaSettingsF
+
+@{
+    //page title
+    ViewBag.PageTitle = T("Admin.Customers.Customers").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Customers list");
+}
+
+@{
+    const string hideSearchBlockAttributeName = "CustomerListPage.HideSearchBlock";
+    var hideSearchBlock = genericAttributeService.GetAttribute<bool>(workContext.CurrentCustomer, hideSearchBlockAttributeName);
+}
+
+
+<div class="content">
+    <div class="form-horizontal">
+        <div id="customer-edit" class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="nav-item active"><a data-toggle="tab" href="#Products">@T("Admin.Customers.Customers")</a></li>
+                @if (Model.IsAdmin)
+                {
+                    <li class="nav-item"><a data-toggle="tab" href="#deleted">@T("Admin.Catalog.Customers.DeletedCustomers")</a></li>
+                }
+            </ul>
+            <div class="tab-content">
+                <div id="Products" class="tab-pane fade in active">
+                    @await Html.PartialAsync("_List", Model)
+                </div>
+                @if (Model.IsAdmin)
+                {
+                    <div id="deleted" class="tab-pane fade">
+                        @await Html.PartialAsync("_deleted", Model)
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

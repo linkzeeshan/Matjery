@@ -1,0 +1,195 @@
+﻿@model VendorInfoModel
+@using Nop.Core.Domain.Vendors
+@{ Layout = "_ColumnsTwo";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.VendorInfo").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-account-page");
+    Html.AppendPageCssClassParts("html-vendorinfo-page"); }
+@section left
+{
+    @await Component.InvokeAsync("CustomerNavigation", new { selectedTabId = CustomerNavigationEnum.VendorInfo })
+}
+<style>
+    .minheight {
+        MIN-HEIGHT: 210PX;
+    }
+</style>
+
+<div class="page account-page vendorinfo-page">
+    <div class="page-title">
+        <h1>@T("Account.MyAccount") - @T("Account.VendorInfo")</h1>
+    </div>
+    <div class="page-body">
+        <form asp-route="CustomerVendorInfo" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="message-error"></div>
+            <div class="fieldset">
+                <div class="form-fields">
+
+                    <div class="inputs">
+
+                        <label asp-for="PictureUrl" asp-postfix=":"></label>
+                        @if (!String.IsNullOrEmpty(Model.PictureUrl))
+                        {
+                            <div class="vendor-picture">
+                                <img src="@(Model.PictureUrl)" alt="picture" />
+                            </div>}
+                    </div>
+
+
+                    <div class="inputs">
+                        <label asp-for="Name" asp-postfix=":"></label>
+                        <input asp-for="Name" disabled="disabled" />
+                        <nop-required />
+                        <span asp-validation-for="Name"></span>
+                        @Html.HiddenFor(model => model.Name)
+                    </div>
+                    <div class="inputs">
+                        <label asp-for="Email" asp-postfix=":"></label>
+                        <input asp-for="Email" />
+                        <nop-required />
+                        <span asp-validation-for="Email"></span>
+                        @Html.HiddenFor(model => model.Email)
+                    </div>
+
+
+
+
+                    <div class="inputs">
+                        <label asp-for="EmiratesId" asp-postfix=":"></label>
+                        <nop-editor asp-for="EmiratesId" />
+                        <span asp-validation-for="EmiratesId"></span>
+                    </div>
+                    <div class="inputs">
+                        <label asp-for="PhoneNumber" asp-postfix=":"></label>
+                        <nop-editor asp-for="PhoneNumber" />
+                        <span asp-validation-for="PhoneNumber"></span>
+                    </div>
+                    <div class="inputs">
+
+                        <label asp-for="SupportedByFoundationId" asp-postfix=":@(Model.SupportedByFoundationId!=null?Model.FoundationAprovalStatus:"")">
+
+                        </label>
+                        @if (Model.RegisterationTypeId != (int)VendorRegisterationType.Foundation
+&& Model.SupportedByFoundationId == null)
+                        {
+                            @Html.DropDownList("SupportedByFoundationId", Model.AvailableSupportedByFoundations) }
+                        else
+                        {
+                            @Html.DropDownList("SupportedByFoundationId", Model.AvailableSupportedByFoundations, new { disabled = "disabled" })}
+                        @Html.ValidationMessageFor(model => model.SupportedByFoundationId)
+                    </div>
+                    <div class="inputs">
+                        <label asp-for="WhatsApp" asp-postfix=":"></label>
+                        <nop-editor asp-for="WhatsApp " />
+                    </div>
+                    <div class="inputs">
+                        <label asp-for="Twitter" asp-postfix=":"></label>
+                        <nop-editor asp-for="Twitter " />
+                    </div>
+                    <div class="inputs">
+                        <label asp-for="Facebook" asp-postfix=":"></label>
+                        <nop-editor asp-for="Facebook " />
+                    </div>
+                    <div class="inputs">
+                        <label asp-for="Googleplus" asp-postfix=":"></label>
+                        <nop-editor asp-for="Googleplus " />
+                    </div>
+                    <div class="inputs">
+                        <label asp-for="Instagram" asp-postfix=":"></label>
+                        <nop-editor asp-for="Instagram " />
+                    </div>
+                    <div class="inputs">
+                        <label asp-for="BBM" asp-postfix=":"></label>
+                        <nop-editor asp-for="BBM " />
+                    </div>
+                    <div class="inputs">
+                        <label asp-for="EnrollForTraining" asp-postfix=":"></label>
+                        <nop-editor asp-for="EnrollForTraining " />
+                    </div>
+                    <div class="inputs">
+                        <label asp-for="Description" asp-postfix=":"></label>
+                        <textarea asp-for="Description"></textarea>
+                    </div>
+                    <div class="inputs">
+                        <label asp-for="PictureUrl" asp-postfix=":"></label>
+                        <input name="uploadedFile" type="file" accept=".png,.jpg,.jpeg" />
+                        @if (!string.IsNullOrEmpty(Model.PictureUrl))
+                        {
+                            <div class="vendor-picture">
+                                <img src="@(Model.PictureUrl)" alt="picture" />
+                                <input type="submit" name="remove-picture" class="button-2 remove-picture-button" value="@T("Account.VendorInfo.Picture.Remove")" />
+                            </div>}
+                    </div>
+                    <div class="inputs">
+                        <div class="message-error disabled-field-notes">@T("account.vendorinfo.editingnotification")</div>
+                    </div>
+                </div>
+            </div>
+            @if (Model.VendorAttributes.Count > 0)
+            {
+                <div class="fieldset">
+                    <div class="form-fields">
+                        @await Html.PartialAsync("_VendorAttributes", Model.VendorAttributes)
+                    </div>
+                </div>}
+            <div class="buttons">
+                <input type="submit" value="@T("Common.Save")" name="save-info-button" class="button-1 save-vendorinfo-button" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<script asp-location="Footer">
+    $('#@Html.IdFor(mdoel => Model.EmiratesId)').mask("000000000000000", {
+        placeholder: "___-____-_______-_",
+        clearIfNotMatch: true
+    });
+
+      $(document).ready(function () {
+          $("#@Html.IdFor(model => model.TradeLicenseNumber)").change(function () {
+              debugger;
+                var licenseNumber = $(this).val();
+                var tradeField = $("#@Html.IdFor(model => model.TradeLicenseNumber)");
+                var issueDate= $("#@Html.IdFor(model => model.IssueDate)");
+                var expiryDate = $("#@Html.IdFor(model => model.ExpiryDate)");
+
+
+                $.ajax({
+                    cache: false,
+                    type: "GET",
+                    url: "@(Url.Action("GetTradeLicense", "Vendor"))",
+                    data: {
+                        "licenseNumber": licenseNumber
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        issueDate.val(data.GetLicenseDetailsResponse.IssueDate);
+                        expiryDate.val(data.GetLicenseDetailsResponse.ExpiryDate);
+                        $("#error-tradeLicenseNumber").html("");
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        issueDate.val("");
+                        expiryDate.val("");
+                        $("#error-tradeLicenseNumber").html(jqXHR.responseText);
+                    }
+                });
+            });
+        });
+</script>
+
+
+<script type="text/javascript">
+    $(function () {
+
+    });
+</script>
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+            window.onload = function () {
+                alert("@ViewBag.Message");
+            };
+    </script>
+}

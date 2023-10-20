@@ -1,0 +1,26 @@
+﻿@model ActionConfirmationModel
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><img src="~/icons/cross-icon.svg"/></span></button>
+            @*<img src="~/icons/delete-icon.png" class="model-delete-icon" />*@
+            <h2 class="modal-title" id="@(Model.WindowId)-title" style="">@T("Admin.Common.AreYouSure")</h2>
+        </div>
+        <div class="modal-body">
+            @if (!string.IsNullOrEmpty(Model.AdditonalConfirmText))
+            {
+                <div class="additional-text">
+                    @T(Model.AdditonalConfirmText)
+                </div>
+            }
+            @T("Admin.Common.ActionConfirmation")
+        </div>
+        <div class="modal-footer">
+            <button type="submit" id="@(Model.WindowId)-submit-button" class="btn btn-primary modal-delete-button">
+                @T("checkout.confirmbutton")
+            </button>
+            <span class="btn btn-default margin-r-5 modal-delete-button" data-dismiss="modal">@T("admin.common.cancel")</span>
+        </div>
+    </div>
+</div>

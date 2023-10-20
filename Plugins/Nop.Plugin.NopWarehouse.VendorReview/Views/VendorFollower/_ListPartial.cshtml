@@ -1,0 +1,61 @@
+﻿@model VendorFollowerListModel
+@using Nop.Plugin.NopWarehouse.VendorReview.Models;
+@using Nop.Web.Framework.Models.DataTables
+@using Microsoft.AspNetCore.Routing
+
+@*@Html.AntiForgeryToken()*@
+
+<div class="panel panel-default">
+
+
+    <div class="panel-body">
+        <div id="vendorfolloweres-grid"></div>
+        @await Html.PartialAsync("Table", new DataTablesModel
+   {
+       Name = "vendorfolloweres-grid",
+       UrlRead = new DataUrl("List", "VendorFollower", new RouteValueDictionary { [nameof(Model.SearchVendorId)] = Model.SearchVendorId }),
+       SearchButtonId = "search-vendorfolloweres",
+       Length = Model.PageSize,
+       LengthMenu = Model.AvailablePageSizes,
+       Filters = new List<FilterParameter>
+            {
+            new FilterParameter(nameof(Model.SearchVendorId)),
+            },
+       ColumnCollection = new List<ColumnProperty>
+                {
+                new ColumnProperty(nameof(VendorFollowerModel.CustomerName))
+                {
+                Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorFollowers.Fields.Customer").Text,
+                Width = "350"
+                },
+
+                new ColumnProperty(nameof(VendorFollowerModel.FollowOnUtc))
+                {
+                Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorFollowers.Fields.FollowOnUtc").Text,
+                Width = "200",
+                },
+
+                new ColumnProperty(nameof(VendorFollowerModel.UnFollowOnUtcStr))
+                {
+                Title = T("Nop.Plugin.NopWarehouse.VendorReview.Admin.VendorFollowers.Fields.Following").Text,
+                Width = "200",
+                ClassName =  NopColumnClassDefaults.CenterAll
+                },
+                new ColumnProperty(nameof(VendorFollowerModel.Id))
+                {
+                Title = T("Admin.Common.Edit").Text,
+                Width = "100",
+                ClassName =  NopColumnClassDefaults.Button,
+                Render = new RenderButtonEdit(new DataUrl("Edit"))
+                }
+                }
+   })
+
+    </div>
+
+</div>
+
+
+
+
+

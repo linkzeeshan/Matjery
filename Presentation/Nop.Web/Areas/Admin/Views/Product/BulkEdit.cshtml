@@ -1,0 +1,613 @@
+﻿@model BulkEditSearchModel
+
+@{
+    var defaultGridPageSize =  EngineContext.Current.Resolve<Nop.Core.Domain.Common.AdminAreaSettings>().DefaultGridPageSize;
+    var gridPageSizes = EngineContext.Current.Resolve<Nop.Core.Domain.Common.AdminAreaSettings>().GridPageSizes;
+
+    const string hideProductsBlockAttributeName = "OrderPage.HideProductsBlock";
+    var hideProductsBlock = genericAttributeService.GetAttribute<bool>(workContext.CurrentCustomer, hideProductsBlockAttributeName);
+
+    //page title
+    ViewBag.Title = T("Admin.Catalog.BulkEdit").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Bulk edit products");
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @T("Admin.Catalog.BulkEdit")
+        </h1>
+        <div class="pull-right">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="form-horizontal">
+            <div class="panel-group">
+                <div class="panel panel-default panel-search">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="col-md-4">
+                                        <nop-label asp-for="@Model.SearchProductName" />
+                                    </div>
+                                    <div class="col-md-8">
+                                        <nop-editor asp-for="@Model.SearchProductName" />
+                                    </div>
+                                </div>
+                                <div class="form-group" @(Model.AvailableCategories.SelectionIsNotPossible() ? Html.Raw("style=\"display:none\"") : null)>
+                                    <div class="col-md-4">
+                                        <nop-label asp-for="@Model.SearchCategoryId" />
+
+                                    </div>
+                                    <div class="col-md-8">
+                                        <nop-select asp-for="SearchCategoryId" asp-items="Model.AvailableCategories" />
+                                    </div>
+                                </div>
+                                <div class="form-group" @(Model.AvailableManufacturers.SelectionIsNotPossible() ? Html.Raw("style=\"display:none\"") : null)>
+                                    <div class="col-md-4">
+                                        <nop-label asp-for="@Model.SearchManufacturerId" />
+                                    </div>
+                                    <div class="col-md-8">
+                                        <nop-select asp-for="SearchManufacturerId" asp-items="Model.AvailableManufacturers" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-4">
+                                        <nop-label asp-for="@Model.SearchProductTypeId" />
+                                    </div>
+                                    <div class="col-md-8">
+                                        <nop-select asp-for="SearchProductTypeId" asp-items="Model.AvailableProductTypes" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-8 col-md-offset-4">
+                                        <button type="button" id="search-products" class="btn btn-primary btn-search">
+                                            <i class="fa fa-search"></i>
+                                            @T("Admin.Common.Search")
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+
+                        @*<nop-panels id="order-panels">
+            <nop-panel asp-name="order-products" asp-icon="fa fa-th-list" asp-title="@T("Admin.Orders.Products")"
+                       asp-hide-block-attribute-name="@hideProductsBlockAttributeName" asp-hide="@hideProductsBlock"
+                       asp-advanced="true">@await Html.PartialAsync("_OrderDetails.Products", Model)</nop-panel>
+        </nop-panels>*@
+                        <div class="btn-group">
+                            @*a vendor cannot import products*@
+                            <button type="button" class="btn btn-success" id="bulkEditsavechanges">
+                                <i class="fa fa-save"></i>
+                                @T("admin.catalog.bulkedit.savechanges").Text
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="bulkEditcancelchanges">
+                                <i class="fa fa-ban"></i>
+                                @T("admin.catalog.bulkedit.cancelchanges").Text
+                            </button>
+                        </div>
+                        @await Html.PartialAsync("Table", new DataTablesModel
+                   {
+                       Name = "products-grid",
+                       UrlRead = new DataUrl("BulkEditSelect", "Product", null),
+                       SearchButtonId = "search-products",
+                       Length = Model.PageSize,
+                       LengthMenu = Model.AvailablePageSizes,
+                       Filters = new List<FilterParameter>
+                  {
+                  new FilterParameter(nameof(Model.SearchProductName)),
+                  new FilterParameter(nameof(Model.SearchCategoryId)),
+                  new FilterParameter(nameof(Model.SearchManufacturerId))
+          },
+                       ColumnCollection = new List<ColumnProperty>
+          {
+              new ColumnProperty(nameof(BulkEditProductModel.Name))
+              {
+                  Title = T("admin.system.templates.product.name").Text,
+                  Width = "250",
+                  Editable = true
+              },
+              new ColumnProperty(nameof(BulkEditProductModel.Id))
+              {
+                  Title = T("Admin.Common.View").Text,
+                  Width = "100",
+                  ClassName =  NopColumnClassDefaults.Button,
+                  Render = new RenderButtonView(new DataUrl("~/Admin/Product/Edit/")),
+              },
+              new ColumnProperty(nameof(BulkEditProductModel.Sku))
+              {
+                  Title = T("admin.catalog.products.fields.sku").Text, 
+                  Width = "150",
+                  Editable = true
+              },
+              new ColumnProperty(nameof(BulkEditProductModel.Price))
+              {
+                  Title = T("admin.catalog.products.fields.price").Text,
+                  Width = "150",
+                  Editable = true
+              },
+              new ColumnProperty(nameof(BulkEditProductModel.OldPrice))
+              {
+                  Title =  T("admin.catalog.products.fields.oldprice").Text,
+                  Width = "150",
+                  Editable = true
+              },
+              new ColumnProperty(nameof(BulkEditProductModel.ManageInventoryMethod))
+              {
+                  Title = T("admin.catalog.products.fields.manageinventorymethod").Text,
+                  Width = "350",
+                  Editable = true
+              },
+              new ColumnProperty(nameof(BulkEditProductModel.StockQuantity))
+              {
+                  Title = T("admin.catalog.products.fields.stockquantity").Text, 
+                  Width = "150",
+                  Editable = true
+              },
+              new ColumnProperty(nameof(BulkEditProductModel.Published))
+              {
+                  Title = T("admin.catalog.categories.fields.published").Text, 
+                  Width = "150",
+              },
+              new ColumnProperty(nameof(BulkEditProductModel.VendorName))
+              {
+                  Title = T("admin.vendors.list.searchname").Text,
+                  Width = "150",
+              },
+              new ColumnProperty(nameof(BulkEditProductModel.Id))
+              {
+                  Title = T("admin.common.delete").Text,
+                  Width = "100",
+                  ClassName =  NopColumnClassDefaults.Button,
+                  Render = new RenderButtonRemove(T("admin.common.delete").Text)
+              }
+
+          }
+                   })
+                    </div>
+                </div>
+            </div>
+        </div> 
+        
+        <script>
+         /*-----------------------------------------BulkEdit Start---------------------------------------*/
+
+var upateProductList = [];
+var bulkEditProductList = [];
+var redproducts = [];
+var product = { "Id": 0, "Name": '', "Sku": '', "Price": 0.0, "OldPrice": 0.0, "ManageInventoryMethod": '', "StockQuantity": '', "Published": true };
+var editRow = { "rowNum": 500, "cellNum": 500, "prviousValue": 0, "currentValue": 0 };
+var celldata = '';
+// upateProductList.push(product);
+// bulkEditProductList.push(editRow);
+
+$(document).ready(function () {
+
+    var previousValue = '';
+    var currentValue = '';
+
+    //var deleteSelectedId = '#delete-selected-4363-action-confirmation-submit-button';
+    var productId = 0;
+    var preCellValue = '';
+    // addAttribute();
+    $("#products-grid").on("change", "td", function () {
+        var updateValue = $(this).find('input').val();
+        console.log("Update value is :" + updateValue);
+        const rowExist = redproducts.findIndex(x => x.rowNum == $(this).closest('tr').index() && x.cellNum == $(this).index());
+        if (rowExist != -1) {
+            const objWithIdIndex = redproducts.findIndex((obj) => obj.rowNum === $(this).closest('tr').index() && obj.cellNum === $(this).index());
+
+            if (objWithIdIndex > -1) {
+                redproducts.splice(objWithIdIndex, 1);
+            }
+        };
+
+        if ($(this).index() == 0 || $(this).index() == 2 || $(this).index() == 3 || $(this).index() == 4 || $(this).index() == 6) {
+
+            if ($(this).index() == 2 || $(this).index() == 3 || $(this).index() == 4 || $(this).index() == 6) {
+                var productValue = parseInt(updateValue);
+
+                if (isNaN(productValue)) {
+                    productValue = null;
+
+                }
+                else {
+                    updateValue = productValue < 0 ? null : productValue;
+                }
+            }
+            if (updateValue != null && updateValue != "") {
+                console.log("cchange");
+
+                $(this).text(updateValue);
+                //$(this).append('<img src="/images/Eo_circle_green_checkmark.png" style="max-width: 13%; float:right" />');
+                $(this).append('<i class="fa fa-check" aria-hidden="true" style="color: green; float: right"></i>');
+                $(this).css("font-weight", "bold");
+                $(this).css('background', '#E0F1E9');
+
+
+                prepareBulkEditProduct($(this), celldata, updateValue);
+
+                if ($(this).find('input').length > 0)
+                    $('#products-grid').find('input').hide();
+                else
+                    $('#products-grid').find('input').remove();
+
+
+
+                $(this).find('span').show();
+                if ($(this).find('input').length > 0)
+                    $(this).find('input').show();
+                else
+                    $('#products-grid').find('input').hide();
+            } else {
+                $(this).append('<i class="fa fa-times" aria-hidden="true" style="color: #DD4B39; float: right"></i>');
+                $(this).css('background', '#F1E3E0');
+                $(this).find('span').text(updateValue);
+                var wrongCellValue = { "rowNum": $(this).closest('tr').index(), "cellNum": $(this).index(), "currentValue": currentValue };
+                redproducts.push(wrongCellValue);
+                prepareBulkEditProduct($(this), celldata, updateValue);
+            }
+        }
+
+    });
+    $("#products-grid").on("dblclick", "td", function () {
+        if ($(this).index() == 0 || $(this).index() == 2 || $(this).index() == 3 || $(this).index() == 4 || $(this).index() == 6) {
+            var currentRow = $(this).closest("tr");
+            var td = currentRow.find("td:eq(1)");
+            var href = td.find('a:first').attr('href').split('/');
+            productId = parseInt(href[href.length - 1]);
+            celldata = $(this).text();
+            var cellValue = '';
+            var spanId = "span" + productId;
+            var inputId = "input" + productId;
+
+
+            if ($(this).find('span').length > 0)
+                $(this).text($(this).find('span').text());
+
+            cellValue = $(this).text();
+            preCellValue = cellValue;
+            $('#products-grid').find('input').hide();
+            // $('span').show();
+            //$('#products-grid').find('input').remove();
+            //if ($(this).find('span').length > 0)
+            $('#products-grid').find('span').show();
+
+            this.innerText = '';
+            //this.innerHTML = '';
+            //add input tag into the current td/cell
+            if ($(this).index() == 0 || $(this).index() == 2) {
+                // $(this).text('');
+                if ($(this).find('input').length > 0) {
+                    $(this).find('input').val(cellValue);
+                }
+                else {
+                    $(this).append('<input type="text" id=' + inputId + '  value="' + cellValue + '" class="product-input"/>');
+                    $(this).append('<span id=' + spanId + '>' + cellValue + '</span>');
+                }
+
+            }
+            else if ($(this).index() == 3 || $(this).index() == 4 || $(this).index() == 6) {
+                //$(this).text('');
+                if ($(this).find('input').length > 0) {
+                    $(this).find('input').val(parseInt(cellValue));
+                }
+                else {
+                    //$(this).text('');
+                    $(this).find('input').val();
+                    $(this).append('<input type="number" min="0" id=' + inputId + ' value="' + parseInt(cellValue) + '"  class="product-input"/>');
+                    $(this).append('<span id=' + spanId + '>' + parseInt(cellValue) + '</span>');
+                }
+            }
+            $(this).find('span').hide();
+
+            //if (cellValue == $(this).find('input').val()) {
+            //    $(this).find('span').show();
+            //}
+            var updateValue = $(this).find('input').val();
+            //$(this).find('span').text(updateValue);
+
+            console.log("Previous value :" + previousValue);
+            console.log("Current value :" + updateValue);
+            if (updateValue != previousValue) {
+                console.log("Current value :" + updateValue);
+
+                //$(this).css("border-color", "red");
+            }
+            console.log($(this));
+        }
+    });
+
+    $("#products-grid").on("click", ".product-delete", function () {
+        productId = parseInt($(this).find('input').val());
+        //delete-selected-4363-action-confirmation-submit-button
+        //deleteSelectedId = '#delete-selected-' + productId + '-action-confirmation-submit-button'.trim();
+        //console.log(deleteSelectedId);
+
+        if (confirm("Are you sure you want to delete this?")) {
+            deleteSelectedProduct(productId);
+        }
+        else {
+            return false;
+        }
+    });
+    $("#products-grid").on("click", "td", function () {
+        previousValue = $(this).find('span').text();
+    });
+    $("#bulkEditcancelchanges").click(function () {
+        //var datatable = changeDataTable();
+        cancelChanges();
+        $('#products-grid').find('input').hide();
+        $('span').show();
+        bulkEditProductList = [];
+        //$.confirm({
+        //    title: 'Are you sure? You want to Cancel Changes!',
+        //    content: datatable,
+        //    buttons: {
+        //        confirm: function () {
+
+        //            $.alert('Confirmed!');
+        //        },
+        //        cancel: function () {
+        //            $.alert('Canceled!');
+        //        },
+        //        //somethingElse: {
+        //        //    text: 'Something else',
+        //        //    btnClass: 'btn-blue',
+        //        //    keys: ['enter', 'shift'],
+        //        //    action: function () {
+        //        //        $.alert('Something else?');
+        //        //    }
+        //        //}
+        //    }
+        //});
+
+
+    });
+    $('#search-products').click(function () {
+        var grid = $('#products-grid').data('kendoGrid');
+        grid.dataSource.page(1); //new search. Set page size to 1
+        //grid.dataSource.read(); we already loaded the grid above using "page" function
+        return false;
+    });
+    $("#bulkEditsavechanges").click(function () {
+
+        if (redproducts.length <= 0) {
+
+            if (upateProductList.length > 0) {
+                // alert(redproducts.length);
+                //  var datatable = changeDataTable();
+                $.confirm({
+                    //<i class="fa fa-folder" aria-hidden="true"></i>
+                    title: '<div><i class="fa fa-folder fa-4x" aria-hidden="true" style="color: #00A65A; max-width: 25%; margin-left:118px"></i><br><b style="margin-left:20px">Do you Want to save changes?</b> </div>',  //'Following highlighted changes have been applied to your Product Catalogue',
+                    content: '<span style="margin-left: 51px">Are you sure you want to save changes?</span>', //datatable,
+                    buttons: {
+
+                        cancel: function () {
+                            // $.alert('Canceled!');
+                        },
+                        Save: function () {
+
+                            saveChanges();
+                            // $.alert('Confirmed!');
+
+                        },
+                        //somethingElse: {
+                        //    text: 'Something else',
+                        //    btnClass: 'btn-blue',
+                        //    keys: ['enter', 'shift'],
+                        //    action: function () {
+                        //        $.alert('Something else?');
+                        //    }
+                        //}
+                    }
+                });
+            }
+        }
+        else {
+            $.alert({
+                title: 'Alert!',
+                content: 'Please enter required fields!',
+            });
+        }
+
+    });
+
+});
+function changeDataTable() {
+    var datatable = "<table class='table table-bordered table-hover table-striped dataTable no-footer'>" +
+        "<thead> <tr role='row'><th style='width:154.85px'>Name</th><th style='width:154.85px'>Sku</th><th style='width:154.85px'>Price</th><th style='width:154.85px'>Old Price</th><th style='width:154.85px'>Stock Quantity</th></tr></thead>" +
+        "<tbody>"
+    for (var i = 0; i < upateProductList.length; i++) {
+        var rowExist = bulkEditProductList.findIndex(x => x.rowNum == i && x.cellNum == 0);
+        var tdStyle0 = "<td>";
+        var tdStyle2 = "<td>";
+        var tdStyle3 = "<td>";
+        var tdStyle4 = "<td>";
+        var tdStyle6 = "<td>";
+        if (rowExist != -1)
+            tdStyle0 = "<td style=' color:red'>";
+        rowExist = bulkEditProductList.findIndex(x => x.rowNum == i && x.cellNum == 2);
+        if (rowExist != -1)
+            tdStyle2 = "<td style=' color:red'>";
+        rowExist = bulkEditProductList.findIndex(x => x.rowNum == i && x.cellNum == 3);
+        if (rowExist != -1)
+            tdStyle3 = "<td style=' color:red'>";
+        rowExist = bulkEditProductList.findIndex(x => x.rowNum == i && x.cellNum == 4);
+        if (rowExist != -1)
+            tdStyle4 = "<td style=' color:red'>";
+        rowExist = bulkEditProductList.findIndex(x => x.rowNum == i && x.cellNum == 6);
+        if (rowExist != -1)
+            tdStyle6 = "<td style=' color:red'>";
+
+        var tableRow = tdStyle0 + upateProductList[i].Name + "</td>" +
+            tdStyle2 + upateProductList[i].Sku + "</td>" +
+            tdStyle3 + upateProductList[i].Price + "</td>" +
+            tdStyle4 + upateProductList[i].OldPrice + "</td>" +
+            tdStyle6 + upateProductList[i].StockQuantity + "</td>";
+
+        datatable = datatable + "<tr>" + tableRow + "</tr>";
+    }
+    datatable = datatable + "</tbody></table >";
+
+    return datatable;
+}
+function additionalData() {
+    var data = {
+        SearchProductName: $('#@Html.IdFor(model => model.SearchProductName)').val(),
+        SearchCategoryId: $('#SearchCategoryId').val(),
+        SearchManufacturerId: $('#SearchManufacturerId').val(),
+        SearchProductTypeId: $('#SearchProductTypeId').val()
+    };
+    addAntiForgeryToken(data);
+    return data;
+}
+function cancelChanges() {
+    upateProductList = [];
+    $('td').css('background', '');
+    $('td').css("font-weight", '');
+    $('td').find('i.fa-check').remove();
+    $('td').find('i.fa-times').remove();
+    redproducts = [];
+    var tr = $("#products-grid tbody").find('tr:eq(0)');
+    // assignId();
+    for (var i = 0; i < bulkEditProductList.length; i++) {
+        //  var editRow = { "rowNum": $this.closest('tr').index(), "cellNum": $this.index(), "prviousValue": prviousValue, "currentValue": currentValue };
+        var tdvalue = bulkEditProductList[i].prviousValue;
+        if (bulkEditProductList[i].cellNum == 0 || bulkEditProductList[i].cellNum == 2 || bulkEditProductList[i].cellNum == 5) {
+            // $(this).text('');
+            var tr = $("#products-grid tbody").find('tr:eq( ' + bulkEditProductList[i].rowNum + ')');
+            var td = tr.find('td:eq(' + bulkEditProductList[i].cellNum + ')');
+            td.text(tdvalue);
+        }
+        else if (bulkEditProductList[i].cellNum == 3 || bulkEditProductList[i].cellNum == 4 || bulkEditProductList[i].cellNum == 6) {
+            var tr = $("#products-grid tbody").find('tr:eq( ' + bulkEditProductList[i].rowNum + ')');
+            var td = tr.find('td:eq(' + bulkEditProductList[i].cellNum + ')');
+            td.text(tdvalue);
+        }
+
+    }
+
+}
+function table_deletedata_products_grid(productId) {
+
+    assignId();
+
+    var postData = {
+        selectedIds: parseInt(productId)
+    };
+    addAntiForgeryToken(postData);
+    $.ajax({
+        cache: false,
+        type: "POST",
+        url: "@Html.Raw(Url.Action("DeleteSelected", "Product"))",
+        data: postData,
+        error: function (jqXHR, textStatus, errorThrown) {
+            //  $('#deleteSelectedFailed-info').text(errorThrown);
+            //   $('#deleteSelectedFailed').click();
+        },
+        complete: function (jqXHR, textStatus) {
+            //updateTable('#products-grid');
+            $('table > tbody > tr#tr' + productId).remove();
+        }
+    });
+
+}
+function prepareBulkEditProduct($this, prviousValue, currentValue) {
+
+    var td = $this.closest('tr').find("td:eq(1)");
+    var href = td.find('a:first').attr('href').split('/');
+    var ProductId = parseInt(href[href.length - 1]);
+    var productName = $this.closest('tr').find("td:eq(0)").text();
+    var rowExist = bulkEditProductList.findIndex(x => x.rowNum == $this.closest('tr').index() && x.cellNum == $this.index());
+    var productRow = upateProductList.findIndex(x => x.Id == ProductId);
+
+    if (rowExist != -1) {
+        bulkEditProductList[rowExist].currentValue = currentValue;
+    }
+    else {
+        var editRow = { "rowNum": $this.closest('tr').index(), "cellNum": $this.index(), "prviousValue": prviousValue, "currentValue": currentValue };
+        bulkEditProductList.push(editRow);
+    }
+
+    if (productRow != -1) {
+
+        for (var i = 0; i < upateProductList.length; i++) {
+            if (upateProductList[i].Id == ProductId) {
+                upateProductList[i].Name = $this.closest('tr').find("td:eq(0)").text();
+                upateProductList[i].Sku = $this.closest('tr').find("td:eq(2)").text();
+                upateProductList[i].Price = $this.closest('tr').find("td:eq(3)").text();
+                upateProductList[i].OldPrice = $this.closest('tr').find("td:eq(4)").text();
+                upateProductList[i].ManageInventoryMethod = $this.closest('tr').find("td:eq(5)").text();
+                upateProductList[i].StockQuantity = $this.closest('tr').find("td:eq(6)").text();
+                upateProductList[i].Published = $this.closest('tr').find("td:eq(7)").text();
+                break;
+            }
+        }
+
+    } else {
+
+        product = {};
+        product.Id = ProductId;
+        product.Name = $this.closest('tr').find("td:eq(0)").text();
+        product.Sku = $this.closest('tr').find("td:eq(2)").text();
+        product.Price = $this.closest('tr').find("td:eq(3)").text();
+        product.OldPrice = $this.closest('tr').find("td:eq(4)").text();
+        product.ManageInventoryMethod = $this.closest('tr').find("td:eq(5)").text();
+        product.StockQuantity = $this.closest('tr').find("td:eq(6)").text();
+        product.Published = $this.closest('tr').find("td:eq(7)").text();
+
+        upateProductList.push(product);
+
+    }
+}
+function saveChanges() {
+    console.log(upateProductList.length);
+    var postData = {
+        products: upateProductList
+    };
+    addAntiForgeryToken(postData);
+    $.ajax({
+        cache: false,
+        type: "POST",
+        url: "@Html.Raw(Url.Action("BulkEditUpdate", "Product"))",
+        data: postData,
+        error: function (jqXHR, textStatus, errorThrown) {
+            //  $('#deleteSelectedFailed-info').text(errorThrown);
+            //   $('#deleteSelectedFailed').click();
+        },
+        complete: function (jqXHR, textStatus) {
+            //updateTable('#products-grid');
+            $('td').css('background', '');
+            $('td').css("font-weight", '');
+            $('td').find('i.fa-check').remove();
+            $(this).closest('tr').remove();
+            $(this).closest('tr').remove();
+        }
+    });
+}
+function assignId() {
+    $('table > tbody > tr').each(function () {
+        var td = $(this).find("td:eq(1)");
+        var href = td.find('a:first').attr('href').split('/');
+        var trId = "tr" + href[href.length - 1];
+        var id = $(this).attr("id", trId);
+        // $(this).parent().parent().attr(ProductId.toString(), id);
+    });
+}
+
+/*----------------------------------------End--------------------------------------------------------*/
+        </script>
+    </div>
+}

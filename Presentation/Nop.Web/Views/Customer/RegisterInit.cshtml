@@ -1,0 +1,60 @@
+﻿@model RegisterModel
+@using Nop.Web.Models.Customer
+@{
+    Layout = "_ColumnsOne";
+    //title
+    Html.AddTitleParts(T("PageTitle.Register").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-registration-page");
+}
+<style>
+    .customer-blocks img {
+        padding: 20px;
+        display: block;
+        vertical-align: middle;
+        margin: auto;
+        height: 150px;
+        width: auto;
+    }
+</style>
+<div class="page login-page register-init-page">
+    <div class="page-title">
+        <h1>@T("Account.Login.Welcome")</h1>
+    </div>
+    <div class="page-body">
+        <div class="customer-blocks">
+            <div class="new-wrapper register-block">
+                <div class="title">
+                    <strong>@T("Account.Login.NewCustomer")</strong>
+                </div>
+                <div class="text">
+                    @T("Account.Login.NewCustomerText")
+                </div>
+                <div class="buttons">
+                    <a class="button-1 button-customer register-button" href="@(Url.Action("Register", new { flage = "customer", type= Model.IsUaePass ? "uaePass": string.Empty, ignoreCode = Model.IsUaePass ? "yes" : string.Empty }))">
+                        @*<i class="icon-customer"></i>*@
+                        <img src="~/icons/buyer.png" />
+                        <span>@T("signup.buyer")</span>
+                    </a>
+                    <!--we will allow only the local user to register as merchant-->
+                    <a class="button-1 button-merchant register-button" href="@(Url.Action("Register", new { flage = "merchant", type = Model.IsUaePass ? "uaePass" : string.Empty , ignoreCode = Model.IsUaePass ? "yes" : string.Empty }))">
+                        @*<i class="icon-merchant"></i>*@
+                        <img src="~/icons/seller.png" />
+                        <span>@T("signup.merchant")</span>
+                    </a>
+                    @*uae pass user will not register from foundation*@
+                    @if (!Model.IsUaePass)
+                    {
+                <a class="button-1 button-foundation register-button" href="@(Url.Action("ApplyFoundation", "foundation"))">
+                    <img src="~/icons/foundation.png" />
+                    @*<i class="icon-merchant"></i>*@
+                    <span>@T("signup.foundation")</span>
+                </a>
+                    }
+                    @*<a class="button-1 register-button" href="@(Url.Action("ApplyFoundation","foundation"))">@T("Account.Foundation")</a>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

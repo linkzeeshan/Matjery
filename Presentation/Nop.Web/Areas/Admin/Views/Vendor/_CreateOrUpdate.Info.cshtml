@@ -1,0 +1,322 @@
+@model VendorModel
+@using Nop.Core.Domain.Vendors;
+<script>
+    $(document).ready(function() {
+        $("#RegisterationTypeId" ).change(function() {
+            if ( $(this).val()==1) {
+                $("#FoundationTypediv").css("display","none");
+                $("#FoundationAprovalStatusIdiv").removeAttr("style");
+                $("#SupportedByFoundationIddiv").removeAttr("style");
+            }else{
+                $("#FoundationTypediv").removeAttr("style");
+                $("#FoundationAprovalStatusIdiv").css("display","none");
+                $("#SupportedByFoundationIddiv").css("display","none");
+            };
+        });
+        if (@Model.RegisterationTypeId == 2)
+        {
+
+            $("#FoundationTypediv").removeAttr("style");
+            $("#SupportedByFoundationIddiv").css("display","none");
+            $("#FoundationAprovalStatusIdiv").css("display","none");
+        }
+    });
+
+</script>
+
+<div class="panel-body">
+    <div class="sub-panel">
+        @if (Model.Id > 0)
+        {
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="@Model.VendorOldSystemId" />
+                </div>
+                <div class="col-md-9">
+
+                    <div class="form-text-row">@Model.VendorOldSystemId</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <div class="label-wrapper"><label class="control-label" for="VendorOldSystemId" title="">@T("Admin.Vendors.Fields.VendorId")</label></div>
+                </div>
+                <div class="col-md-9">
+
+                    <div class="form-text-row">@Model.Id</div>
+                </div>
+            </div>
+        }
+        @(Html.LocalizedEditor<VendorModel, VendorLocalizedModel>("vendor-info-localized",
+        @<div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="@Model.Locales[item].Name" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="@Model.Locales[item].Name" />
+                    <span asp-validation-for="@Model.Locales[item].Name"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="@Model.Locales[item].Description" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="@Model.Locales[item].Description" asp-template="RichEditor" />
+                    <span asp-validation-for="@Model.Locales[item].Description"></span>
+                </div>
+            </div>
+            <input type="hidden" asp-for="@Model.Locales[item].LanguageId" />
+        </div>
+        ,
+        @<div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="Name" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="Name" asp-required="true" />
+                    <span asp-validation-for="Name"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="Description" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="Description" asp-template="RichEditor" />
+                    <span asp-validation-for="Description"></span>
+                </div>
+            </div>
+        </div>))
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="WhatsApp" />
+            </div>
+            <div class="col-md-9">
+                <nop-editor asp-for="@Model.WhatsApp" />
+                @Html.ValidationMessageFor(model => model.WhatsApp)
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="Instagram" />
+            </div>
+            <div class="col-md-9">
+                <nop-editor asp-for="@Model.Instagram" />
+                @Html.ValidationMessageFor(model => model.Instagram)
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="Twitter" />
+            </div>
+            <div class="col-md-9">
+                <nop-editor asp-for="@Model.Twitter" />
+                @Html.ValidationMessageFor(model => model.Twitter)
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="Facebook" />
+            </div>
+            <div class="col-md-9">
+                <nop-editor asp-for="@Model.Facebook" />
+                @Html.ValidationMessageFor(model => model.Facebook)
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="Googleplus" />
+            </div>
+            <div class="col-md-9">
+                <nop-editor asp-for="@Model.Googleplus" />
+                @Html.ValidationMessageFor(model => model.Googleplus)
+            </div>
+        </div>
+        <div class="form-group" style="display:none">
+            <div class="col-md-3">
+                <nop-label asp-for="BBM" />
+            </div>
+            <div class="col-md-9">
+                <nop-editor asp-for="@Model.BBM" />
+                @Html.ValidationMessageFor(model => model.BBM)
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="EnrollForTraining" />
+            </div>
+            <div class="col-md-9">
+                <nop-editor asp-for="@Model.EnrollForTraining" />
+                @Html.ValidationMessageFor(model => model.EnrollForTraining)
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="PhoneNumber" />
+            </div>
+            <div class="col-md-9">
+                <nop-editor asp-for="@Model.PhoneNumber" />
+                @Html.ValidationMessageFor(model => model.PhoneNumber)
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="EmiratesId" />
+            </div>
+            <div class="col-md-9">
+                <nop-editor asp-for="@Model.EmiratesId" />
+                @Html.ValidationMessageFor(model => model.EmiratesId)
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="EmiratesIdCopyId" />
+            </div>
+            <div class="col-md-5">
+                <nop-editor asp-for="@Model.EmiratesIdCopyId" />
+                @Html.ValidationMessageFor(model => model.EmiratesIdCopyId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="Email" />
+            </div>
+            <div class="col-md-9">
+                <nop-editor asp-for="Email" asp-required="true" />
+                <span asp-validation-for="Email"></span>
+            </div>
+        </div>
+
+        @if (Model.Id > 0)
+        {
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="AssociatedCustomers" />
+                </div>
+                <div class="col-md-9">
+                    @if (Model.AssociatedCustomers.Count > 0)
+                    {
+                        for (var i = 0; i < Model.AssociatedCustomers.Count; i++)
+                        {
+                            <a asp-action="Edit" asp-controller="Customer" asp-route-id="@Model.AssociatedCustomers[i].Id">
+                                @Model.AssociatedCustomers[i].Email
+                            </a>
+                            if (i != Model.AssociatedCustomers.Count - 1)
+                            {
+                                <text>, </text>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        @T("Admin.Vendors.Fields.AssociatedCustomerEmails.None")
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="Active" />
+            </div>
+            <div class="col-md-9">
+                <nop-editor asp-for="Active" />
+                <span asp-validation-for="Active"></span>
+            </div>
+        </div>
+
+        <div class="form-group advanced-setting">
+            <div class="col-md-3">
+                <nop-label asp-for="PictureId" />
+            </div>
+            <div class="col-md-9">
+                <nop-editor asp-for="PictureId" />
+                <span asp-validation-for="PictureId"></span>
+            </div>
+        </div>
+
+        <div class="form-group advanced-setting">
+            <div class="col-md-3">
+                <nop-label asp-for="AdminComment" />
+            </div>
+            <div class="col-md-9">
+                <nop-textarea asp-for="AdminComment"></nop-textarea>
+                <span asp-validation-for="AdminComment"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="RegisterationTypeId" />
+            </div>
+            <div class="col-md-9">
+                <nop-select asp-for="RegisterationTypeId" asp-items="@((VendorRegisterationType)Model.RegisterationTypeId).ToSelectList()" />
+                @Html.ValidationMessageFor(model => model.RegisterationTypeId)
+            </div>
+        </div>
+        <div id="SupportedByFoundationIddiv" class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="SupportedByFoundationId" />
+            </div>
+            <div class="col-md-9">
+                <nop-select asp-for="SupportedByFoundationId" asp-items="@Model.AvailableVendor" />
+                @Html.ValidationMessageFor(model => model.SupportedByFoundationId)
+            </div>
+        </div>
+        <div id="FoundationTypediv" style="display:none" class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="FoundationTypeId" />
+            </div>
+            <div class="col-md-9">
+                <nop-select asp-for="FoundationTypeId" asp-items="@Model.FoundationType" />
+                @Html.ValidationMessageFor(model => model.FoundationTypeId)
+            </div>
+        </div>
+        <div id="FoundationAprovalStatusIdiv" class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="FoundationAprovalStatusId" />
+            </div>
+            <div class="col-md-9">
+                <nop-select asp-for="FoundationAprovalStatusId" asp-items="@Model.AvailibleAprovalStatus" />
+            </div>
+        </div>
+        @if (Model.FoundationAprovalByCustomerId != null && Model.FoundationAprovalByCustomerId > 0)
+        {
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="AprovalByCustomer" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="AprovalByCustomer" />
+                    @Html.ValidationMessageFor(model => model.AprovalByCustomer)
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (Model.VendorAttributes.Count > 0)
+    {
+        @await Html.PartialAsync("_VendorAttributes", Model.VendorAttributes)
+    }
+
+    @*<div class="panel panel-default advanced-setting">
+            <div class="panel-heading">
+                @T("Admin.Vendors.Address")
+            </div>
+            <div class="panel-body">
+                <nop-editor asp-for="Address" asp-template="Address" />
+            </div>
+        </div>*@
+    <script>
+
+        $("#@Html.IdFor(model => model.Name)").keyup(function () {
+            AutoTranslate(this, "#@Html.IdFor(model => model.Locales[0].Name)",false);
+        });
+        function SetDescription(myval) {
+            AutoTranslate(myval, tinymce.get("@Html.IdFor(model => model.Locales[0].Description)"),true);
+        }
+    </script>
+</div>

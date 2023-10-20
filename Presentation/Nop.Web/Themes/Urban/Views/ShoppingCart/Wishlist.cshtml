@@ -1,0 +1,346 @@
+﻿@model WishlistModel
+@using Nop.Core
+@using Nop.Core.Domain.Tax
+@inject IWebHelper webHelper
+@inject IWorkContext workContext
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Wishlist").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-wishlist-page");
+}
+<style>
+
+
+
+    .button-plus {
+        left: -13px;
+    }
+
+    .cart .cart-item-row .quantity .plus, .cart .cart-item-row .quantity .minus, .overview .add-to-cart .plus, .overview .add-to-cart .minus, .variant-overview .add-to-cart .plus, .variant-overview .add-to-cart .minus {
+        float: none !important;
+        /*  border-radius: 50%;*/
+        padding: 7px 12px;
+    }
+
+    .cart .qty-input {
+        border: none !important;
+    }
+</style>
+<div class="page wishlist-page">
+    <div class="page-title">
+        <h1>
+            @if (Model.IsEditable)
+            {
+                @T("Wishlist")
+            }
+            else
+            {
+                @string.Format(T("Wishlist.WishlistOf").Text, Model.CustomerFullname)
+            }
+        </h1>
+    </div>
+    <div class="page-body">
+        @if (Model.Items.Count > 0)
+        {
+            <div class="wishlist-content">
+                @if (Model.Warnings.Count > 0)
+                {
+                    <div class="message-error">
+                        <ul>
+                            @foreach (var warning in Model.Warnings)
+                            {
+                                <li>@warning</li>
+                            }
+                        </ul>
+                    </div>
+                }
+                <form asp-route="Wishlist" method="post">
+
+                    <table class="cart">
+                        <colgroup>
+                            <col width="1" />
+
+                            @if (Model.DisplayAddToCart)
+                            {
+                                <col width="1" />
+                            }
+                            @if (Model.ShowSku)
+                            {
+                                <col width="1" />
+                            }
+                            @if (Model.ShowProductImages)
+                            {
+                                <col width="1" />
+                            }
+                            <col />
+                            <col width="1" />
+                            <col width="1" />
+                            @if (Model.IsEditable)
+                            {
+                                <col width="1" />
+                            }
+                            <col width="1" />
+                        </colgroup>
+                        <thead>
+                            <tr class="cart-header-row">
+                                <th><span class="item-count">#</span></th>
+
+                                @if (Model.ShowSku)
+                                {
+                                    <th class="sku" data-hide="w410, w480, w580, w768, w980">
+                                        @T("ShoppingCart.SKU")
+                                    </th>
+                                }
+                                @if (Model.ShowProductImages)
+                                {
+                                    <th class="product-picture">
+                                    </th>
+                                }
+                                <th class="product" data-hide="w410, w480, w580, w768">
+                                    @T("ShoppingCart.Product(s)")
+                                </th>
+                                <th class="unit-price" data-hide="w410, w480, w580">
+                                    @T("ShoppingCart.UnitPrice")
+                                </th>
+                                <th class="quantity">
+                                    @T("ShoppingCart.Quantity")
+                                </th>
+                                @if (Model.IsEditable)
+                                {
+                                    <th class="remove-from-cart">
+                                        @T("ShoppingCart.Remove")
+                                    </th>
+                                }
+                                <th class="subtotal">
+                                    @T("ShoppingCart.ItemTotal")
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{var counter = 0;}
+                            @foreach (var item in Model.Items)
+                            {
+                                counter++;
+                            <tr class="cart-item-row">
+                                <td><span class="item-count">@counter</span></td>
+
+
+                                @if (Model.ShowSku)
+                                {
+                                    <td class="sku">
+                                        <label class="td-title">@T("ShoppingCart.SKU"):</label>
+                                        <span class="sku-number">@item.Sku</span>
+                                    </td>
+                                }
+                                @if (Model.ShowProductImages)
+                                {
+                                    <td class="product-picture">
+                                        <a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })"><img alt="@item.Picture.AlternateText" src="@item.Picture.ImageUrl" title="@item.Picture.Title" /></a>
+                                    </td>
+                                }
+                                <td class="product">
+                                    <a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" class="product-name">@item.ProductName</a>
+                                    @if (!string.IsNullOrEmpty(item.AttributeInfo))
+                                    {
+                                        <div class="attributes">
+                                            @Html.Raw(item.AttributeInfo)
+                                        </div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(item.RecurringInfo))
+                                    {
+                                        <div class="recurring-info">
+                                            @Html.Raw(item.RecurringInfo)
+                                        </div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(item.RentalInfo))
+                                    {
+                                        <div class="rental-info">
+                                            @Html.Raw(item.RentalInfo)
+                                        </div>
+                                    }
+                                    @if (Model.IsEditable && item.AllowItemEditing)
+                                    {
+                                        var editCartItemUrl = Url.RouteUrl("Product", new { SeName = item.ProductSeName }, webHelper.CurrentRequestProtocol);
+                                        editCartItemUrl = webHelper.ModifyQueryString(editCartItemUrl, "updatecartitemid", item.Id.ToString());
+                                        <div class="edit-item">
+                                            <a href="@editCartItemUrl">@T("Common.Edit")</a>
+                                        </div>
+                                    }
+                                    @if (item.Warnings.Count > 0)
+                                    {
+                                        <div class="message-error">
+                                            <ul>
+                                                @foreach (var warning in item.Warnings)
+                                                {
+                                                    <li>@warning</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
+                                </td>
+                                <td class="unit-price">
+                                    <label class="td-title">@T("ShoppingCart.UnitPrice"):</label>
+                                    <span class="product-unit-price">@item.UnitPrice</span>
+                                </td>
+
+                                <td class="quantity" style="min-width: 150px; ">
+                                    <label class="td-title" for="itemquantity@(item.Id)">@T("ShoppingCart.Quantity"):</label>
+                                    @if (Model.IsEditable)
+                                    {
+
+
+                                        <div class="input-group">
+
+                                            <span class="minus add-crt-hide-part" data-field="itemquantity@(item.Id)">-</span>
+                                            <input style="background-color:white"  name="itemquantity@(item.Id)" id="itemquantity@(item.Id)" type="text" value="@(item.Quantity)" class="qty-input" aria-label="@T("ShoppingCart.Quantity")" />
+                                            <span class="plus add-crt-hide-part" data-field="itemquantity@(item.Id)">+</span>
+
+                                        </div>
+
+
+
+
+
+
+
+                                    }
+                                    else
+                                    {
+                                        <span class="product-quantity">@item.Quantity</span>
+                                    }
+                                </td>
+                                @if (Model.IsEditable)
+                                {
+                                    <td class="remove-from-cart">
+                                        <input type="checkbox" name="removefromcart" value="@(item.Id)" style="display:none;" />
+                                        <button type="button" style="width: 50px;height: 50px;background-color: transparent;border: 1px solid #c2c2c2;">
+                                            <i class="fi-delete" style="font-size:20px;color:red;"></i>
+                                        </button>
+
+                                    </td>
+                                }
+                                <td class="subtotal">
+                                    <label class="td-title">@T("ShoppingCart.ItemTotal"):</label>
+                                    <span class="product-subtotal">@item.SubTotal</span>
+                                    @if (!string.IsNullOrEmpty(item.Discount))
+                                    {
+                                        <div class="discount">
+                                            @T("ShoppingCart.ItemYouSave", item.Discount)
+                                        </div>
+                                        if (item.MaximumDiscountedQty.HasValue)
+                                        {
+                                            <div class="discount-additional-info">
+                                                @T("ShoppingCart.MaximumDiscountedQty", item.MaximumDiscountedQty.Value)
+                                            </div>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                    @if (Model.Items.Count > 0 && Model.DisplayTaxShippingInfo)
+                    {
+                        var inclTax = workContext.TaxDisplayType == TaxDisplayType.IncludingTax;
+                        //tax info is already included in the price (incl/excl tax). that's why we display only shipping info here
+                        //of course, you can modify appropriate locales to include VAT info there
+                        <div class="tax-shipping-info">
+                            @T(inclTax ? "Wishlist.TaxShipping.InclTax" : "Wishlist.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
+                        </div>
+                    }
+                    <div class="buttons">
+                        <div class="common-buttons">
+                            @if (Model.IsEditable)
+                            {
+                                <input type="submit" name="updatecart" value="@T("Wishlist.UpdateCart")" class="button-2 update-wishlist-button" style="display:none"/>
+                            }
+                            @*@if (Model.DisplayAddToCart)
+                            {
+                                <input type="submit" name="addtocartbutton" value="@T("ShoppingCart.AddToCart")" class="button-2 wishlist-add-to-cart-button" />
+                            }*@
+                            @if (Model.IsEditable && Model.EmailWishlistEnabled)
+                            {
+                                <input type="button" value="@T("Wishlist.EmailAFriend")" class="button-2 email-a-friend-wishlist-button" onclick="setLocation('@Url.RouteUrl("EmailWishlist")')" />
+                            }
+                        </div>
+                    </div>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="no-data">
+                @T("Wishlist.CartIsEmpty")
+            </div>
+        }
+    </div>
+    @*@if (Model.IsEditable && Model.Items.Count > 0)
+    {
+            var wishlistUrl = Url.RouteUrl("Wishlist", new { customerGuid = Model.CustomerGuid }, webHelper.CurrentRequestProtocol);
+            <div class="share-info">
+                <span class="share-label">@T("Wishlist.YourWishlistURL"):</span>
+                <a href="@wishlistUrl" class="share-link">@wishlistUrl</a>
+            </div>
+    }*@
+</div>
+<script>
+    $(function () {
+        $('.qty-input').keypress(function (e) {
+            var charCode = (e.which) ? e.which : event.keyCode
+            if (String.fromCharCode(charCode).match(/[^0-9]/g))
+                return false;
+        });
+        $('.cart tbody tr').on('click', 'td.remove-from-cart', function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            var checkbox = $this.find('input[type=checkbox]');
+            checkbox.prop('checked', true);
+
+            var reply = confirm('@T("common.areyousure")');
+            if (reply) {
+                $('input[name="updatecart"]').click();
+            }
+        });
+        $(".qty-input").change(function () {
+            $('.common-buttons .update-wishlist-button').click();
+        });
+    });
+    function incrementValue(e) {
+        e.preventDefault();
+        var fieldName = $(e.target).data('field');
+        var parent = $(e.target).closest('div');
+        var currentVal = parseInt(parent.find('input[name=' + fieldName + ']').val(), 10);
+
+        if (!isNaN(currentVal)) {
+            parent.find('input[name=' + fieldName + ']').val(currentVal + 1);
+        } else {
+            parent.find('input[name=' + fieldName + ']').val(0);
+        }
+    }
+
+    function decrementValue(e) {
+        e.preventDefault();
+        var fieldName = $(e.target).data('field');
+        var parent = $(e.target).closest('div');
+        var currentVal = parseInt(parent.find('input[name=' + fieldName + ']').val(), 10);
+
+        if (!isNaN(currentVal) && currentVal > 0) {
+            parent.find('input[name=' + fieldName + ']').val(currentVal - 1);
+        } else {
+            parent.find('input[name=' + fieldName + ']').val(0);
+        }
+    }
+
+    $('.input-group').on('click', '.plus', function (e) {
+        incrementValue(e);
+        $(".qty-input").trigger("change");
+    });
+
+    $('.input-group').on('click', '.minus', function (e) {
+        decrementValue(e);
+        $(".qty-input").trigger("change");
+    });
+</script>

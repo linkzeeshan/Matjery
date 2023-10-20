@@ -1,0 +1,26 @@
+﻿<script src="~/Themes/Urban/Content/scripts/owl.carousel.js"></script>
+<link href="~/Themes/Urban/Content/css/owl.carousel.css" rel="stylesheet" />
+
+@model IList<ProductOverviewModel>
+    @{
+    Layout = null;
+    }
+    @using Nop.Web.Models.Catalog;
+    <div class="vendor-list-homepage">
+        <div class="vendor-list-homepage-body">
+            <div class="item-grid owl-carousel home-page-vendors">
+                @foreach (var item in Model)
+                {
+                <div class="item-box">
+                    <div class="vendor-item">
+                        <div class="picture" id="slider_@item.Id">
+                            <a href="@Url.RouteUrl(" Product", new { SeName=item.SeName })" title="@item.DefaultPictureModel.Title">
+                                <img alt="@item.DefaultPictureModel.AlternateText" src="@item.DefaultPictureModel.ImageUrl" title="@item.DefaultPictureModel.Title" />
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    </div>

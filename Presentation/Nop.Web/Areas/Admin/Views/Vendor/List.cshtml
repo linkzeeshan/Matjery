@@ -1,0 +1,106 @@
+﻿@model VendorSearchModel
+
+@using Nop.Core.Domain.Common
+@{
+    //page title
+    ViewBag.PageTitle = T("Admin.Vendors").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Vendors");
+}
+
+
+<script>
+    $(document).ready(function() {
+        bindBootstrapTabSelectEvent('customer-edit');
+    });
+</script>
+
+<div class="content-header clearfix">
+    <h1 class="pull-left">
+        @T("Admin.Vendors")
+    </h1>
+    @if (Model.IsAdmin)
+    {
+        <div class="pull-right">
+            <button type="button" name="importexcel" class="btn bg-olive" data-toggle="modal" data-target="#importexcel-window">
+                <i class="fa fa-upload"></i>
+                @T("Admin.Common.Import")
+            </button>
+
+            <a asp-action="Create" class="btn bg-blue">
+                <i class="fa fa-plus-square"></i>
+                @T("Admin.Common.AddNew")
+            </a>
+            @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.VendorListButtons })
+        </div>
+    }
+</div>
+
+<div class="content">
+    <div class="form-horizontal">
+        <div id="customer-edit" class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="nav-item active"><a data-toggle="tab" href="#vendors">@T("Admin.Vendors")</a></li>
+                @if (Model.IsAdmin)
+                {
+                    <li class="nav-item"><a data-toggle="tab" href="#deleted">@T("Admin.Vendors.DeletedVendors")</a></li>
+                }   
+            </ul>
+            <div class="tab-content">
+                <div id="vendors" class="tab-pane fade in active">
+                    @await Html.PartialAsync("_vendorlist", Model)
+                </div>
+                @if (Model.IsAdmin)
+                {
+                    <div id="deleted" class="tab-pane fade">
+                        @await Html.PartialAsync("_deletedlist", Model)
+                    </div>
+                }
+                </div>
+        </div>
+    </div>
+</div>
+
+@*save selected tab name*@
+@*<input type="hidden" id="selected-tab-name" name="selected-tab-name" value="@(Html.GetSelectedTabName())">*@
+
+
+@*import customers form*@
+<div id="importexcel-window" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="importexcel-window-title">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="importexcel-window-title">@T("Admin.Common.ImportFromExcel")</h4>
+            </div>
+            @using (Html.BeginForm("ImportExcel", "Vendor", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <div class="form-horizontal">
+                    <div class="modal-body">
+                        @Html.AntiForgeryToken()
+                        <div class="form-group">
+                            <div class="col-md-2">
+                                <div class="label-wrapper">
+                                    <label class="control-label">
+                                        @T("Admin.Common.ExcelFile")
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-10">
+                                <input type="file" id="importexcelfile" name="importexcelfile" class="form-control" accept=".xlsx,.xls,.csv"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            @T("Admin.Common.ImportFromExcel")
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+

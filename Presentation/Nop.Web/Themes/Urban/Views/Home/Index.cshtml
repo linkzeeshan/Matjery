@@ -1,0 +1,199 @@
+﻿@{
+    Layout = "_ColumnsOne";
+
+    //page class
+    Html.AppendPageCssClassParts("html-home-page");
+}
+@using Nop.Core.Infrastructure;
+@using Nop.Core;
+@inject IWorkContext _workContext
+@{ 
+    var workLanguage = EngineContext.Current.Resolve<IWorkContext>().WorkingLanguage;
+}
+<div class="page home-page">
+    <div class="page-body">
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HomepageTop })
+
+        @await Component.InvokeAsync("HomepageCategories")
+        @await Component.InvokeAsync("HomePageBannerCampaigns")
+        @*@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HomepageBeforeProducts })
+        @await Component.InvokeAsync("Widget", new { widgetZone = "home_page_urban_categories" })
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HomepageBeforeNews })*@
+
+        @*<span class="icon-divider slider-divider"></span>
+        <div class="section-title">
+            <h3>@T("HomepageTopProducts")</h3>
+        </div>*@
+        <div class="fi-tab-container">
+            <ul class="fi-tab">
+                <li><a href="#homage-page-products-tab" class="tab-link current" data-tab="homage-page-products-tab">@T("HomePage.Products")</a></li>
+                <li><a href="#homage-page-new-products-tab" class="tab-link" data-tab="homage-page-new-products-tab">@T("Products.NewProducts")</a></li>
+                <li><a href="#homage-page-bestsellers-tab" class="tab-link" data-tab="homage-page-bestsellers-tab">@T("Bestsellers")</a></li>
+            </ul>
+            <div class="fi-tab-content">
+                <div class="tab-content current" id="homage-page-products-tab">
+                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HomepageFeaturedProducts })
+                    @*@await Component.InvokeAsync("HomepageProducts", new { productThumbPictureSize = 0 })*@
+                </div>
+                <div class="tab-content" id="homage-page-new-products-tab">
+                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HomepageNewProducts })
+                    @*@await Component.InvokeAsync("HomepageNewProducts")*@
+
+                </div>
+                <div class="tab-content" id="homage-page-bestsellers-tab">
+                    @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HomepageBeforeBestSellers })
+                    @*@await Component.InvokeAsync("HomepageBestSellers")*@
+
+                </div>
+            </div>
+        </div>
+        <span class="icon-divider slider-divider"></span>
+        <div class="section-title">
+            <h3>@T("Discounted")</h3>
+        </div>
+
+        @await Component.InvokeAsync("HomepageDiscountedProducts")
+
+        @await Component.InvokeAsync("ProductReviewPopup")
+        @*@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HomepageBeforePoll })
+        <span class="icon-divider slider-divider"></span>
+        <div class="section-title">
+            <h3>@T("Vendors")</h3>
+        </div>*@
+        <div class="fi-tab-container tab-container-vendors">
+            <ul class="fi-tab">
+                <li><a href="#home-page-brands-tab" class="tab-link current" data-tab="home-page-brands-tab">@T("Brands")</a></li>
+                <li><a href="#home-page-entities-tab" class="tab-link" data-tab="home-page-entities-tab">@T("Entities")</a></li>
+            </ul>
+            <div class="fi-tab-content">
+                <div class="tab-content current" id="home-page-brands-tab">
+                    @*@await Component.InvokeAsync("HomePageVendors")*@
+                    @*@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.HomepageVendors })*@
+                    @await Component.InvokeAsync("HomePageVendors", new { displayEntities = false })
+                    <div class="view-all">
+                        <a href="@Url.RouteUrl("VendorList")">@T("Vendors.ViewAll")</a>
+                    </div>
+                </div>
+                <div class="tab-content" id="home-page-entities-tab">
+                    @*@await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.homepageEntities })*@
+                    @await Component.InvokeAsync("HomePageVendors", new { displayEntities = true })
+                    <div class="view-all">
+                        <a href="@Url.RouteUrl("VendorList", new { displayEntities = true })">@T("Vendors.ViewAll")</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script asp-location="Footer">
+    $(function () {
+        $('.fi-tab li a').click(function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            var tabContainer = $this.closest('.fi-tab-container');
+
+            var tab_id = $this.attr('data-tab');
+            //$(this).fadeIn();
+            tabContainer.find('ul.fi-tab li a').removeClass('current');
+            tabContainer.find('.tab-content').removeClass('current');
+
+            $(this).addClass('current');
+            $("#" + tab_id).addClass('current');
+        });
+        //product-grid home-page-product-grid home-page-discounted-grid
+        $('.home-page-discounted-grid .item-grid').owlCarousel({
+/*        $('product-grid home-page-product-grid home-page-discounted-grid').owlCarousel({*/
+            loop: true,
+            margin: 10,
+            responsiveClass: true,
+            rtl: @(workLanguage.Rtl ? "true": "false"),
+            responsive: {
+                0: {
+                    items: 1,
+                    nav: true,
+                    loop: false,
+                },
+                768: {
+                    items: 3,
+                    nav: true,
+                    loop: false,
+                },
+                1024: {
+                    items: 4,
+                    nav: true,
+                    loop: false,
+                    margin: 10,
+                }
+            }
+        });
+        $('.home-page-vendors').owlCarousel({
+            loop: true,
+            margin: 10,
+            responsiveClass: true,
+            rtl: @(workLanguage.Rtl ? "true": "false"),
+            responsive: {
+                0: {
+                    items: 1,
+                    nav: true,
+                    loop: false,
+                },
+                768: {
+                    items: 3,
+                    nav: true,
+                    loop: false,
+                },
+                1000: {
+                    items: 6,
+                    nav: true,
+                    loop: false,
+                    margin: 5,
+                }
+            }
+        });
+    });
+
+    jQuery(document).ready(function ($) {
+
+        var slideCount = $('#slider picture a').length;
+        var slideWidth = $('#slider picture a').width();
+        var slideHeight = $('#slider picture a').height();
+        var sliderUlWidth = slideCount * slideWidth;
+
+        $('#slider').css({ width: slideWidth, height: slideHeight });
+
+        $('#slider picture').css({ width: sliderUlWidth, marginLeft: -slideWidth });
+
+        $('#slider picture a:last-child').prependTo('#slider picture');
+
+        function moveLeft() {
+            $('#slider picture').animate({
+                left: +slideWidth
+            }, 200, function () {
+                $('#slider picture a:last-child').prependTo('#slider picture');
+                $('#slider picture').css('left', '');
+            });
+        };
+
+        function moveRight() {
+            $('#slider picture').animate({
+                left: -slideWidth
+            }, 200, function () {
+                $('#slider picture a:first-child').appendTo('#slider picture');
+                $('#slider picture').css('left', '');
+            });
+        };
+
+        $('a.control_prev').click(function () {
+            moveLeft();
+            return false;
+        });
+
+        $('a.control_next').click(function () {
+            moveRight();
+            return false;
+
+        });
+
+    });
+</script>

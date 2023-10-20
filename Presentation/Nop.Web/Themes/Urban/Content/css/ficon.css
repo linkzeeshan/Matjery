@@ -1,0 +1,297 @@
+@font-face {
+  font-family: 'ficons';
+  src:  url('../fonts/ficon/ficons.eot?lgfmax');
+  src:  url('../fonts/ficon/ficons.eot?lgfmax#iefix') format('embedded-opentype'),
+    url('../fonts/ficon/ficons.ttf?lgfmax') format('truetype'),
+    url('../fonts/ficon/ficons.woff?lgfmax') format('woff'),
+    url('../fonts./ficon/ficons.svg?lgfmax#ficons') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="fi-"], [class*=" fi-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'ficons' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.fi-confirm-tick:before {
+  content: "\e958";
+}
+.fi-summary:before {
+  content: "\e957";
+}
+.fi-cancel:before {
+  content: "\e954";
+}
+.fi-pending:before {
+  content: "\e955";
+}
+.fi-area:before {
+  content: "\e953";
+}
+.fi-smile:before {
+  content: "\e952";
+}
+.fi-card-cvv:before {
+  content: "\e950";
+}
+.fi-credit-card:before {
+  content: "\e951";
+}
+.fi-address:before {
+  content: "\e94e";
+}
+.fi-city:before {
+  content: "\e94f";
+}
+.fi-plus:before {
+  content: "\e94c";
+}
+.fi-minus:before {
+  content: "\e94d";
+}
+.fi-phone:before {
+  content: "\e94b";
+}
+.fi-calendar-fill:before {
+  content: "\e947";
+}
+.fi-delivered:before {
+  content: "\e948";
+}
+.fi-delivery:before {
+  content: "\e949";
+}
+.fi-processing:before {
+  content: "\e94a";
+}
+.fi-calendar:before {
+  content: "\e945";
+}
+.fi-gender:before {
+  content: "\e946";
+}
+.fi-price:before {
+  content: "\e943";
+}
+.fi-arrow-down:before {
+  content: "\e944";
+}
+.fi-tick:before {
+  content: "\e936";
+}
+.fi-brands-outline:before {
+  content: "\e937";
+}
+.fi-vendor:before {
+  content: "\e938";
+}
+.fi-listing-outline:before {
+  content: "\e939";
+}
+.fi-arrow-round-left:before {
+  content: "\e93a";
+}
+.fi-arrow-round-right:before {
+  content: "\e93b";
+}
+.fi-edit-round:before {
+  content: "\e93c";
+}
+.fi-close-round .path1:before {
+  content: "\e93d";
+  color: rgb(0, 0, 0);
+}
+.fi-close-round .path2:before {
+  content: "\e93e";
+  margin-left: -1em;
+  color: rgb(255, 255, 255);
+}
+.fi-delete:before {
+  content: "\e93f";
+}
+.fi-select:before {
+  content: "\e940";
+}
+.fi-edit:before {
+  content: "\e941";
+}
+.fi-remove-item:before {
+  content: "\e942";
+}
+.fi-brands:before {
+  content: "\e934";
+}
+.fi-listing:before {
+  content: "\e935";
+}
+.fi-register:before {
+  content: "\e933";
+}
+.fi-whatsapp:before {
+  content: "\e924";
+}
+.fi-instagram:before {
+  content: "\e925";
+}
+.fi-twitter:before {
+  content: "\e926";
+}
+.fi-google-plus:before {
+  content: "\e90d";
+}
+.fi-facebook:before {
+  content: "\e90a";
+}
+.fi-staring:before {
+  content: "\e927";
+}
+.fi-add-more:before {
+  content: "\e928";
+}
+.fi-comments:before {
+  content: "\e929";
+}
+.fi-dropbox:before {
+  content: "\e92a";
+}
+.fi-like:before {
+  content: "\e92b";
+}
+.fi-heart-outline:before {
+  content: "\e92c";
+}
+.fi-wishlist:before {
+  content: "\e91c";
+}
+.fi-arrow-left:before {
+  content: "\e902";
+}
+.fi-arrow-right:before {
+  content: "\e92d";
+}
+.fi-description:before {
+  content: "\e92e";
+}
+.fi-share:before {
+  content: "\e92f";
+}
+.fi-close:before {
+  content: "\e930";
+}
+.fi-arrow-thin-left:before {
+  content: "\e931";
+}
+.fi-arrow-thin-right:before {
+  content: "\e932";
+}
+.fi-filter:before {
+  content: "\e921";
+}
+.fi-rating-outline:before {
+  content: "\e923";
+}
+.fi-rating:before {
+  content: "\e922";
+}
+.fi-camera:before {
+  content: "\e91e";
+}
+.fi-email:before {
+  content: "\e91f";
+}
+.fi-mobile:before {
+  content: "\e920";
+}
+.fi-button:before {
+  content: "\e91d";
+}
+.fi-about:before {
+  content: "\e900";
+}
+.fi-add-to-cart:before {
+  content: "\e901";
+}
+.fi-cart:before {
+  content: "\e904";
+}
+.fi-category:before {
+  content: "\e905";
+}
+.fi-catering:before {
+  content: "\e906";
+}
+.fi-diversified-products:before {
+  content: "\e907";
+}
+.fi-dot:before {
+  content: "\e908";
+}
+.fi-dot-outline:before {
+  content: "\e909";
+}
+.fi-fashion:before {
+  content: "\e90b";
+}
+.fi-food:before {
+  content: "\e90c";
+}
+.fi-help:before {
+  content: "\e90e";
+}
+.fi-heritage:before {
+  content: "\e90f";
+}
+.fi-home:before {
+  content: "\e910";
+}
+.fi-info-1:before {
+  content: "\e911";
+}
+.fi-info-2:before {
+  content: "\e912";
+}
+.fi-logout:before {
+  content: "\e913";
+}
+.fi-menu:before {
+  content: "\e914";
+}
+.fi-menu-rtl:before {
+  content: "\e956";
+}
+.fi-my-orders:before {
+  content: "\e915";
+}
+.fi-password:before {
+  content: "\e916";
+}
+.fi-perfumes:before {
+  content: "\e917";
+}
+.fi-search:before {
+  content: "\e918";
+}
+.fi-settings:before {
+  content: "\e919";
+}
+.fi-star:before {
+  content: "\e91a";
+}
+.fi-avatar:before {
+  content: "\e903";
+}
+.fi-username:before {
+  content: "\e91b";
+}
+

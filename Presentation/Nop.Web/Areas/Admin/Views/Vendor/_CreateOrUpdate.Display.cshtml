@@ -1,0 +1,215 @@
+@model VendorModel
+@Html.HiddenFor(model => model.PageSizeOptions)
+@Html.HiddenFor(model => model.PageSize)
+@Html.HiddenFor(model => model.AllowCustomersToSelectPageSize)
+
+@{
+    var currentCustomer = EngineContext.Current.Resolve<IWorkContext>().CurrentCustomer;
+    //bool isAdmin = currentCustomer.IsAdmin();
+}
+<div class="panel-body">
+    <div class="sub-panel">
+        @*  <div class="form-group advanced-setting">
+            <div class="col-md-3">
+                <nop-label asp-for="AllowCustomersToSelectPageSize" />
+            </div>
+            <div class="col-md-9">
+                <nop-editor asp-for="AllowCustomersToSelectPageSize" />
+                <span asp-validation-for="AllowCustomersToSelectPageSize"></span>
+            </div>
+        </div>*@
+
+        @*        <nop-nested-setting asp-for="AllowCustomersToSelectPageSize">
+            <div class="form-group advanced-setting" id="pnlPageSize">
+                <div class="col-md-3">
+                    <nop-label asp-for="PageSize" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="PageSize" />
+                    <span asp-validation-for="PageSize"></span>
+                </div>
+            </div>
+            <div class="form-group advanced-setting" id="pnlPageSizeOptions">
+                <div class="col-md-3">
+                    <nop-label asp-for="PageSizeOptions" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="PageSizeOptions" />
+                    <span asp-validation-for="PageSizeOptions"></span>
+                </div>
+            </div>
+        </nop-nested-setting>*@
+
+        @if (1 == 1)
+        {
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="CanPublish" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="CanPublish" />
+                    @Html.ValidationMessageFor(model => model.CanPublish)
+                </div>
+            </div>
+            <div class="form-group advanced-setting">
+                <div class="col-md-3">
+                    <nop-label asp-for="DisplayOrder" />
+                </div>
+                <div class="col-md-9">
+                    <nop-editor asp-for="DisplayOrder" />
+                    <span asp-validation-for="DisplayOrder"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="LicenseNo" />
+                </div>
+                <div class="col-md-5">
+                    <nop-editor asp-for="LicenseNo" />
+                    @Html.ValidationMessageFor(model => model.LicenseNo)
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="IssueDate" />
+                </div>
+                <div class="col-md-2">
+                    <nop-editor asp-for="IssueDate" asp-disabled="true" />
+                    @Html.ValidationMessageFor(model => model.IssueDate)
+                </div>
+                <div class="col-md-1">
+                    <nop-label asp-for="ExpiryDate" />
+                </div>
+                <div class="col-md-2">
+                    <nop-editor asp-for="ExpiryDate" asp-disabled="true" />
+                    @Html.ValidationMessageFor(model => model.ExpiryDate)
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="LicenseCopyId" />
+                </div>
+                <div class="col-md-5">
+                    <nop-editor asp-for="LicenseCopyId" />
+                    @Html.ValidationMessageFor(model => model.LicenseCopyId)
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="SelectedVendorCategoryIds" />
+                </div>
+                <div class="col-md-5">
+                    <nop-select asp-for="SelectedVendorCategoryIds" asp-items="Model.AvailableCategories" asp-multiple="true" />
+                    <script>
+                                            $(document).ready(function() {
+                                                var rolesIdsInput =
+                                                $('#@Html.IdFor(model => model.SelectedVendorCategoryIds)')
+                                                .data("kendoMultiSelect");
+                                                rolesIdsInput.setOptions({
+                                                    autoClose: false,
+                                                    filter: "contains"
+                                                });
+                                                @*@if (Model.AvailableCategories.Count == 0)
+                                                {
+                                                    <text>
+                                                        rolesIdsInput.setOptions({
+                                                            enable: false,
+                                                            placeholder:
+                                                                '@T("Admin.Catalog.Products.CustomerRoles.NoCustomerRolesAvailable")'
+                                                        });
+                                                        rolesIdsInput._placeholder();
+                                                        rolesIdsInput._enable();
+                                                    </text>
+                                                }*@
+                                            });
+                    </script>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="LicensedBy" />
+                </div>
+                <div class="col-md-5">
+                    @(Html.LocalizedEditor<VendorModel, VendorLocalizedModel>("vendor-license-localized",
+                        @<div style="display: inline-block;width: 100%;">
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="Locales[item].LicensedBy" />
+                                    @Html.ValidationMessageFor(model => model.Locales[item].LicensedBy)
+                                </div>
+                            @Html.HiddenFor(model => model.Locales[item].LanguageId)
+                        </div>,
+                        @<div style="display: inline-block;width: 100%;">
+                                <div class="col-md-9">
+                                    <nop-editor asp-for="LicensedBy" />
+                                    @Html.ValidationMessageFor(model => model.LicensedBy)
+                                </div>
+                        </div>
+
+                ))
+                </div>
+            </div>
+        }
+        @if (Model.Id > 0)
+        {
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="CreatedOnStr" />
+                </div>
+                <div class="col-md-9">
+                    <span>@Model.CreatedOnStr</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="CreatedByStr" />
+                </div>
+                <div class="col-md-9">
+                    @if (Model.CreatedBy.HasValue)
+                    {
+                        @Html.ActionLink(Model.CreatedByStr, "Edit", "Customer", new { id = Model.CreatedBy }, new { })
+                    }
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="UpdatedOnStr" />
+                </div>
+                <div class="col-md-9">
+                    <span>@Model.UpdatedOnStr</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="UpdatedByStr" />
+                </div>
+                <div class="col-md-9">
+                    @if (Model.UpdatedBy.HasValue)
+                    {
+                        @Html.ActionLink(Model.UpdatedByStr, "Edit", "Customer", new { id = Model.UpdatedBy }, new { })
+                    }
+                </div>
+            </div>
+        }
+
+
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $("#@Html.IdFor(model => model.AllowCustomersToSelectPageSize)").click(togglePageSize);
+        togglePageSize();
+    });
+    $("#@Html.IdFor(model => model.LicensedBy)").keyup(function () {
+       AutoTranslate(this, "#@Html.IdFor(model => model.Locales[0].LicensedBy)",false);
+      });
+    function togglePageSize() {
+        if ($('#@Html.IdFor(model => model.AllowCustomersToSelectPageSize)').is(':checked')) {
+            $('#pnlPageSize').hide();
+            $('#pnlPageSizeOptions').show();
+        } else {
+            $('#pnlPageSize').show();
+            $('#pnlPageSizeOptions').hide();
+        }
+    }
+</script>

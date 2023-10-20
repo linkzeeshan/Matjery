@@ -1,0 +1,268 @@
+﻿@model ApplyVendorModel
+@{
+    Layout = "_ColumnsOne";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Vendors.Apply").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-apply-vendor-page");
+}
+<link href="~/lib/kendo/2020.1.406/styles/web/kendo.common.min.css" rel="stylesheet" />
+<div class="page apply-vendor-page">
+    <div class="page-title">
+        <h1>@T("PageTitle.Vendors.Apply")</h1>
+    </div>
+    <div class="page-body">
+        @await Component.InvokeAsync("TopicBlock", new { systemName = "ApplyVendor" })
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ApplyVendorTop })
+        @if (Model.DisableFormInput)
+        {
+            <div class="result">
+                @Model.Result
+            </div>
+        }
+        else
+        {
+            <form asp-route="ApplyVendorAccount" method="post" enctype="multipart/form-data">
+                <div style="text-align:center" asp-validation-summary="ModelOnly" class="message-error"></div>
+                <div class="fieldset">
+                    <div class="form-fields">
+                        <div class="inputs">
+                            <label asp-for="Name" asp-postfix=":"></label>
+                            <input asp-for="Name" class="name" placeholder="@T("Vendors.ApplyAccount.Name.Hint")" />
+                            <nop-required />
+                            <span asp-validation-for="Name"></span>
+                        </div>
+                        <div class="inputs">
+                            <label asp-for="Email" asp-postfix=":"></label>
+                            <input asp-for="Email" class="name" placeholder="@T("Vendors.ApplyAccount.Email.Hint")" />
+                            <nop-required />
+                            <span asp-validation-for="Email"></span>
+                        </div>
+                        <div class="inputs">
+                            <label asp-for="PhoneNumber" asp-postfix=":"></label>
+                            <input asp-for="PhoneNumber" class="name" />
+                            <nop-required />
+                            <span asp-validation-for="PhoneNumber"></span>
+                        </div>
+
+                        <div class="inputs">
+                            <label asp-for="Description" asp-postfix=":"></label>
+                            <textarea asp-for="Description" class="description"></textarea>
+                        </div>
+                        <div class="inputs">
+                            <label asp-for="TradeLicenseNumber" asp-postfix=":"></label>
+                            <nop-editor asp-for="TradeLicenseNumber" />
+                            <span asp-validation-for="TradeLicenseNumber"></span>
+                            <span id="error-tradeLicenseNumber" class="field-validation-error" data-valmsg-for="LastName" data-valmsg-replace="true" />
+                            <span id="error-tradeLicenseNumber-success" class="retrieve-success" data-valmsg-replace="true" />
+                        </div>
+                        <div style="display: flex; padding-left: 170px; padding-right: 170px">
+                            <div class="inputs">
+                                <label asp-for="IssueDate" asp-postfix=":"></label>
+                                <nop-editor asp-for="IssueDate" />
+                                <span asp-validation-for="IssueDate"></span>
+                            </div>
+                            <div class="inputs">
+                                <label asp-for="ExpiryDate" asp-postfix=":"></label>
+                                <nop-editor asp-for="ExpiryDate" />
+                                <span asp-validation-for="ExpiryDate"></span>
+                            </div>
+                        </div>
+                        <div class="inputs" style="font-size:15px">
+                           
+                            <label style="display: inline;">@T("account.vendorinfo.categoryid"):</label>    <nop-required />
+                            <select asp-for="@Model.CategoryId" asp-items="Model.Categories"></select>
+                            <script>
+                                $(document).ready(function () {
+                                   $("#@Html.IdFor(model => model.CategoryId)").kendoMultiSelect({
+                                        select: function (e) {
+                                            var current = this.value();
+
+                                            if (this.dataSource.view()[e.item.index()].value === "0") {
+                                                this.value("");
+                                            }
+                                            else if (current.indexOf("0") !== -1) {
+                                                current = $.grep(current, function (value) {
+                                                    return value !== "0";
+                                                });
+
+                                                this.value(current);
+                                            }
+                                        },
+                                        change: function (e) {
+                                            if (this.value().length === 0)
+                                                this.value(["0"]);
+                                        }
+                                    }).data("kendoMultiSelect");
+                                });
+                            </script>
+                            <span asp-validation-for="CategoryId"></span>
+
+                        </div>
+                        <div class="inputs">
+                            <label asp-for="TradeLicenseFile" asp-postfix=":"></label>
+
+                            <input type="file" id="tradeLicenseFile" name="tradeLicenseFile" accept=".pdf, .doc, .docx,.png,.jpg,.jpeg" />
+                            <label style="font-size: 10px; color: #009ddc">(pdf,doc,docx,png,jpg,jpeg only allowed)   <span id="file-error" style="color:red"></span></label>
+                            @if (!string.IsNullOrEmpty(Model.TradeLicenseFile))
+                            {
+                                <div class="vendor-picture">
+                                    <img src="@(Model.TradeLicenseFile)" alt="TradeFile" />
+                                    <input type="submit" name="remove-picture" class="button-2 remove-picture-button" value="@T("Account.VendorInfo.TradeLicenseFile.Remove")" />
+                                </div>
+                            }
+                        </div>
+
+                        <div class="inputs">
+                            <label asp-for="WhatsApp" asp-postfix=":"></label>
+                            <input asp-for="WhatsApp" class="name" />
+                        </div>
+                        <div class="inputs">
+                            <label asp-for="Instagram" asp-postfix=":"></label>
+                            <input asp-for="Instagram" class="name" />
+                        </div>
+                        <div class="inputs">
+                            <label asp-for="Twitter" asp-postfix=":"></label>
+                            <input asp-for="Twitter" class="name" />
+                        </div>
+                        <div class="inputs">
+                            <label asp-for="Facebook" asp-postfix=":"></label>
+                            <input asp-for="Facebook" class="name" />
+                        </div>
+                        <div class="inputs">
+                            <label asp-for="Googleplus" asp-postfix=":"></label>
+                            <input asp-for="Googleplus" class="name" />
+                        </div>
+                        <div class="inputs">
+                            <label asp-for="EmiratesId" asp-postfix=":"></label>
+                            <input asp-for="EmiratesId" class="name" />
+                        </div>
+                        @if (Model.IsUaePass && !string.IsNullOrEmpty(Model.EmiratesId))
+                        {
+                            @Html.HiddenFor(model => model.EmiratesId)
+                            @*<script>
+                                    $(document).ready(function () {
+
+                                      $("#@Html.FieldIdFor(model => model.EmiratesId)").attr("disabled", true);
+                                    });
+                                </script>*@
+                        }
+
+                        <div class="inputs">
+                            <label>@T("Vendors.ApplyAccount.Picture"):</label>
+                            <input name="uploadedFile" type="file" accept=".png,.jpg,.jpeg" />
+                        </div>
+                        @await Html.PartialAsync("_VendorAttributes", Model.VendorAttributes)
+                        @if (Model.DisplayCaptcha)
+                        {
+                            <nop-captcha />}
+                        @if (Model.TermsOfServiceEnabled)
+                        {
+                            <script asp-location="Footer">
+                                $(document).ready(function() {
+                                    $('#apply-vendor').on('click', function() {
+                                        if ($('#termsofservice').is(':checked')) {
+                                            //do some stuff
+                                            return true;
+                                        } else {
+                                            //just show validation errors, dont post
+                                            alert('@Html.Raw(JavaScriptEncoder.Default.Encode(T("Vendors.ApplyAccount.AcceptTermsOfService.Required").Text))');
+                                            return false;
+                                        }
+                                    });
+                                });
+                            </script>
+                            <div class="terms-of-service">
+                                <input id="termsofservice" type="checkbox" name="termsofservice" />
+                                <label for="termsofservice">@T("Vendors.ApplyAccount.AcceptTermsOfService")</label>
+                                @if (Model.TermsOfServicePopup)
+                                {
+                                    <span class="read" id="read-acceptterms">@T("Vendors.ApplyAccount.AcceptTermsOfService.Read")</span>
+                                    <script asp-location="Footer">
+                                        $(document).ready(function() {
+                                            $('#read-acceptterms').on('click',
+                                                function (e) {
+                                                    displayPopupContentFromUrl(
+                                                        '@Url.RouteUrl("TopicPopup", new {SystemName = "VendorTermsOfService"})',
+                                                        '@T("Vendors.ApplyAccount.AcceptTermsOfService")');
+                                                });
+                                        });
+                                    </script>
+                                }
+                                else
+                                {
+                                    <a class="read" id="read-acceptterms" href="@Url.RouteUrl("Topic", new {SeName = Html.GetTopicSeName("VendorTermsOfService") })">@T("Vendors.ApplyAccount.AcceptTermsOfService.Read")</a>}
+                            </div>}
+                    </div>
+                </div>
+                <div class="buttons">
+                    <input type="submit" id="apply-vendor" name="apply-vendor" class="button-1 apply-vendor-button" value="@T("Vendors.ApplyAccount.Button")" />
+                </div>
+            </form>
+        }
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ApplyVendorBottom })
+    </div>
+</div>
+
+<script asp-location="Footer">
+
+    $(document).ready(function () {
+        $('#@Html.IdFor(mdoel => Model.IssueDate)').prop('readonly', true);
+        $('#@Html.IdFor(mdoel => Model.Email)').prop('readonly', true);
+      //  $('#@Html.IdFor(mdoel => Model.ExpiryDate)').prop('readonly', true);
+        $("#tradeLicenseFile").change(function () {
+            var file = this.files[0];
+            var fileType = file.type;
+            var fileSize = file.size / 1024 / 1024; //size in MB
+
+            //validate file type
+            if (fileType != "image/png" && fileType != "image/jpeg" && fileType != "image/jpg" && fileType != "application/pdf" && fileType != "application/msword" && fileType != "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+                document.getElementById("file-error").innerHTML = "Invalid File Type";
+                $("#tradeLicenseFile").val('');
+                return false;
+            }
+
+            //validate file size
+            if (fileSize > 5) { //10 MB
+                document.getElementById("file-error").innerHTML = "File size should be less than 5 MB.";
+                $("#tradeLicenseFile").val('');
+                return false;
+            }
+
+        });
+    });
+      $(document).ready(function () {
+          $("#@Html.IdFor(model => model.TradeLicenseNumber)").change(function () {
+              debugger;
+                var licenseNumber = $(this).val();
+                var tradeField = $("#@Html.IdFor(model => model.TradeLicenseNumber)");
+                var issueDate= $("#@Html.IdFor(model => model.IssueDate)");
+                var expiryDate = $("#@Html.IdFor(model => model.ExpiryDate)");
+
+
+                $.ajax({
+                    cache: false,
+                    type: "GET",
+                    url: "@(Url.Action("GetTradeLicense", "Vendor"))",
+                    data: {
+                        "licenseNumber": licenseNumber
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        issueDate.val(data.GetLicenseDetailsResponse.IssueDate);
+                        expiryDate.val(data.GetLicenseDetailsResponse.ExpiryDate);
+                        $("#error-tradeLicenseNumber").html("");
+                        $("#error-tradeLicenseNumber-success").html('DED Verified successfully');
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        issueDate.val("");
+                        expiryDate.val("");
+                        $("#error-tradeLicenseNumber").html(jqXHR.responseText);
+                    }
+                });
+            });
+      });
+
+
+</script>

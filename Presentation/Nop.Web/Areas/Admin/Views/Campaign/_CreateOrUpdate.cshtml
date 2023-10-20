@@ -1,0 +1,40 @@
+@model CampaignModel
+@inject AdminAreaSettings adminAreaSettings
+@using Nop.Core;
+@using Nop.Core.Domain.Customers;
+@using Nop.Core.Domain.Messages;
+@using Nop.Services
+
+@{
+    var currentCustomer = EngineContext.Current.Resolve<IWorkContext>().CurrentCustomer;
+    bool isAdmin = Model.IsAdmin;
+}
+@{  
+    const string hideInfoBlockAttributeName = "Campaign.HideInfoBlock";
+    var hideInfoBlock = genericAttributeService.GetAttribute<bool>(workContext.CurrentCustomer, hideInfoBlockAttributeName);
+
+    const string hideProductBlockAttributeName = "Campaign.HideProductBlock";
+    var hideProductBlock = genericAttributeService.GetAttribute<bool>(workContext.CurrentCustomer, hideProductBlockAttributeName, defaultValue: true);
+}
+
+
+    <div asp-validation-summary="All"></div>
+    <input asp-for="Id" type="hidden" />
+
+    <div class="content">
+        <div class="form-horizontal">
+
+            <nop-panels id="campaign-panels">
+                @if (Model.IsAdmin)
+                {
+                    <nop-panel asp-name="campaign-info" asp-icon="fa fa-info" asp-title="@T("Admin.Promotions.Campaigns.Info")" asp-hide-block-attribute-name="@hideInfoBlockAttributeName" asp-hide="@hideInfoBlock" asp-advanced="false">@await Html.PartialAsync("_CreateOrUpdate.Info", Model)</nop-panel>
+                }
+
+                <nop-panel asp-name="campaign-products" asp-icon="fa fa-television" asp-title="@T("Admin.Promotions.Campaigns.Products")" asp-hide-block-attribute-name="@hideProductBlockAttributeName" asp-hide="@hideProductBlock" asp-advanced="false">@await Html.PartialAsync("_CreateOrUpdate.Products", Model)</nop-panel>
+                @* @await Component.InvokeAsync("AdminWidget", new { widgetZone = AdminWidgetZones.CampaignDetailsBottom, additionalData = Model })*@
+            </nop-panels>
+
+
+           
+        </div>
+    </div>

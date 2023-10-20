@@ -1,0 +1,15 @@
+﻿{
+  "Group": "NopAdvance",
+  "FriendlyName": "Cash On Delivery (COD)",
+  "SystemName": "NopAdvance.Plugin.COD",
+  "Version": "1.0",
+  "SupportedVersions": [ "4.30" ],
+  "Author": "NopAdvance team",
+  "DisplayOrder": 1,
+  "FileName": "NopAdvance.Plugin.Payments.COD.dll",
+  "Description": "This payment module allows you to enable NopAdvance \"Cash On Delivery (COD)\" option in your store",
+  "DependsOnSystemNames": [ "NopAdvance.Core" ],
+  "CoreVersion": "1.11",
+  "ProductUrl": "https://store.nopadvance.com/cash-on-delivery-cod-nopcommerce-plugin",
+  "HelpUrl": "https://docs.nopadvance.com/cod-nopcommerce-plugin.html"
+}

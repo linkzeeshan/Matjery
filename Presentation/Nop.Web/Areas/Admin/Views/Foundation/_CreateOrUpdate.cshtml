@@ -1,0 +1,92 @@
+
+<div asp-validation-summary="ModelOnly"></div>
+<input asp-for="Id" type="hidden" />
+
+@using Nop.Web.Areas.Admin.Models.Foundation
+@model FoundationModel
+@using Nop.Core.Domain.Vendors;
+@using Nop.Services.Vendors;
+@using Nop.Services
+@using System.Text;
+@using Nop.Core.Domain.Customers;
+@using Nop.Core;
+@using Nop.Core.Infrastructure;
+@Html.ValidationSummary(false)
+@Html.HiddenFor(model => model.Id)
+@Html.HiddenFor(model => model.Deleted)
+
+<div class="content">
+    <div class="form-horizontal">
+        <div id="foundation-edit" class="nav-tabs-custom">
+            <div class="panel-group">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                     
+                        @(Html.LocalizedEditor<FoundationModel, FoundationLocalizedModel>("Foundation-info-localized",
+
+                @<div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="@Model.Locales[item].Name" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="@Model.Locales[item].Name" />
+                            <span asp-validation-for="@Model.Locales[item].Name"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="@Model.Locales[item].Description" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-textarea asp-for="@Model.Locales[item].Description" />
+                            <span asp-validation-for="@Model.Locales[item].Description"></span>
+                        </div>
+                    </div>
+                   <input type="hidden" asp-for="@Model.Locales[item].LanguageId" />
+                </div>
+    ,
+                @<div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="Name" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="Name" asp-required="true" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="Description" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-textarea asp-for="Description"  asp-required="true" />
+                        </div>
+                    </div>
+                </div>
+
+                ))
+                        <div class="form-group">
+                            <div class="col-md-3">
+                                <nop-label asp-for="PhoneNumber" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="PhoneNumber" asp-required="true" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-3">
+                                <nop-label asp-for="Email" />
+
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="Email" asp-required="true" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,68 @@
+﻿@using Newtonsoft.Json
+@using Nop.Services.Messages
+@{
+        //Get messages from TempData
+        var notes = TempData.ContainsKey(NopMessageDefaults.NotificationListKey)
+            ? JsonConvert.DeserializeObject<IList<NotifyData>>(TempData[NopMessageDefaults.NotificationListKey].ToString())
+            : null;
+        var alertcheck = "";
+        if (notes != null)
+        {
+            foreach (var note in notes)
+            {
+                var cssStyle = "";
+                switch (note.Type)
+                {
+                    case NotifyType.Success:
+                        cssStyle = "alert-success";
+                        break;
+                    case NotifyType.Error:
+                        cssStyle = "alert-danger";
+                        break;
+                    case NotifyType.Warning:
+                        cssStyle = "alert-warning";
+                        break;
+                }
+                alertcheck = cssStyle;
+    <div class="alert @cssStyle alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        @if (cssStyle == "alert-success")
+        { <img src="~/images/not-tick.png"  style="width:30px; height:30px"/>}  
+        <b class="alert-text" @(cssStyle == "alert-success" ? "style=color:#009551" : null)>
+            @if (note.Encode)
+            {
+                <text>
+                    @note.Message
+                </text>
+                @*if (note.Name != null)
+                {
+                    <br />
+                    <span>
+                        <text>
+                            @note.Name
+                        </text>
+                    </span>
+                }*@
+            }
+            else
+            {
+                <text>
+                    @Html.Raw(note.Message)
+                </text>
+                @*if (note.Name != null)
+                {
+                    <br />
+                    <span>
+                        <text>
+                            @note.Name
+                        </text>
+                    </span>
+                    
+                }*@
+            }
+        </b>
+    </div>
+           
+            }
+        }
+    }

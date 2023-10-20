@@ -1,0 +1,78 @@
+﻿@model Nop.Plugin.NopWarehouse.VendorReview.Models.ConfigurationModel
+
+@using Nop.Web.Framework;
+@{
+    Layout = null;
+}
+
+@Html.ActionLink("StoreScopeConfiguration", "Setting", new { area = "Admin" })
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="panel-group">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <div class="col-md-3">
+                       @* @Html.OverrideStoreCheckboxFor(model => model.WidgetZone_VendorReviews_OverrideForStore, model => model.VendorReviewsWidgetZone, Model.ActiveStoreScopeConfiguration)*@
+                        @*@Html.NopLabelFor(model => model.VendorReviewsWidgetZone)*@
+                        <nop-label asp-for="VendorReviewsWidgetZone" />
+                    </div>
+                    <div class="col-md-9">
+                        @Html.DropDownListFor(model => model.VendorReviewsWidgetZone, Model.AvailableWidgetZone_VendorReviews)
+                        @Html.ValidationMessageFor(model => model.VendorReviewsWidgetZone)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                        @*@Html.OverrideStoreCheckboxFor(model => model.DefaultVendorRatingValue_OverrideForStore, model => model.DefaultVendorRatingValue, Model.ActiveStoreScopeConfiguration)*@
+                      
+                        <nop-label asp-for="DefaultVendorRatingValue" />
+
+                    </div>
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.DefaultVendorRatingValue)
+                        @Html.ValidationMessageFor(model => model.DefaultVendorRatingValue)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                       @* @Html.OverrideStoreCheckboxFor(model => model.AllowAnonymousUsersToReviewVendor_OverrideForStore, model => model.AllowAnonymousUsersToReviewVendor, Model.ActiveStoreScopeConfiguration)*@
+                       
+                        <nop-label asp-for="AllowAnonymousUsersToReviewVendor" />
+                    </div>
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.AllowAnonymousUsersToReviewVendor)
+                        @Html.ValidationMessageFor(model => model.AllowAnonymousUsersToReviewVendor)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-3">
+                       @* @Html.OverrideStoreCheckboxFor(model => model.VendorReviewsMustBeApproved_OverrideForStore, model => model.VendorReviewsMustBeApproved, Model.ActiveStoreScopeConfiguration)*@
+                      
+                        <nop-label asp-for="VendorReviewsMustBeApproved" />
+
+                    </div>
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.VendorReviewsMustBeApproved)
+                        @Html.ValidationMessageFor(model => model.VendorReviewsMustBeApproved)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <div class="col-md-3">
+                        &nbsp;
+                    </div>
+                    <div class="col-md-9">
+                        <input type="submit" name="save" class="btn bg-blue" value="@T("Admin.Common.Save")" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

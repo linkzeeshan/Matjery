@@ -1,0 +1,444 @@
+﻿@using Nop.Core
+@using Nop.Core.Infrastructure
+@using Nop.Services.Configuration
+@using Nop.Web.Models.Catalog;
+@using Nop.Web.Extensions;
+@model Nop.Web.Models.Catalog.SearchModel
+
+@{
+    Layout = "_ColumnsTwo";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Search").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-search-page");
+
+    var currentStoreId = EngineContext.Current.Resolve<IStoreContext>().CurrentStore.Id;
+
+    var isOneColumn = EngineContext.Current.Resolve<ISettingService>().GetSettingByKey("urbanthemesettings.iscategorypageonecolumn", false, currentStoreId, true);
+
+    var searchTooltip = T("Search.SearchBox.Tooltip");
+}
+
+<style>
+    .forcheckbox {
+        text-transform: uppercase !important;
+    }
+
+    .searchType {
+        font-size: 14px;
+        text-transform: uppercase;
+        color: #606060;
+        padding: 5px 15px 5px 5px;
+    }
+</style>
+<script asp-location="Footer">
+    $(document).ready(function () {
+        $("#@Html.IdFor(model => model.adv)").attr("checked", true);
+
+        $('input[type=radio][name=searchType]').change(function () {
+            if (this.value == 'P') {
+                $('.form_p').css('display', 'block');
+                $('#search_box_store').css('display', 'none');
+            }
+            else if (this.value == 'S') {
+                $('.form_p').css('display', 'none');
+                $('#search_box_store').css('display', 'block');
+            }
+        });
+
+        var urlParams = new URLSearchParams(window.location.search);
+        var st = urlParams.get('searchType');
+        if (st == 'S') {
+            $('.form_p').css('display', 'none');
+            $('#search_box_store').css('display', 'block');
+        }
+    });
+</script>
+<div class="page search-page">
+    <div class="page-title">
+        <h1>@T("Search")</h1>
+    </div>
+    <div class="page-body">
+        <div class="search-input">
+            @using (Html.BeginRouteForm("ProductSearchNew", FormMethod.Get))
+            {
+                <div class="fieldset">
+                    <div class="form-fields">
+                        <div class="advanced-search">
+                            <div class="inputs">
+                                <label>@T("Common.Search"):</label>
+                                <div class="searchType">
+                                    <span class="product">
+                                        @Html.RadioButton("searchType", "P", true, new { id = "searchType-product" })
+                                        <label class="forcheckbox" for="searchType-product">@T("Admin.Catalog.Categories.Products.Fields.Product")</label>
+                                    </span>
+                                    <span class="store">
+                                        @Html.RadioButton("searchType", "S", false, new { id = "searchType-store" })
+                                        <label class="forcheckbox" for="searchType-store">@T("Admin.Catalog.Categories.List.SearchStore")</label>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="inputs form_p" id="search_box_product">
+                       
+                                <label asp-for="q">@T("Search.SearchTerm"):</label>
+                                @Html.TextBoxFor(model => model.q, new { @class = "search-text", id = "small-searchterms1" })
+
+                            </div>
+
+                            <div class="inputs" id="search_box_store" style="display:none;">
+                                <label asp-for="q">@T("Search.SearchTerm"):</label>
+                                @*<label asp-for="q">@T("admin.catalog.products.list.searchcategory"):</label>*@
+                                @Html.TextBoxFor(model => model.qs, new { @class = "search-text", id = "small-searchterms2" })
+                            </div>
+
+                            @if (Model.AvailableCategories.Count > 0)
+                            {
+                        <div class="inputs form_p">
+                            <label asp-for="cid">@T("admin.catalog.products.list.searchcategory"):</label>
+                       
+                            @Html.DropDownListFor(model => model.cid, Model.AvailableCategories)
+                        </div>
+                                <div class="inputs reversed form_p">
+                                    @Html.CheckBoxFor(model => model.isc)
+                                    @Html.LabelFor(model => model.isc)
+                                </div>
+                            }
+                            @if (Model.asv && Model.AvailableVendors.Count > 0)
+                            {
+                        <div class="inputs form_p">
+                     
+                            <label asp-for="vid">@T("Search.Vendor"):</label>
+                            @Html.DropDownListFor(model => model.vid, Model.AvailableVendors)
+                        </div>
+                            }
+                            <div class="inputs form_p">
+                                <label>@T("Search.PriceRange"):</label>
+                                <span class="price-range">
+                                    @T("Search.PriceRange.From")
+                                    @Html.TextBoxFor(model => model.pf, new { @class = "price-from", @type = "number", style = "height: 35px;color:#898989;border:1px solid #c2c2c2;margin-left:0px;" })
+                                    @T("Search.PriceRange.To")
+                                    @Html.TextBoxFor(model => model.pt, new { @class = "price-to", @type = "number", style = "height: 35px;color:#898989;border:1px solid #c2c2c2;margin-left:10px;" })
+                                </span>
+                            </div>
+                            <div class="inputs reversed form_p">
+                                @Html.CheckBoxFor(model => model.sid)
+                                @Html.LabelFor(model => model.sid)
+                            </div>
+
+                            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductSearchPageAdvanced })
+                        </div>
+                        <div class="buttons">
+                            <input type="submit" class="button-1 search-button" value="@T("Search.Button")" />
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+
+        @if (isOneColumn)
+        {
+            @await Component.InvokeAsync("Widget", new { widgetZone = "urban_theme_ajax_filters" })
+
+        }
+
+        @if (Model.Products.Count > 0)
+        {
+            @await Html.PartialAsync("_CatalogSelectors", Model.PagingFilteringContext)
+
+        }
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductSearchPageBeforeResults })
+
+        <div class="search-results">
+            @if (!String.IsNullOrEmpty(Model.Warning))
+            {
+                <div class="warning">
+                    @Model.Warning
+                </div>
+            }
+            @if (Model.NoResults)
+            {
+                decimal? minPriceConverted = null;
+                decimal? maxPriceConverted = null;
+
+                if (!string.IsNullOrEmpty(Model.pf))
+                {
+                    minPriceConverted = decimal.Parse(Model.pf);
+                }
+                if (!string.IsNullOrEmpty(Model.pt))
+                {
+                    maxPriceConverted = decimal.Parse(Model.pt);
+                }
+
+                if (minPriceConverted > maxPriceConverted)
+                {
+                    <div class="no-result">
+                        @T("Search.PriceRange.Error")
+                    </div>
+                }
+                else
+                {
+                    <div class="no-result">
+                        @T("Search.NoResultsText")
+                    </div>
+                }
+
+            }
+
+            @if (Model.Products.Count > 0)
+            {
+                if (Model.PagingFilteringContext.ViewMode == "list")
+                {
+                    @*list mode*@
+                    <div class="product-list">
+                        <div class="item-grid">
+                            @foreach (var product in Model.Products)
+                            {
+                                <div class="item-box">
+                                    @await Html.PartialAsync("_ProductBox", product)
+
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    @*grid mode*@
+                    <div class="product-grid">
+                        <div class="item-grid">
+                            @foreach (var product in Model.Products)
+                            {
+                                <div class="item-box">
+                                    @await Html.PartialAsync("_ProductBox", product)
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            @{
+                var pager = Html.Pager(Model.PagingFilteringContext).QueryParam("pagenumber").BooleanParameterName("adv").BooleanParameterName("isc").BooleanParameterName("sid").RenderEmptyParameters(true);
+            }
+            @if (!pager.IsEmpty())
+            {
+                <div class="pager">
+                    @pager
+                </div>
+            }
+
+            @*Vendor search results*@
+            @{
+                if (Model.SearchedVendors.Count > 0)
+                {
+                    <div class="vendor-grid">
+                        <div class="item-grid">
+                            @foreach (var item in Model.SearchedVendors)
+                            {
+                                <div class="item-box">
+                                    <div class="vendor-item">
+                                        <h2 class="title">
+                                            <a href="@Url.RouteUrl("Vendor", new { SeName = item.SeName })" title="@item.PictureModel.Title">
+                                                @item.Name
+                                            </a>
+                                        </h2>
+                                        <div class="picture">
+                                            <a href="@Url.RouteUrl("Vendor", new { SeName = item.SeName })" title="@item.PictureModel.Title">
+                                                <img alt="@item.PictureModel.AlternateText" src="@item.PictureModel.ImageUrl" title="@item.PictureModel.Title" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    var pager_stores = Html.Pager(Model.PagingFilteringContext).QueryParam("pagenumber");
+
+                    <div class="pager">
+                        @pager_stores
+                    </div>
+                }
+            }
+        </div>
+        @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.ProductSearchPageAfterResults })
+    </div>
+</div>
+
+<div class="search-box-wrapper" style="display:block;">
+    <div class="search-box store-search-box" id="sb1">
+        @using (Html.BeginRouteForm("ProductSearch", FormMethod.Get, new { onsubmit = "return check_small_search_form()" }))
+        {
+            @*<input type="text" class="search-box-text" id="small-searchterms1" autocomplete="off" value="@searchTooltip" name="q" />*@
+            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.SearchBoxBeforeSearchButton })
+
+            <script type="text/javascript">
+        $(document).ready(function() {
+            $("#small-searchterms1").focus(function() {
+                if (this.value == '@T("Search.SearchBox.Tooltip")') {
+                    this.value = '';
+                }
+            });
+
+            $("#small-searchterms1").blur(function() {
+                if (this.value == '') {
+                    this.value = '@searchTooltip';
+                }
+            });
+            if (sevenSpikes.getViewPort().width >= 1000) {
+                instantSearchCustomWrapper();
+            }
+        });
+
+        function check_small_search_form() {
+            var search_terms = $("#small-searchterms1");
+            if (search_terms.val() == "" || search_terms.val() == "@searchTooltip") {
+                alert('@T("Search.EnterSearchTerms").Text');
+                search_terms.focus();
+                return false;
+            }
+            return true;
+        }
+
+        //custom select
+            function instantSearchCustomWrapper() {
+
+                var customSelectElements = $('#sb1 select');
+
+                customSelectElements.each(function () {
+                    $(this).wrap('<div class="custom-select" />');
+                    $('<div class="custom-select-text" />').prependTo($(this).parent('.custom-select'));
+                    $(this).siblings('.custom-select-text').text($(this).children('option:selected').text());
+                }).change(function () {
+                    $(this).siblings('.custom-select-text').text($(this).children('option:selected').text());
+                });
+            }
+
+
+            </script>
+
+            //if (Model.AutoCompleteEnabled)
+            //{
+            <text>
+                <script type="text/javascript">
+                $(document).ready(function() {
+                    $('#small-searchterms1').autocomplete({
+                            delay: 500,
+                            minLength: @(Model.SearchTermMinimumLength.ToString()),
+                            source: '@(Url.RouteUrl("ProductSearchAutoComplete"))',
+                            appendTo: '#sb1',
+                            select: function(event, ui) {
+                                $("#small-searchterms1").val(ui.item.label);
+                                setLocation(ui.item.producturl);
+                                return false;
+                            }
+                        })
+                        .data("ui-autocomplete")._renderItem = function(ul, item) {
+                            var t = item.label;
+                            //html encode
+                            t = htmlEncode(t);
+                            return $("<li style='align:-webkit-match-parent;'></li>")
+                                .data("item.autocomplete", item)
+                                .append("<a>@(true ? Html.Raw("<img src='\" + item.productpictureurl + \"' style='display:block;'>") : null)<span style='position:relative;top:-80px;color:black;'>" + t + "</span></a>")
+                            .appendTo(ul);
+            };
+        });
+                </script>
+            </text>
+            //}
+            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.SearchBox })
+          
+
+        }
+    </div>
+</div>
+
+<div class="search-box-wrapper" style="display:block;">
+    <div class="search-box store-search-box" id="sb2">
+        @using (Html.BeginRouteForm("ProductSearch", FormMethod.Get, new { onsubmit = "return check_small_search_form()" }))
+        {
+            @*<input type="text" class="search-box-text" id="small-searchterms1" autocomplete="off" value="@searchTooltip" name="q" />*@
+
+            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.SearchBoxBeforeSearchButton })
+            <script type="text/javascript">
+        $(document).ready(function() {
+            $("#small-searchterms2").focus(function() {
+                if (this.value == '@T("Search.SearchBox.Tooltip")') {
+                    this.value = '';
+                }
+            });
+
+            $("#small-searchterms2").blur(function() {
+                if (this.value == '') {
+                    this.value = '@searchTooltip';
+                }
+            });
+            if (sevenSpikes.getViewPort().width >= 1000) {
+                instantSearchCustomWrapper();
+            }
+        });
+
+        function check_small_search_form() {
+            var search_terms = $("#small-searchterms2");
+            if (search_terms.val() == "" || search_terms.val() == "@searchTooltip") {
+                alert('@T("Search.EnterSearchTerms").Text');
+                search_terms.focus();
+                return false;
+            }
+            return true;
+        }
+
+        //custom select
+            function instantSearchCustomWrapper() {
+
+                var customSelectElements = $('#sb2 select');
+
+                customSelectElements.each(function () {
+                    $(this).wrap('<div class="custom-select" />');
+                    $('<div class="custom-select-text" />').prependTo($(this).parent('.custom-select'));
+                    $(this).siblings('.custom-select-text').text($(this).children('option:selected').text());
+                }).change(function () {
+                    $(this).siblings('.custom-select-text').text($(this).children('option:selected').text());
+                });
+            }
+
+
+            </script>
+
+            //if (Model.AutoCompleteEnabled)
+            //{
+            <text>
+                <script type="text/javascript">
+                $(document).ready(function() {
+                    $('#small-searchterms2').autocomplete({
+                            delay: 500,
+                            minLength: @(Model.SearchTermMinimumLength.ToString()),
+                            source: '@(Url.RouteUrl("VendorSearchAutoComplete"))',
+                            appendTo: '#sb1',
+                            select: function(event, ui) {
+                                $("#small-searchterms2").val(ui.item.Name);
+                                setLocation(ui.item.VendorUrl);
+                                return false;
+                            }
+                        })
+                        .data("ui-autocomplete")._renderItem = function(ul, item) {
+                            debugger;
+                            var t = item.Name;
+                            //html encode
+                            t = htmlEncode(t);
+                            return $("<li></li>")
+                                .data("item.autocomplete", item)
+                                .append("<a>@(true ? Html.Raw("<img src='\" + item.PictureModel.ImageUrl + \"' style='display:block;'>") : null)<span style='position:relative;top:-60px;color:black;'>" + t + "</span></a>")
+                            .appendTo(ul);
+            };
+        });
+                </script>
+            </text>
+            //}
+            @await Component.InvokeAsync("Widget", new { widgetZone = PublicWidgetZones.SearchBox })
+          
+        }
+    </div>
+</div>

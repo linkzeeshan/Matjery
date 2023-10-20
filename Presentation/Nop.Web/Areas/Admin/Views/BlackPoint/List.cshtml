@@ -1,0 +1,224 @@
+﻿@using Nop.Web.Areas.Admin.Models.BlackPoint
+@using Nop.Services.Customers;
+@using Nop.Core.Domain.Customers;
+@model BlackPointSearchModel
+
+@inject IWorkContext workContext
+@{
+    //page title
+    ViewBag.Title = T("Admin.Promotions.BlackPoint").Text;
+
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Black Point");
+}
+@{
+    const string hideSearchBlockAttributeName = "CategoryPage.HideSearchBlock";
+    var hideSearchBlock = genericAttributeService.GetAttribute<bool>(workContext.CurrentCustomer, hideSearchBlockAttributeName);
+    var _workContext = EngineContext.Current.Resolve<IWorkContext>();
+    var _customerService = EngineContext.Current.Resolve<ICustomerService>();
+}
+@if (Model.IsAdmin)
+{
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @T("Admin.Promotions.BlackPoint")
+        </h1>
+    </div>
+}
+<div class="content">
+    <div class="form-horizontal">
+        <div class="panel-group">
+            <div class="panel panel-default panel-search">
+                <div class="panel-body">
+                    <div class="row search-row @(!hideSearchBlock ? "opened" : "")" data-hideAttribute="@hideSearchBlockAttributeName">
+                        <div class="search-text">@T("Admin.Common.Search")</div>
+                        <div class="icon-search"><i class="fa fa-search" aria-hidden="true"></i></div>
+                        <div class="icon-collapse"><i class="fa fa-angle-down" aria-hidden="true"></i></div>
+                    </div>
+
+                    <div class="search-body @(hideSearchBlock ? "closed" : "")">
+                        @if (!_customerService.IsAdmin(_workContext.CurrentCustomer))
+                        {
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="col-md-4">
+                                        <nop-label asp-for="AddedBy" />
+                                    </div>
+                                    <div class="col-md-8">
+                                        <nop-editor asp-for="AddedBy" asp-items="Model.AddedBy" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-8 col-md-offset-4">
+                                    <button type="button" id="search-blackpoints" class="btn btn-primary btn-search"><i class="fa fa-search"></i>@T("Admin.Common.Search")</button>
+                                </div>
+                            </div>
+                        </div>
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="col-md-4">
+                                            <nop-label asp-for="BlackPointType" />
+                                        </div>
+                                        <div class="col-md-8">
+                                            <nop-select asp-for="BlackPointType" asp-items="Model.AvailablePointType" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-4">
+                                            <nop-label asp-for="BlackPointStatus" />
+                                        </div>
+                                        <div class="col-md-8">
+                                            <nop-select asp-for="BlackPointStatus" asp-items="Model.AvailablePointStatus" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-8 col-md-offset-4">
+                                            <button type="button" id="search-blackpoints" class="btn btn-primary btn-search"><i class="fa fa-search"></i>@T("Admin.Common.Search")</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="col-md-4">
+                                            <nop-label asp-for="Name" />
+                                        </div>
+                                        <div class="col-md-8">
+                                            <nop-editor asp-for="Name" asp-items="Model.Name" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+
+                        @if (!_customerService.IsAdmin(_workContext.CurrentCustomer))
+                        {
+                            @await Html.PartialAsync("Table", new DataTablesModel
+                       {
+                           Name = "blackpoints-grid",
+                           UrlRead = new DataUrl("List", "BlackPoint", null),
+                           SearchButtonId = "search-blackpoints",
+                           Length = Model.PageSize,
+                           LengthMenu = Model.AvailablePageSizes,
+                           Filters = new List<FilterParameter>
+                                                     {
+                                                 //new FilterParameter(nameof(Model.BlackPointType)),
+                                                 //new FilterParameter(nameof(Model.BlackPointStatus)),
+                                                 new FilterParameter(nameof(BlackPointModel.AddedBy))
+                                             },
+                           ColumnCollection = new List<ColumnProperty>
+                                             {
+                                                 new ColumnProperty(nameof(BlackPointModel.Id))
+                                                 {
+                                                     Title = T("Admin.Promotions.BlackPoint.Fields.Id").Text,
+                                                 },
+                                                 new ColumnProperty(nameof(BlackPointModel.AddedBy))
+                                                 {
+                                                     Title = T("Admin.Promotions.BlackPoint.Fields.Customer").Text
+                                                 },
+                                                 new ColumnProperty(nameof(BlackPointModel.CreatedOn))
+                                                 {
+                                                     Title = T("Admin.Promotions.BlackPoint.Fields.CreatedOn").Text
+                                                 },
+                                                 new ColumnProperty(nameof(BlackPointModel.Comment))
+                                                 {
+                                                     Title = T("admin.promotions.blackpoint.fields.comment").Text
+                                                 },
+                                                 new ColumnProperty(nameof(BlackPointModel.OrderId))
+                                                 {
+                                                  Title = T("Admin.Orders.Fields.Order").Text,
+                                                  Width = "50",
+                                                  ClassName = NopColumnClassDefaults.Button,
+                                                  Render = new RenderButtonView(new DataUrl("~/Admin/Order/Edit"))
+                                                 }
+                                             }
+                       })
+                        }
+                        else
+                        {
+                            @await Html.PartialAsync("Table", new DataTablesModel
+                                     {
+                                         Name = "blackpoints-grid",
+                                         UrlRead = new DataUrl("List", "BlackPoint", null),
+                                         SearchButtonId = "search-blackpoints",
+                                         Length = Model.PageSize,
+                                         LengthMenu = Model.AvailablePageSizes,
+                                         Filters = new List<FilterParameter>
+                                                 {
+                                             new FilterParameter(nameof(Model.BlackPointType)),
+                                             new FilterParameter(nameof(Model.BlackPointStatus)),
+                                             new FilterParameter(nameof(Model.Name))
+                                         },
+                                         ColumnCollection = new List<ColumnProperty>
+                                         {
+                                             new ColumnProperty(nameof(BlackPointModel.Id))
+                                             {
+                                                 Title = T("Admin.Promotions.BlackPoint.Fields.Id").Text,
+                                             },
+                                             new ColumnProperty(nameof(BlackPointModel.AddedBy))
+                                             {
+                                                 Title = T("Admin.Promotions.BlackPoint.Fields.Customer").Text
+                                             },
+                                             new ColumnProperty(nameof(BlackPointModel.BlackPointType))
+                                             {
+                                                 Title = T("Admin.Promotions.BlackPoint.Fields.BlackPointType").Text
+                                             },
+                                             new ColumnProperty(nameof(BlackPointModel.PointStatus))
+                                             {
+                                                 Title = T("Admin.Promotions.BlackPoint.Fields.BlackPointStatus").Text,
+                                                 Render = new RenderCustom("renderColumnPointStatus")
+                                             },
+                                             new ColumnProperty(nameof(BlackPointModel.AddedOn))
+                                             {
+                                                 Title = T("Admin.Promotions.BlackPoint.Fields.Vendor").Text
+                                             },
+                                             new ColumnProperty(nameof(BlackPointModel.CreatedOn))
+                                             {
+                                                 Title = T("Admin.Promotions.BlackPoint.Fields.CreatedOn").Text
+                                             },
+                                             new ColumnProperty(nameof(CategoryModel.Id))
+                                             {
+                                                 Title = T("Admin.Common.Edit").Text,
+                                                 Width = "100",
+                                                 ClassName =  NopColumnClassDefaults.Button,
+                                                 Render = new RenderButtonEdit(new DataUrl("Edit"))
+                                             }
+                                         }
+                                     })
+                        }
+                        <script>
+                            function renderColumnPointStatus(data, type, row, meta) {
+                                var color;
+                                switch (row.PointStatusId) {
+                                    case 1:
+                                        color = 'yellow';
+                                        break;
+                                    case 2:
+                                        color = 'green';
+                                        break;
+                                    case 3:
+                                        color = 'red';
+                                        break;
+                                }
+                                return '<span class="grid-report-item ' + color + '">' + data + '</span >';
+                            }
+                        </script>
+                        <nop-alert asp-alert-id="deleteSelectedFailed" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

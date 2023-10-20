@@ -1,0 +1,91 @@
+﻿
+
+@using Nop.Web.Models.Catalog
+
+@model IList<CategoryModel>
+
+@if (Model.Count > 0)
+{
+    var homePageCategoriesCss = string.Empty;
+    var homePageCategoriesBanner1 = await Component.InvokeAsync("Widget", new { widgetZone = "home_page_categories_banner1" });
+    var homePageCategoriesBanner2 = await Component.InvokeAsync("Widget", new { widgetZone = "home_page_categories_banner2" });
+    var firstRow = Model.Take(3);
+    var secondRow = Model.Skip(3);
+
+
+    if (!String.IsNullOrEmpty(homePageCategoriesBanner1.ToHtmlString()) || !String.IsNullOrEmpty(homePageCategoriesBanner2.ToHtmlString()))
+    {
+        homePageCategoriesCss = "banner-included";
+    }
+
+    <div class="home-page-category-grid @homePageCategoriesCss">
+        <div class="item-grid">
+            @{
+                var counter = 0;
+            }
+            <div class="grid">
+                <div class="grid-item-row grid-item-row-first">
+                    @foreach (var item in firstRow)
+                    {
+                        counter++;
+                        {ItemBoxPrinter(item, counter); }
+
+                    }
+                    <div class="grid-item">
+                        @await Component.InvokeAsync("TopicBlock", new { systemName = "HomePageBanner1" })
+                
+                    </div>
+                </div>
+                <div class="grid-item-row grid-item-row-second">
+                    @foreach (var item in secondRow)
+                    {
+                        counter++;
+                        {ItemBoxPrinter(item, counter); }
+             
+
+                    }
+                    <div class="grid-item">
+                        @await Component.InvokeAsync("TopicBlock", new { systemName = "HomePageBanner2" })
+
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                $(function () {
+                    setTimeout(function () {
+                        $('.grid-item-row-first').masonry({
+                            // options
+                            itemSelector: '.grid-item',
+                            columnWidth: 1,
+                        });
+                        $('.grid-item-row-second').masonry({
+                            // options
+                            itemSelector: '.grid-item',
+                            columnWidth: 1,
+                            
+                            originLeft: false
+                        });
+                    }, 100);
+                });
+            </script>
+        </div>
+    </div>
+}
+@{
+    void ItemBoxPrinter(CategoryModel item, int counter)
+    {
+        var titleType = item.Name.Length > 6 ? "big-title" : "small-title";
+        var evenOrOdd = item.Name.Length % 2 == 0 ? "even" : "odd";
+
+        <div class="grid-item">
+            <a href="@Url.RouteUrl("Category", new { SeName = item.SeName })" title="@item.PictureModel.Title">
+                <img alt="@item.PictureModel.AlternateText" src="@item.PictureModel.ImageUrl" title="@item.PictureModel.Title" />
+            </a>
+            <div class="grid-item-heading">
+                <a href="@Url.RouteUrl("Category", new { SeName = item.SeName })" title="@item.PictureModel.Title">
+                    <h1>@item.Name</h1>
+                </a>
+            </div>
+        </div>
+    }
+}

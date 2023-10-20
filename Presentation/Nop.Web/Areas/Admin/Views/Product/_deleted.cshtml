@@ -1,0 +1,67 @@
+﻿@model ProductSearchModel
+
+@using Nop.Core.Domain.Common
+
+
+
+
+<div class="content">
+    <div class="form-horizontal">
+        <div class="panel-group">
+
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    @await Html.PartialAsync("Table", new DataTablesModel
+                    {
+                        Name = "deleted-grid",
+                        UrlRead = new DataUrl("deletedProductList", "Product", null),
+                        Length = Model.PageSize,
+                        LengthMenu = Model.AvailablePageSizes,
+                        ColumnCollection = new List<ColumnProperty>
+                        {
+                            new ColumnProperty(nameof(ProductModel.PictureThumbnailUrl))
+                            {
+                            Title = T("Admin.Catalog.Products.Fields.PictureThumbnailUrl").Text,
+                            Width = "100",
+                            Render = new RenderPicture()
+                            },
+                            new ColumnProperty(nameof(ProductModel.Name))
+                            {
+                                Title = T("Admin.Catalog.Products.Fields.Name").Text,
+                                Width = "300"
+                            },
+                            new ColumnProperty(nameof(ProductModel.Sku))
+                            {
+                                Title = T("Admin.Catalog.Products.Fields.Sku").Text,
+                                Width = "300"
+                            },
+                            new ColumnProperty(nameof(ProductModel.Price))
+                            {
+                                Title = T("Admin.Catalog.Products.Fields.Price").Text,
+                                Width = "150"
+                            },
+                            new ColumnProperty(nameof(ProductModel.StockQuantity))
+                            {
+                                Title = T("Admin.Catalog.Products.Fields.StockQuantity").Text,
+                                Width = "150"
+                            },
+                            new ColumnProperty(nameof(ProductModel.CreatedOn))
+                            {
+                                Title = T("admin.catalog.productreviews.fields.createdon").Text,
+                                Width = "150"
+                            }
+                            ,
+                            new ColumnProperty(nameof(ProductModel.Id))
+                            {
+                                  Title = T("Admin.Common.View").Text,
+                                Width = "50",
+                                ClassName =  NopColumnClassDefaults.Button,
+                                Render = new RenderButtonView(new DataUrl("Edit"))
+                            }
+                        }
+                    })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

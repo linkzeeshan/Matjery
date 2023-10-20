@@ -1,0 +1,99 @@
+﻿@using Nop.Web.Areas.Admin.Models.BlackPoint
+@using Nop.Core.Domain.BlackPoints
+@model BlackPointModel
+@Html.ValidationSummary(false)
+<input asp-for="Id" type="hidden" />
+<input asp-for="OrderId" type="hidden" />
+
+
+<div class="panel-group">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="BlackPointCount" />
+                </div>
+                <div class="col-md-9">
+                    <div class="form-text-row">@Model.BlackPointCount</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="PointStatus" />
+                </div>
+                <div class="col-md-9">
+                    <div class="input-group input-group-short">
+                        <div class="input-group-text">
+                            <div class="form-text-row"><strong>@Model.PointStatus </strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="BlackPointType" />
+                </div>
+                <div class="col-md-9">
+                    <div class="form-text-row">@Model.BlackPointType</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="AddedBy" />
+                </div>
+                <div class="col-md-9">
+                    <div class="form-text-row">@Model.AddedBy</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="AddedOn" />
+                </div>
+                <div class="col-md-9">
+                    <div class="form-text-row">@Model.AddedOn</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="Comment" />
+                </div>
+                <div class="col-md-9">
+                    <div class="form-text-row">@Model.Comment</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="PointStatus" />
+                </div>
+                <div class="col-md-9">
+
+                    @Html.DropDownListFor(model => model.PointStatusId, ((BlackPointStatusEnum)Model.PointStatusId).ToSelectList(), new { @class = "form-control" })
+
+                    @*<select id="drpEmpList" class="form-control" asp-for="EmployeeId" asp-items="@(new SelectList((IEnumerable<SelectListItem>)ViewBag.PriorityID, "Value", "Text"))">
+                            <option value="">--Select--</option>
+                        </select>*@
+
+                    @Html.ValidationMessageFor(model => model.PointStatusId)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="Note" />
+                </div>
+                <div class="col-md-9">
+
+                    <nop-editor asp-for="Note" asp-template="RichEditor" />
+                    @Html.ValidationMessageFor(model => model.Note)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
